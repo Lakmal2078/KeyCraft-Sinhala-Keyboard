@@ -324,9 +324,11 @@ public class ThemeTest
       counts.put(category, counts.get(category) + 1);
     }
     assertEquals(2, (int) counts.get(ThemePicker.ThemeCategory.SYSTEM));
-    assertEquals(11, (int) counts.get(ThemePicker.ThemeCategory.DARK));
     assertEquals(3, (int) counts.get(ThemePicker.ThemeCategory.LIGHT));
-    assertEquals(2, (int) counts.get(ThemePicker.ThemeCategory.VIBRANT));
+    assertEquals(4, (int) counts.get(ThemePicker.ThemeCategory.DARK));
+    assertEquals(1, (int) counts.get(ThemePicker.ThemeCategory.HIGH_CONTRAST));
+    assertEquals(2, (int) counts.get(ThemePicker.ThemeCategory.SRI_LANKA));
+    assertEquals(6, (int) counts.get(ThemePicker.ThemeCategory.TERMINAL));
     assertNull(ThemePicker.categoryOf(null));
     assertNull(ThemePicker.categoryOf("removed_theme"));
   }

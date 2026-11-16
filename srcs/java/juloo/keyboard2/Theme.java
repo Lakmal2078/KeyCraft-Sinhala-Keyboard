@@ -151,11 +151,10 @@ public class Theme
     return _key_font;
   }
 
-  /** Compute the key-corner radius for the selected style. */
   static float computeKeyBorderRadius(String shape, float keyWidth,
       float themeRadius, boolean customBorderEnabled, float customRadius)
   {
-    if (customBorderEnabled)
+    if (customBorderEnabled && customRadius > 0f)
       return customRadius * keyWidth;
     if ("square".equals(shape))
       return 0f;
@@ -165,7 +164,7 @@ public class Theme
       return keyWidth * 0.28f;
     if ("pill".equals(shape))
       return keyWidth * 0.5f;
-    return themeRadius;
+    return themeRadius > 0f ? themeRadius : keyWidth * 0.16f;
   }
 
   public static final class Computed
@@ -289,7 +288,8 @@ public class Theme
             default:
               int normalKeyColor = config.custom_colors_enabled ? computeKeyColor(config.custom_bg_color, theme.colorKey) : theme.colorKey;
               bg_paint.setColor(normalKeyColor);
-              border_width = config.borderConfig ? config.customBorderLineWidth : theme.keyBorderWidth;
+              float defaultBw = Math.max(1.5f, theme.keyBorderWidth > 0 ? theme.keyBorderWidth : 1.5f);
+              border_width = config.borderConfig ? (config.customBorderLineWidth > 0 ? config.customBorderLineWidth : defaultBw) : theme.keyBorderWidth;
               break;
           }
           bg_paint.setAlpha(config.keyOpacity);
@@ -299,11 +299,16 @@ public class Theme
         {
           int bg = config.custom_bg_color;
           boolean isDark = ((0.299 * ((bg >> 16) & 0xFF) + 0.587 * ((bg >> 8) & 0xFF) + 0.114 * (bg & 0xFF)) / 255.0) < 0.5;
-          bColor = blend(config.custom_bg_color, isDark ? 0xFFFFFFFF : 0xFF000000, 0.08f);
+          bColor = blend(config.custom_bg_color, isDark ? 0xFFFFFFFF : 0xFF000000, 0.18f);
         }
         else
         {
           bColor = theme.keyBorderColorLeft;
+          if (bColor == 0 || (bColor & 0xFF000000) == 0)
+          {
+            boolean isDark = getContrastColor(theme.colorKey) == 0xFFFFFFFF;
+            bColor = isDark ? 0x33FFFFFF : 0x22000000;
+          }
         }
         border_left_paint = init_border_paint(config, border_width, bColor);
         border_top_paint = init_border_paint(config, border_width, bColor);

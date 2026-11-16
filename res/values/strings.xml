@@ -279,7 +279,12 @@
     <string name="pref_theme_category_system">System &amp; Adaptive</string>
     <string name="pref_theme_category_dark">Dark &amp; AMOLED</string>
     <string name="pref_theme_category_light">Light &amp; Minimal</string>
+    <string name="pref_theme_category_terminal">Terminal &amp; Dev</string>
+    <string name="pref_theme_category_sri_lanka">Sri Lanka Heritage</string>
+    <string name="pref_theme_category_high_contrast">High Contrast</string>
     <string name="pref_theme_category_vibrant">Vibrant &amp; Heritage</string>
+    <string name="pref_sound_on_keypress">Sound feedback</string>
+    <string name="pref_sound_on_keypress_summary">Play a sound on keypress</string>
     <string name="pref_theme_search_hint">Search themes…</string>
     <string name="pref_theme_no_results">No matching themes found</string>
     <string name="pref_theme_favorite_add">Add to favorites</string>

@@ -68,6 +68,8 @@ public class Keyboard2View extends View
     BOTTOM
   }
 
+  public static final float TOUCH_MARGIN_TOLERANCE_PX = 8.0f;
+
   public Keyboard2View(Context context, AttributeSet attrs)
   {
     super(context, attrs);
@@ -172,6 +174,15 @@ public class Keyboard2View extends View
     _config.handler.key_down(k, isSwipe);
     invalidate();
     vibrate();
+    playKeySound();
+  }
+
+  private void playKeySound()
+  {
+    if (_config != null && _config.sound_on_keypress)
+    {
+      playSoundEffect(android.view.SoundEffectConstants.CLICK);
+    }
   }
 
   public void onPointerUp(KeyValue k, Pointers.Modifiers mods)
@@ -237,9 +248,11 @@ public class Keyboard2View extends View
 
   private KeyboardData.Row getRowAtPosition(float ty)
   {
+    if (_keyboard == null || _keyboard.rows.isEmpty() || _tc == null)
+      return null;
     float y = _config.marginTop;
     if (ty < y)
-      return null;
+      return _keyboard.rows.get(0);
     for (int i = 0; i < _keyboard.rows.size(); i++)
     {
       KeyboardData.Row row = _keyboard.rows.get(i);
@@ -247,27 +260,29 @@ public class Keyboard2View extends View
       if (ty < y)
         return row;
     }
-    return null;
+    return _keyboard.rows.get(_keyboard.rows.size() - 1);
   }
 
   private KeyboardData.Key getKeyAtPosition(float tx, float ty)
   {
     KeyboardData.Row row = getRowAtPosition(ty);
-    float x = _marginLeft;
-    if (row == null || tx < x)
+    if (row == null || row.keys.isEmpty())
       return null;
+    float x = _marginLeft;
+    if (tx < x)
+      return row.keys.get(0);
     for (int i = 0; i < row.keys.size(); i++)
     {
       KeyboardData.Key key = row.keys.get(i);
       float xLeft = x + key.shift * _keyWidth;
       float xRight = xLeft + key.width * _keyWidth;
-      if (tx < xLeft)
-        return null;
-      if (tx < xRight)
+      if (tx >= xLeft && tx < xRight)
         return key;
+      if (tx < xLeft)
+        return (i > 0) ? row.keys.get(i - 1) : key;
       x = xRight;
     }
-    return null;
+    return row.keys.get(row.keys.size() - 1);
   }
 
   private void vibrate()
@@ -624,13 +639,9 @@ public class Keyboard2View extends View
     float padding = w / 2.f;
     _tmpRect.set(x + padding, y + padding, x + keyW - padding, y + keyH - padding);
     canvas.drawRoundRect(_tmpRect, r, r, tc.bg_paint);
-    if (w > 0.f)
+    if (w > 0.f && tc.border_left_paint != null)
     {
-      float overlap = r - r * 0.85f + w; // sin(45°)
-      drawBorder(canvas, x, y, x + overlap, y + keyH, tc.border_left_paint, tc);
-      drawBorder(canvas, x + keyW - overlap, y, x + keyW, y + keyH, tc.border_right_paint, tc);
-      drawBorder(canvas, x, y, x + keyW, y + overlap, tc.border_top_paint, tc);
-      drawBorder(canvas, x, y + keyH - overlap, x + keyW, y + keyH, tc.border_bottom_paint, tc);
+      canvas.drawRoundRect(_tmpRect, r, r, tc.border_left_paint);
     }
   }
 
@@ -691,9 +702,32 @@ public class Keyboard2View extends View
     kv = modifyKey(kv, _mods);
     if (kv == null)
       return;
+    String str = kv.getString();
+    if (str == null || str.isEmpty())
+      return;
     float textSize = scaleTextSize(kv, true);
     Paint p = tc.label_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), labelColor(kv, isKeyDown, false, tc), textSize);
-    canvas.drawText(kv.getString(), x, (keyH - p.ascent() - p.descent()) / 2f + y, p);
+    float textW = p.measureText(str);
+    float maxW = _keyWidth - tc.border_width * 2f - 4f;
+    if (textW > maxW && maxW > 0)
+    {
+      textSize = Math.max(8f, textSize * (maxW / textW));
+      p = tc.label_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), labelColor(kv, isKeyDown, false, tc), textSize);
+    }
+    canvas.drawText(str, x, (keyH - p.ascent() - p.descent()) / 2f + y, p);
+  }
+
+  public static boolean isComplexScript(String label)
+  {
+    if (label == null)
+      return false;
+    for (int ci = 0; ci < label.length(); ci++)
+    {
+      char ch = label.charAt(ci);
+      if ((ch >= '\u0D80' && ch <= '\u0DFF') || ch == '\u200D' || ch == '\u200C')
+        return true;
+    }
+    return false;
   }
 
   private void drawSubLabel(Canvas canvas, KeyValue kv, float x, float y,
@@ -704,6 +738,9 @@ public class Keyboard2View extends View
     Vertical v = LABEL_POSITION_V[sub_index];
     kv = modifyKey(kv, _mods);
     if (kv == null)
+      return;
+    String label = kv.getString();
+    if (label == null || label.isEmpty())
       return;
     float textSize = scaleTextSize(kv, false);
     Paint p = tc.sublabel_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), labelColor(kv, isKeyDown, true, tc), textSize, a);
@@ -716,11 +753,19 @@ public class Keyboard2View extends View
       x += keyW / 2f;
     else
       x += (a == Paint.Align.LEFT) ? subPadding : keyW - subPadding;
-    String label = kv.getString();
+
     int label_len = label.length();
-    // Limit the label of string keys to 3 characters
-    if (label_len > 3 && kv.getKind() == KeyValue.Kind.String)
+    boolean isComplexScript = isComplexScript(label);
+    if (!isComplexScript && label_len > 3 && kv.getKind() == KeyValue.Kind.String)
       label_len = 3;
+
+    float textW = p.measureText(label, 0, label_len);
+    float maxSubW = keyW * 0.46f;
+    if (textW > maxSubW && maxSubW > 0)
+    {
+      textSize = Math.max(6f, textSize * (maxSubW / textW));
+      p = tc.sublabel_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), labelColor(kv, isKeyDown, true, tc), textSize, a);
+    }
     canvas.drawText(label, 0, label_len, x, y, p);
   }
 

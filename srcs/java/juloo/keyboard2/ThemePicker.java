@@ -36,8 +36,11 @@ final class ThemePicker
     ALL,
     FAVORITES,
     SYSTEM,
-    DARK,
     LIGHT,
+    DARK,
+    HIGH_CONTRAST,
+    SRI_LANKA,
+    TERMINAL,
     VIBRANT
   }
 
@@ -53,26 +56,31 @@ final class ThemePicker
       case "system":
       case "monet":
         return ThemeCategory.SYSTEM;
+      case "light":
+      case "white":
+      case "gruvbox_light":
+      case "catppuccin_latte":
+        return ThemeCategory.LIGHT;
       case "dark":
       case "black":
       case "oled_black":
       case "graphite_pro":
+        return ThemeCategory.DARK;
+      case "high_contrast":
+      case "high_contrast_yellow":
+        return ThemeCategory.HIGH_CONTRAST;
+      case "sinhala_sand":
+      case "lanka_maroon":
+      case "lanka_blue":
+      case "sinhala_heritage":
+        return ThemeCategory.SRI_LANKA;
       case "gruvbox_dark":
       case "solarized_dark":
       case "dracula":
       case "nord":
       case "tokyo_night":
       case "catppuccin_mocha":
-      case "high_contrast":
-        return ThemeCategory.DARK;
-      case "light":
-      case "white":
-      case "gruvbox_light":
-      case "catppuccin_latte":
-        return ThemeCategory.LIGHT;
-      case "sinhala_sand":
-      case "lanka_maroon":
-        return ThemeCategory.VIBRANT;
+        return ThemeCategory.TERMINAL;
       default:
         return null;
     }
@@ -201,9 +209,11 @@ final class ThemePicker
       ThemeCategory.ALL,
       ThemeCategory.FAVORITES,
       ThemeCategory.SYSTEM,
-      ThemeCategory.DARK,
       ThemeCategory.LIGHT,
-      ThemeCategory.VIBRANT
+      ThemeCategory.DARK,
+      ThemeCategory.HIGH_CONTRAST,
+      ThemeCategory.SRI_LANKA,
+      ThemeCategory.TERMINAL
     };
 
     final List<TextView> chipViews = new ArrayList<>();
@@ -535,10 +545,16 @@ final class ThemePicker
             return getStringSafe(context, R.string.pref_theme_category_favorites, "Favorites");
           case SYSTEM:
             return getStringSafe(context, R.string.pref_theme_category_system, "System");
-          case DARK:
-            return getStringSafe(context, R.string.pref_theme_category_dark, "Dark");
           case LIGHT:
             return getStringSafe(context, R.string.pref_theme_category_light, "Light");
+          case DARK:
+            return getStringSafe(context, R.string.pref_theme_category_dark, "Dark");
+          case HIGH_CONTRAST:
+            return getStringSafe(context, R.string.pref_theme_category_high_contrast, "High Contrast");
+          case SRI_LANKA:
+            return getStringSafe(context, R.string.pref_theme_category_sri_lanka, "Sri Lanka");
+          case TERMINAL:
+            return getStringSafe(context, R.string.pref_theme_category_terminal, "Terminal");
           case VIBRANT:
             return getStringSafe(context, R.string.pref_theme_category_vibrant, "Vibrant");
         }
@@ -550,8 +566,11 @@ final class ThemePicker
       case ALL: return "All";
       case FAVORITES: return "Favorites";
       case SYSTEM: return "System";
-      case DARK: return "Dark";
       case LIGHT: return "Light";
+      case DARK: return "Dark";
+      case HIGH_CONTRAST: return "High Contrast";
+      case SRI_LANKA: return "Sri Lanka";
+      case TERMINAL: return "Terminal";
       case VIBRANT: return "Vibrant";
       default: return "";
     }

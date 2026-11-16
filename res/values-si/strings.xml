@@ -278,7 +278,12 @@
     <string name="pref_theme_category_system">පද්ධති (System)</string>
     <string name="pref_theme_category_dark">අඳුරු (Dark)</string>
     <string name="pref_theme_category_light">දීප්තිමත් (Light)</string>
+    <string name="pref_theme_category_terminal">පර්යන්ත (Terminal &amp; Dev)</string>
+    <string name="pref_theme_category_sri_lanka">ශ්‍රී ලංකා (Sri Lanka)</string>
+    <string name="pref_theme_category_high_contrast">ඉහළ ප්‍රතිවිරුද්ධ (High Contrast)</string>
     <string name="pref_theme_category_vibrant">වර්ණවත් (Vibrant)</string>
+    <string name="pref_sound_on_keypress">ශබ්ද ප්‍රතිපෝෂණය</string>
+    <string name="pref_sound_on_keypress_summary">යතුරක් එබූ විට ශබ්දයක් වාදනය කරන්න</string>
     <string name="pref_theme_search_hint">තේමා සොයන්න…</string>
     <string name="pref_theme_no_results">ගැලපෙන තේමාවක් හමු නොවීය</string>
     <string name="pref_theme_favorite_add">ප්‍රියතම ලැයිස්තුවට එක් කරන්න</string>

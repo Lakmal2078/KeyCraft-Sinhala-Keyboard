@@ -65,11 +65,11 @@ android {
     }
 
     create("release") {
-      val rawKs = System.getenv("RELEASE_KEYSTORE")?.trim()?.removePrefix("=")
-      val ks = if (rawKs.isNullOrBlank()) "release.keystore" else rawKs
-      val keystore = file(ks)
+      val rawKs = System.getenv("RELEASE_KEYSTORE")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
+      val ksName = if (rawKs.isNullOrBlank()) "release.keystore" else rawKs
+      val keystore = file("${rootDir}/$ksName")
       if (!keystore.exists() || !keystore.isFile) {
-        val b64 = System.getenv("RELEASE_KEYSTORE_BASE64")?.trim()?.removePrefix("=")
+        val b64 = System.getenv("RELEASE_KEYSTORE_BASE64")
         if (!b64.isNullOrBlank()) {
           runCatching {
             val cleanB64 = b64.replace(Regex("[^A-Za-z0-9+/=]"), "")
@@ -77,15 +77,14 @@ android {
           }
         }
       }
-      if (keystore.exists() && keystore.isFile) {
-        storeFile = keystore
-        val rawPass = System.getenv("RELEASE_KEYSTORE_PASSWORD")?.trim()?.removePrefix("=")
-        storePassword = if (!rawPass.isNullOrBlank()) rawPass else "***REMOVED***"
-        val rawAlias = System.getenv("RELEASE_KEY_ALIAS")?.trim()?.removePrefix("=")
-        keyAlias = if (!rawAlias.isNullOrBlank()) rawAlias else "release"
-        val rawKeyPass = System.getenv("RELEASE_KEY_PASSWORD")?.trim()?.removePrefix("=")
-        keyPassword = if (!rawKeyPass.isNullOrBlank()) rawKeyPass else "***REMOVED***"
-      }
+      val targetKeystore = if (keystore.exists() && keystore.isFile) keystore else file("${rootDir}/release.keystore")
+      storeFile = targetKeystore
+      val rawPass = System.getenv("RELEASE_KEYSTORE_PASSWORD")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
+      storePassword = if (!rawPass.isNullOrBlank()) rawPass else "***REMOVED***"
+      val rawAlias = System.getenv("RELEASE_KEY_ALIAS")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
+      keyAlias = if (!rawAlias.isNullOrBlank()) rawAlias else "release"
+      val rawKeyPass = System.getenv("RELEASE_KEY_PASSWORD")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
+      keyPassword = if (!rawKeyPass.isNullOrBlank()) rawKeyPass else "***REMOVED***"
     }
   }
 
