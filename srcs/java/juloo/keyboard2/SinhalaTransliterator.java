@@ -1367,6 +1367,26 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("yohan", "යොහාන්");
     COMMON_WORDS.put("zoom", "zoom");
 
+    // Helakuru Singlish additions
+    COMMON_WORDS.put("une", "වුණේ");
+    COMMON_WORDS.put("danne", "දන්නේ");
+    COMMON_WORDS.put("yanne", "යන්නේ");
+    COMMON_WORDS.put("enne", "එන්නේ");
+    COMMON_WORDS.put("denne", "දෙන්නේ");
+    COMMON_WORDS.put("ganne", "ගන්නේ");
+    COMMON_WORDS.put("balanne", "බලන්නේ");
+    COMMON_WORDS.put("theruna", "තේරුණා");
+    COMMON_WORDS.put("therenawa", "තේරෙනවා");
+    COMMON_WORDS.put("hoda", "හොඳ");
+    COMMON_WORDS.put("hodatama", "හොඳටම");
+    COMMON_WORDS.put("oyaata", "ඔයාට");
+    COMMON_WORDS.put("be", "බැහැ");
+    COMMON_WORDS.put("sthuthiyi", "ස්තූතියි");
+    COMMON_WORDS.put("ethakota", "එතකොට");
+    COMMON_WORDS.put("iru", "ඍ");
+    COMMON_WORDS.put("pruthuvi", "පෘථිවි");
+    COMMON_WORDS.put("chandra", "චන්ද්‍ර");
+
 NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "දවසක්", "රාත්‍රියක්"));
     NEXT_WORD_PREDICTIONS.put("ස්තූතියි", Arrays.asList("බොහොම", "ඔබට", "යාලුවා"));
     NEXT_WORD_PREDICTIONS.put("ආයුබෝවන්", Arrays.asList("ඔබට", "සියලු දෙනාටම", "සුබ"));
@@ -1487,6 +1507,7 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
     {"nng", "\u0D9F"},  // ඟ
     {"mmb", "\u0DB9"},  // ඹ
     {"nnd", "\u0DAC"},  // ඬ
+    {"nd", "\u0DB3"},   // ඳ (single nd; "ndh" guarded in parsePhonetic)
     {"kh", "\u0D9B"},  // ඛ
     {"Kh", "\u0D9B"},  // ඛ
     {"gh", "\u0D9D"},  // ඝ
@@ -1693,6 +1714,8 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
       list.add("ක");
       list.add("කෑම");
       list.add("කලින්");
+      if (!list.contains(trimmed))
+        list.add(trimmed); // raw English spelling stays reachable
       return list;
     }
 
@@ -1716,6 +1739,16 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
             break;
         }
       }
+    }
+
+    // Single "nd" is ambiguous: ඳ (primary) vs ඬ or න්ද alternatives
+    if (lower.contains("nd") && !lower.contains("ndh")
+        && !COMMON_WORDS.containsKey(lower) && primary.contains("\u0DB3"))
+    {
+      String altDda = primary.replace("\u0DB3", "\u0DAC");
+      String altNda = primary.replace("\u0DB3", "\u0DB1\u0DCA\u0DAF");
+      if (!list.contains(altDda)) list.add(altDda);
+      if (!list.contains(altNda)) list.add(altNda);
     }
 
     // Phonetic alternatives
@@ -1831,6 +1864,18 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
         || type == Character.OTHER_PUNCTUATION;
   }
 
+  private static boolean isRuAt(String w, int idx)
+  {
+    return idx + 1 < w.length()
+        && (w.charAt(idx) == 'r' || w.charAt(idx) == 'R')
+        && (w.charAt(idx + 1) == 'u' || w.charAt(idx + 1) == 'U');
+  }
+
+  private static boolean isUAt(String w, int idx)
+  {
+    return idx < w.length() && (w.charAt(idx) == 'u' || w.charAt(idx) == 'U');
+  }
+
   public static String parsePhonetic(String word)
   {
     if (word == null || word.isEmpty())
@@ -1842,6 +1887,8 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
     StringBuilder out = new StringBuilder();
     int len = word.length();
     int i = 0;
+    // True right after a Gatapilla / ඍ cluster: a following "sh" becomes ෂ.
+    boolean ruCluster = false;
 
     while (i < len)
     {
@@ -1857,11 +1904,38 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
         break;
       }
 
-      // Anusvara before h, j, s, c, k, g
-      if (i > 0 && out.length() > 0 && i + 1 < len && (word.charAt(i) == 'n' || word.charAt(i) == 'N'))
+      // Independent ඍ (U+0D8D) / ඎ (U+0D8E) at word start: rushi, ruthu, ruuthu.
+      // "rth..." at word start gives ඍ + th (Rthu -> ඍතු). Restricted to these
+      // shapes so ordinary words keep their normal spelling.
+      if (i == 0 && (word.charAt(0) == 'r' || word.charAt(0) == 'R'))
+      {
+        boolean dbl = isUAt(word, 2);
+        int after = dbl ? 3 : 2;
+        if (isRuAt(word, 0)
+            && (word.regionMatches(true, after, "sh", 0, 2)
+                || word.regionMatches(true, after, "th", 0, 2)))
+        {
+          out.append(dbl ? "\u0D8E" : "\u0D8D");
+          i = after;
+          ruCluster = true;
+          continue;
+        }
+        if (word.regionMatches(true, 1, "th", 0, 2))
+        {
+          out.append("\u0D8D"); // ඍ
+          i = 1;
+          continue;
+        }
+      }
+
+      // Anusvara before h, j, s, c, k, and before the "ngh" cluster.
+      // A bare "ng" is left for the ඟ (U+0D9F) consonant below.
+      if (i > 0 && out.length() > 0 && i + 1 < len
+          && (word.charAt(i) == 'n' || word.charAt(i) == 'N'))
       {
         char next = Character.toLowerCase(word.charAt(i + 1));
-        if (next == 'h' || next == 'j' || next == 's' || next == 'c' || next == 'k' || next == 'g')
+        boolean nasalGha = next == 'g' && word.regionMatches(true, i, "ngh", 0, 3);
+        if (next == 'h' || next == 'j' || next == 's' || next == 'c' || next == 'k' || nasalGha)
         {
           out.append(ANUSVARA);
           i++;
@@ -1891,7 +1965,6 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
             out.append("\u0DBB").append(VIRAMA).append(ZWJ).append(nextCons);
             i += 1 + nextConsLen;
 
-            // Check following vowel on the repaya consonant
             String matchedVowelSign = null;
             int matchedVowelLen = 0;
             for (String[] pair : VOWELS_DEPENDENT)
@@ -1913,13 +1986,18 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
         }
       }
 
-      // Check for consonant match
+      // Consonant match
       String matchedConsonant = null;
+      String matchedKey = null;
       int matchedConsonantLen = 0;
       for (String[] pair : CONSONANTS)
       {
         if (word.startsWith(pair[0], i))
         {
+          // Single "nd" -> ඳ, but "ndh" keeps its conjunct reading.
+          if ("nd".equals(pair[0]) && word.startsWith("ndh", i))
+            continue;
+          matchedKey = pair[0];
           matchedConsonant = pair[1];
           matchedConsonantLen = pair[0].length();
           break;
@@ -1928,11 +2006,27 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
 
       if (matchedConsonant != null)
       {
+        boolean retroflexSh = ruCluster;
+        ruCluster = false;
+        if (retroflexSh && "sh".equals(matchedKey))
+          matchedConsonant = "\u0DC2"; // ෂ after ඍ / ෘ (krushi -> කෘෂි)
+
         i += matchedConsonantLen;
 
         if (matchedConsonant.equals(ANUSVARA))
         {
           out.append(ANUSVARA);
+          continue;
+        }
+
+        // Gatapilla ෘ (U+0DD8) and Diga Gatapilla ෲ (U+0DF2): kru, kruu.
+        // Must run before the Rakaransaya check below.
+        if (isRuAt(word, i))
+        {
+          boolean dbl = isUAt(word, i + 2);
+          out.append(matchedConsonant).append(dbl ? "\u0DF2" : "\u0DD8");
+          i += dbl ? 3 : 2;
+          ruCluster = true;
           continue;
         }
 
@@ -1943,21 +2037,18 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
           char nextChar = word.charAt(i);
           if ((nextChar == 'y' || nextChar == 'Y') && (i + 1 == len || isVowel(word.charAt(i + 1)) || word.charAt(i + 1) == 'a'))
           {
-            // Yanshaya: Consonant + U+0DCA + U+200D + U+0DBA
             out.append(matchedConsonant).append(VIRAMA).append(ZWJ).append("\u0DBA");
             i++;
             hasConjunct = true;
           }
           else if ((nextChar == 'r' || nextChar == 'R') && (i + 1 == len || isVowel(word.charAt(i + 1))))
           {
-            // Rakaranshaya: Consonant + U+0DCA + U+200D + U+0DBB
             out.append(matchedConsonant).append(VIRAMA).append(ZWJ).append("\u0DBB");
             i++;
             hasConjunct = true;
           }
         }
 
-        // Check following vowel
         String matchedVowelSign = null;
         int matchedVowelLen = 0;
         for (String[] pair : VOWELS_DEPENDENT)
@@ -1973,24 +2064,19 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
         if (matchedVowelSign != null)
         {
           if (!hasConjunct)
-          {
             out.append(matchedConsonant);
-          }
           out.append(matchedVowelSign);
           i += matchedVowelLen;
         }
         else
         {
           if (!hasConjunct)
-          {
             out.append(matchedConsonant);
-          }
           out.append(VIRAMA);
         }
       }
       else
       {
-        // Try matching independent vowel
         String matchedVowel = null;
         int matchedVowelLen = 0;
         for (String[] pair : VOWELS_INDEPENDENT)

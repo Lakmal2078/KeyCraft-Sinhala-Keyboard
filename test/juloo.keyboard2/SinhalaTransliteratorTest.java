@@ -164,6 +164,68 @@ public class SinhalaTransliteratorTest
   }
 
   @Test
+  public void testHelakuruSinglishV2()
+  {
+    // Gatapilla and Diga Gatapilla
+    assertEquals("කෘ", SinhalaTransliterator.transliterate("kru"));
+    assertEquals("කෲ", SinhalaTransliterator.transliterate("kruu"));
+    assertEquals("අමෘත", SinhalaTransliterator.transliterate("amrutha"));
+    assertEquals("කෘත්‍ය", SinhalaTransliterator.transliterate("kruthya"));
+    assertEquals("කෘෂි", SinhalaTransliterator.transliterate("krushi"));
+
+    // Independent ඍ
+    assertEquals("ඍෂි", SinhalaTransliterator.transliterate("rushi"));
+    assertEquals("ඍෂි", SinhalaTransliterator.transliterate("Rushi"));
+    assertEquals("ඍතු", SinhalaTransliterator.transliterate("ruthu"));
+    assertEquals("ඍතු", SinhalaTransliterator.transliterate("Rthu"));
+    assertEquals("ඍ", SinhalaTransliterator.transliterate("Iru"));
+
+    // Sanñaka consonants
+    assertEquals("සඳ", SinhalaTransliterator.transliterate("sanda"));
+    assertEquals("හඳ", SinhalaTransliterator.transliterate("handa"));
+    assertEquals("බඳ", SinhalaTransliterator.transliterate("banda"));
+    assertEquals("ගඟ", SinhalaTransliterator.transliterate("ganga"));
+    assertEquals("කොළඹ", SinhalaTransliterator.transliterate("kolamba"));
+
+    // Conjuncts
+    assertEquals("විද්‍යාව", SinhalaTransliterator.transliterate("vidyaawa"));
+    assertEquals("චන්ද්‍ර", SinhalaTransliterator.transliterate("chandra"));
+
+    // Helakuru Singlish lexicon
+    assertEquals("වැඩ", SinhalaTransliterator.transliterate("wada"));
+    assertEquals("දැන්", SinhalaTransliterator.transliterate("dan"));
+    assertEquals("තේරුණා", SinhalaTransliterator.transliterate("theruna"));
+    assertEquals("වුණේ", SinhalaTransliterator.transliterate("une"));
+    assertEquals("දන්නේ", SinhalaTransliterator.transliterate("danne"));
+    assertEquals("කරන්නේ", SinhalaTransliterator.transliterate("karanne"));
+    assertEquals("හොඳටම", SinhalaTransliterator.transliterate("hodatama"));
+    assertEquals("පුළුවන්ද", SinhalaTransliterator.transliterate("puluwanda"));
+  }
+
+  @Test
+  public void testSuggestionsAlwaysContainRawEnglish()
+  {
+    String[] inputs = {"ka", "lakmal", "sanda", "ganga", "wifi", "zoom", "anda"};
+    for (String input : inputs)
+    {
+      assertTrue(input + " must include raw English",
+          SinhalaTransliterator.getSuggestions(input).contains(input));
+    }
+  }
+
+  @Test
+  public void testNdAlternativeSuggestions()
+  {
+    java.util.List<String> andaSug = SinhalaTransliterator.getSuggestions("anda");
+    assertEquals("අඳ", andaSug.get(0));
+    assertTrue(andaSug.contains("අඬ"));
+
+    java.util.List<String> kandaSug = SinhalaTransliterator.getSuggestions("kanda");
+    assertTrue(kandaSug.contains("කඳ"));
+    assertTrue(kandaSug.contains("කන්ද"));
+  }
+
+  @Test
   public void testHelakuruPhoneticBasicWords()
   {
     assertEquals("අම්මා", SinhalaTransliterator.transliterate("ammaa"));

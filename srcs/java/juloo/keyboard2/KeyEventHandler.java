@@ -778,7 +778,8 @@ public final class KeyEventHandler
     if (_sinhala_buffer.length() > 0 && conn != null)
     {
       String committedSinhala = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
-      if (_config.space_bar_auto_complete && _suggestions.count > 0
+      // Helakuru behaviour: Slot 0 is always committed before the space.
+      if (_suggestions.count > 0
           && _suggestions.suggestions[0] != null
           && !_suggestions.suggestions[0].equals(_sinhala_buffer.toString()))
       {
