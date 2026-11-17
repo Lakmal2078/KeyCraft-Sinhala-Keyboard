@@ -322,38 +322,14 @@ public class Cdict {
 
   public String word(int index) {
     if (index < 0) return "";
-    byte[] buf = new byte[512];
-    int len = word_node(_root_node, 0, index, buf, 0, buf.length);
+    // First measure the complete UTF-8 word, then allocate exactly what is needed.
+    // Dictionary words are not limited to an arbitrary fixed-size scratch buffer.
+    int len = word_node(_root_node, 0, index, null, 0, Integer.MAX_VALUE);
     if (len <= 0) return "";
-    if (len == buf.length) {
-      len = trimIncompleteUtf8(buf, len);
-    }
+    byte[] buf = new byte[len];
+    int written = word_node(_root_node, 0, index, buf, 0, buf.length);
+    if (written != len) return "";
     return new String(buf, 0, len, StandardCharsets.UTF_8);
-  }
-
-  private static int trimIncompleteUtf8(byte[] buf, int len) {
-    int i = len - 1;
-    while (i >= 0 && (buf[i] & 0xC0) == 0x80) {
-      i--;
-    }
-    if (i < 0) return 0;
-    int lead = buf[i] & 0xFF;
-    int expectedLen;
-    if ((lead & 0x80) == 0) {
-      expectedLen = 1;
-    } else if ((lead & 0xE0) == 0xC0) {
-      expectedLen = 2;
-    } else if ((lead & 0xF0) == 0xE0) {
-      expectedLen = 3;
-    } else if ((lead & 0xF8) == 0xF0) {
-      expectedLen = 4;
-    } else {
-      return i;
-    }
-    if (i + expectedLen > len) {
-      return i;
-    }
-    return len;
   }
 
   public int[] suffixes(Result result, int count) {
@@ -581,15 +557,17 @@ public class Cdict {
         }
       }
       if (next_b == 0) return dsti;
-      dst[dsti] = label;
+      if (dst != null) dst[dsti] = label;
       return word_node(node, next_b, index - next_num, dst, dsti + 1, max_len);
     } else { // PREFIX
       int p_len = (_data[node] & 0xFF) >> 1;
       int next_ptr = decode_int24(_data, node + 1);
       int end = Math.min(dsti + p_len, max_len);
-      int pi = 0;
-      while (dsti < end) {
-        dst[dsti++] = _data[node + 4 + pi++];
+      if (dst != null) {
+        int pi = 0;
+        while (dsti < end) {
+          dst[dsti++] = _data[node + 4 + pi++];
+        }
       }
       return word_node(node, next_ptr, index, dst, end, max_len);
     }

@@ -56,6 +56,50 @@ public class CdictMalformedInputTest {
     assertEquals(1, dict.freq(0));
   }
 
+  @Test public void readsSinhalaWordsLongerThan512Utf8Bytes() throws Exception {
+    String expected = "අ".repeat(180); // 540 UTF-8 bytes
+    byte[] word = expected.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    int root = 32;
+    int nodeCount = (word.length + 126) / 127;
+    int[] starts = new int[nodeCount];
+    int cursor = root;
+    int consumed = 0;
+    for (int i = 0; i < nodeCount; i++) {
+      starts[i] = cursor;
+      int chunkLength = Math.min(127, word.length - consumed);
+      cursor += (4 + chunkLength + 1) & ~1;
+      consumed += chunkLength;
+    }
+    int leaf = cursor;
+    int frequency = leaf + 2;
+    int name = frequency + 1;
+    byte[] data = new byte[name + 2];
+    data[0] = 'D'; data[1] = 'i'; data[2] = 'c'; data[3] = 1; data[4] = 1;
+    putInt(data, 5, name);
+    putInt(data, 9, root);
+    putInt(data, 13, frequency);
+    data[leaf] = 0; data[leaf + 1] = 0;
+    data[frequency] = 1;
+    data[name] = 'm'; data[name + 1] = 0;
+
+    consumed = 0;
+    for (int i = 0; i < nodeCount; i++) {
+      int start = starts[i];
+      int chunkLength = Math.min(127, word.length - consumed);
+      int next = (i + 1 < nodeCount) ? starts[i + 1] : leaf;
+      int relative = next - start;
+      data[start] = (byte)((chunkLength << 1) | 1);
+      data[start + 1] = (byte)(relative >>> 16);
+      data[start + 2] = (byte)(relative >>> 8);
+      data[start + 3] = (byte)(relative | ((i + 1 == nodeCount) ? 1 : 0));
+      System.arraycopy(word, consumed, data, start + 4, chunkLength);
+      consumed += chunkLength;
+    }
+
+    Cdict dict = Cdict.of_bytes(data)[0];
+    assertEquals(expected, dict.word(0));
+  }
+
   @Test public void rejectsTruncatedAndInvalidHeaders() {
     assertRejected(new byte[0]);
     assertRejected(new byte[] {'D', 'i', 'c', 1});

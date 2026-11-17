@@ -90,10 +90,8 @@ android {
 
   buildTypes {
     named("release") {
-      // Keep release runtime behavior aligned with debug while investigating
-      // suggestion/dictionary regressions caused by R8/resource shrinking.
-      isMinifyEnabled = false
-      isShrinkResources = false
+      isMinifyEnabled = true
+      isShrinkResources = true
       proguardFiles(
         getDefaultProguardFile("proguard-android-optimize.txt"),
         "proguard-rules.pro")
