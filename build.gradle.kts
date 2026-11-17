@@ -65,9 +65,10 @@ android {
     }
 
     create("release") {
-      val rawKs = System.getenv("RELEASE_KEYSTORE")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
+      val rawKs = System.getenv("RELEASE_KEYSTORE")?.trim()
       val ksName = if (rawKs.isNullOrBlank()) "release.keystore" else rawKs
-      val keystore = file("${rootDir}/$ksName")
+      val configuredKeystore = file(ksName)
+      val keystore = if (configuredKeystore.isAbsolute) configuredKeystore else file("${rootDir}/$ksName")
       if (!keystore.exists() || !keystore.isFile) {
         val b64 = System.getenv("RELEASE_KEYSTORE_BASE64")
         if (!b64.isNullOrBlank()) {
