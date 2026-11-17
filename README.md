@@ -1,149 +1,136 @@
-# KeyCraft Sinhala Keyboard [<img src="https://hosted.weblate.org/widget/unexpected-keyboard/svg-badge.svg" alt="පරිවර්තන තත්ත්වය" />](https://hosted.weblate.org/engage/unexpected-keyboard/)
+# KeyCraft Sinhala Keyboard
 
-**සිංහල**
+**සිංහල ලිවීම ලස්සනට, ඉක්මනට**
+
+*Type Sinhala beautifully and quickly.*
+
+KeyCraft යනු සිංහල සහ දෛනික ටයිප් කිරීම පහසු කරවන, Android සඳහා නිර්මාණය කළ අභිරුචිකරණය කළ හැකි Keyboard යෙදුමකි. Singlish → Sinhala පරිවර්තනය, Swipe Typing, විවිධ Keyboard Layouts, Themes සහ Productivity Tools එකම යෙදුමකින් ලබා දෙයි.
+
+[**⬇️ KeyCraft v1.0.0 Download කරන්න**](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.0.0) · [Source Code](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard) · [Bug එකක් වාර්තා කරන්න](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues)
 
 ---
 
-⚠️ Google සමාගමේ Android developer registration ප්‍රතිපත්ති පිළිබඳ වැඩිදුර තොරතුරු [keepandroidopen.org](https://keepandroidopen.org/) වෙතින් ලබාගත හැක.
+## 📥 Download සහ Install කිරීම
 
----
+1. [KeyCraft v1.0.0 Release පිටුවට](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.0.0) යන්න.
+2. **KeyCraft-Sinhala-Keyboard-release.apk** ගොනුව Download කරන්න.
+3. Download කළ APK එක විවෘත කර Android ඉල්ලන්නේ නම් එම Source එකෙන් Install කිරීමට අවසර දෙන්න.
+4. KeyCraft විවෘත කර තිරයේ පෙන්වන පියවර අනුගමනය කර Keyboard එක Enable කර Default Keyboard ලෙස තෝරන්න.
 
-## 📥 Download
+> **සටහන:** Android Version එක සහ දුරකථන නිෂ්පාදකයා අනුව Settings මෙනුවේ නම් වෙනස් විය හැක. නිල Release පිටුවෙන් පමණක් APK Download කරන්න.
 
-**KeyCraft release:** නව KeyCraft GitHub repository එක සහ release page එක ප්‍රකාශයට පත් කළ පසු මෙහි එක් කරනු ඇත.
+## ✨ ප්‍රධාන විශේෂාංග
 
-දැනට development build එක පමණක් සකස් කර ඇත. පළමු signed release එක වෙනම KeyCraft repository එක සකස් කිරීමෙන් පසු නිකුත් කරනු ඇත.
+- **Sinhala Auto-Transliteration** — Singlish ලෙස ටයිප් කර සිංහලට ස්වයංක්‍රීයව පරිවර්තනය කරන්න. උදාහරණයක් ලෙස \`amma\` → \`අම්මා\`.
+- **Word Suggestions** — වචන සම්පූර්ණ කිරීම සහ අක්ෂර වින්‍යාස යෝජනා.
+- **Swipe Typing** — යතුරක කොන් දෙසට Swipe කිරීමෙන් අමතර අක්ෂර ඇතුළත් කරන්න.
+- **Customizable Layouts** — Keyboard Layouts තෝරන්න, අමතර Layouts සහ Keys එක් කරන්න.
+- **Themes සහ පෙනුම** — වර්ණ, Key Shapes, Borders, Fonts, Spacing සහ Keyboard ප්‍රමාණය වෙනස් කරන්න.
+- **Productivity Tools** — Quick Calculator, Text Shortcuts සහ Quick-Action Toolbar.
+- **Clipboard Tools** — අවශ්‍ය පරිදි Clipboard History සහ Quick Paste භාවිත කරන්න.
+- **Typing Controls** — Number Row, NumPad, Key Repeat, Auto Capitalization, Vibration ඇතුළු තවත් සැකසුම්.
 
-Android සඳහා නිර්මාණය කළ සැහැල්ලු, පෞද්ගලිකත්වයට මුල්තැන දෙන තිරයේ යතුරුපුවරුවකි.
+## 📱 Screenshots
 
-> **පෞද්ගලිකත්ව සටහන:** Singlish → Sinhala පරිවර්තනය උපාංගය තුළම සිදු වේ. විකල්ප ශබ්දකෝෂ පරිශීලකයා ඉල්ලා download කිරීමට `INTERNET` අවසරය අවශ්‍ය වේ. Source inspection එකේ analytics/telemetry SDK හෝ ටයිප් කළ පෙළ upload කරන code path එකක් හමු නොවීය.
-
-https://github.com/Julow/Unexpected-Keyboard/assets/2310568/28f8f6fe-ac13-46f3-8c5e-d62443e16d0d
-
-යතුරුපුවරුවේ යතුරු කොන දෙසට ඇඟිල්ල ස්වයිප් කිරීමෙන් අමතර අක්ෂර ටයිප් කළ හැක. එය මෙහි ප්‍රධාන විශේෂාංගයයි.
-
-මෙම යෙදුම මුලින්ම නිර්මාණය කර තිබුණේ Termux භාවිත කරන ක්‍රමලේඛකයන් සඳහාය. දැන් එය එදිනෙදා භාවිතයටත් ඉතා සුදුසුය.
-
-මෙම යෙදුමේ දැන්වීම් අඩංගු නොවන අතර, එය **GNU General Public License v3.0 (GPL-3.0)** බලපත්‍රය යටතේ නිකුත් කර ඇති විවෘත මූලාශ්‍ර මෘදුකාංගයකි ([LICENSE](LICENSE)).
-
-**භාවිතය:** යතුරුවල කොනවල දක්වා ඇති සංකේත භාවිත කිරීමට, ඔබේ ඇඟිල්ල ඒ සංකේතය ඇති දිශාවට යතුර මතින් ස්වයිප් කරන්න. උදාහරණයක් ලෙස, පහළ-වම් කෙළවර දෙසට ස්වයිප් කළ විට Settings (සැකසීම්) විවෘත වේ.
-
-| <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="තිර රුව 1" /> | <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" alt="තිර රුව 2"/> | <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="තිර රුව 3"/> |
+| Keyboard | Settings | Themes |
 | --- | --- | --- |
-| <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="තිර රුව 4" /> | <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" alt="තිර රුව 5" /> | <img src="/fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" alt="තිර රුව 6" /> |
+| <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="KeyCraft Keyboard" width="220" /> | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" alt="KeyCraft Settings" width="220" /> | <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="KeyCraft Themes" width="220" /> |
 
-## යෙදුමේ පරිවර්තන වැඩිදියුණු කිරීමට උදව් කරන්න
+## 🔐 පෞද්ගලිකත්වය (Privacy)
 
-පරිවර්තන දායකත්වය සඳහා මුල් upstream [Unexpected Keyboard Weblate ව්‍යාපෘතිය](https://hosted.weblate.org/engage/unexpected-keyboard/) භාවිතා වේ; KeyCraft සඳහා වෙනම translation project එකක් පසුව සකස් කළ හැක.
+- Sinhala Transliteration ක්‍රියාවලිය උපාංගය තුළම සිදු වේ.
+- Optional Dictionaries Download කිරීමට Internet Permission භාවිත වේ.
+- Clipboard පහසුකම් සැකසුම් මඟින් පාලනය කළ හැක. Clipboard History හෝ Preview සක්‍රිය කිරීමට පෙර ඒවායේ Settings පරීක්ෂා කරන්න.
+- KeyCraft තුළ දැන්වීම් (Ads) නොමැත.
 
-[<img src="https://hosted.weblate.org/widget/unexpected-keyboard/multi-auto.svg" alt="පරිවර්තන තත්ත්වය" />](https://hosted.weblate.org/engage/unexpected-keyboard/)
+KeyCraft විවෘත මූලාශ්‍ර (Open Source) ව්‍යාපෘතියකි. Source Code එක පරීක්ෂා කර යෙදුමේ Permissions සහ ක්‍රියාකාරීත්වය පිළිබඳව වැඩිදුර සොයා බැලිය හැක.
 
-## යෙදුම ගොඩනැගීමට අවශ්‍ය මූලික සුදුසුකම් (Build Prerequisites)
-- **OpenJDK 17** (හෝ ඊට අනුකූල JDK)
-- **Android SDK**: Build tools සහ Platform `android-36`
-- **Python 3.x**: Layouts හා xml උත්පාදනය සඳහා (`gen_layouts.py`, `gen_method_xml.py`, `check_layout.py`)
-- **fontforge**: විශේෂ යතුරු අයිකන font ගොඩනැගීම සඳහා
-- **keytool**: Local debug keystore ජනනය කිරීම සඳහා
-- **පරිසර විචල්‍ය (Env Vars)**: `.env.example` බලන්න
+## 🛠️ Source Code එකෙන් Build කිරීම
 
-### බිල්ඩ් සහ පරීක්ෂණ විධාන (Building & Testing)
+### අවශ්‍යතා (Requirements)
 
-#### 1. Debug APK එක බිල්ඩ් කිරීම
-Debug build එකේදී keystore එකක් නොමැති නම් ස්වයංක්‍රීයව debug keystore එකක් ජනනය වේ:
-```sh
+- JDK 17
+- Android SDK — Android Platform 36 සහ ඊට ගැළපෙන Build Tools
+- Android NDK \`27.2.12479018\` (Native Dictionary Component සඳහා)
+- Python 3
+- FontForge
+- Git සහ Submodule Support
+
+Repository එක සහ Submodules Clone කරන්න:
+
+~~~sh
+git clone --recurse-submodules https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard.git
+cd KeyCraft-Sinhala-Keyboard
+~~~
+
+දැනටමත් Clone කර ඇති Repository එකක Submodules ලබාගැනීමට:
+
+~~~sh
+git submodule update --init --recursive
+~~~
+
+සම්පූර්ණ Development Environment සහ Native Build උපදෙස් සඳහා [CONTRIBUTING.md](CONTRIBUTING.md) බලන්න.
+
+### Debug APK එක Build කිරීම
+
+~~~sh
 ./gradlew assembleDebug
-```
-- **Output APK**: `build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk`
-- (මෙන්ම `app/build/outputs/apk/debug/app-debug.apk` වෙතද copy වේ)
+~~~
 
-#### 2. Release APK එක බිල්ඩ් කිරීම (Signed)
-Release APK එක sign කිරීමට ඔබගේම release keystore එක සහ පහත signing credentials හතරම අවශ්‍ය වේ. Hardcoded release-password fallback එකක් නොමැත.
+APK Output Path එක:
 
-පළමුව template එකෙන් local `.env` ගොනුව සාදා එය ආරක්ෂා කරන්න:
-```sh
-cp .env.example .env
-chmod 600 .env
-```
-`.env` ගොනුව විවෘත කර ඔබගේ සැබෑ keystore path එක, keystore password එක, alias එක සහ key password එක යොදන්න:
-- `RELEASE_KEYSTORE`
-- `RELEASE_KEYSTORE_PASSWORD`
-- `RELEASE_KEY_ALIAS`
-- `RELEASE_KEY_PASSWORD`
+~~~text
+build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk
+~~~
 
-ඉන්පසු නිර්දේශිත release build script එක ධාවනය කරන්න:
-```sh
-bash ./build_release.sh
-```
-මෙම script එක `.env` load කර අවශ්‍ය values සහ keystore file එක පරීක්ෂා කර `clean assembleRelease` ධාවනය කරයි. විකල්පයක් ලෙස, `.env` දැනටමත් සකසා ඇත්නම්:
-```sh
-set -a
-. ./.env
-set +a
-./gradlew assembleRelease
-```
-- **Output APK**: `build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk`
-- Release APK එකෙහි ප්‍රමාණය සහ විස්තර වාර්තාවක් `build/reports/apk-release-report.txt` හි ස්වයංක්‍රීයව ජනනය වේ.
+### Signed Release APK එක Local Build කිරීම
 
-**ආරක්ෂාව:** `.env` හෝ production keystore ගොනු Git වෙත commit/push නොකරන්න. `.env` යනු විශ්වාසදායක ඔබේම shell-compatible file එකක් පමණක් විය යුතුය.
+Release APK එක Sign කිරීම සඳහා ඔබ සතු Release Keystore එකක් භාවිත කළ යුතුය. Keystore ගොනු හෝ Signing Passwords කිසිවිටෙක Git Repository එකට Commit නොකරන්න.
 
-#### 3. Termux / PRoot (Android) හරහා බිල්ඩ් කිරීම
-Android දුරකථනය තුළ Termux හෝ PRoot Linux පරිසරයක සිට build කරන්නේ නම්:
-1. `~/.gradle/gradle.properties` ගොනුව තුළ AAPT2 override සකසා ඇති බව තහවුරු කරගන්න:
-   ```properties
-   android.aapt2FromMavenOverride=/data/data/com.termux/files/usr/bin/aapt2
-   ```
-2. අවශ්‍ය APK වර්ගය build කරන්න:
-   ```sh
-   # Debug APK එක සඳහා
-   ./gradlew assembleDebug
-
-   # Signed Release APK එක සඳහා (.env කලින් configure කර තිබිය යුතුය)
+1. Environment Template එක Copy කරන්න:
+   ~~~sh
+   cp .env.example .env
+   chmod 600 .env
+   ~~~
+2. \`.env\` ගොනුව තුළ පහත Values සකසන්න:
+   - \`RELEASE_KEYSTORE\`
+   - \`RELEASE_KEYSTORE_PASSWORD\`
+   - \`RELEASE_KEY_ALIAS\`
+   - \`RELEASE_KEY_PASSWORD\`
+3. Release Build එක ධාවනය කරන්න:
+   ~~~sh
    bash ./build_release.sh
-   ```
-3. ඔබ build කළ variant එකට අදාළ APK එක Phone එකේ Download ෆෝල්ඩරයට copy කරගන්න. පහත උදාහරණවල `debug` වෙනුවට `release` භාවිත කරන්නේ signed Release APK එක build කළ විට පමණි:
-   ```sh
-   # Debug APK
-   # PRoot:
-   cp build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk /sdcard/Download/
-   # Termux:
-   cp build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk ~/storage/shared/Download/
+   ~~~
 
-   # Signed Release APK (පළමුව .env configure කර bash ./build_release.sh ධාවනය කරන්න)
-   # PRoot:
-   cp build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk /sdcard/Download/
-   # Termux:
-   cp build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk ~/storage/shared/Download/
-   ```
+APK Output Path එක:
 
-#### 4. වෙනත් විධාන
-```sh
-# APK report එකක් ලබාගැනීමට
-./gradlew generateReleaseApkReport
+~~~text
+build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk
+~~~
 
-# Unit tests ධාවනය කිරීමට
-./gradlew test
-```
+### GitHub Actions මඟින් Release කිරීම
 
-## පෞද්ගලිකත්වය සහ ක්ලිප්බෝඩ් ආරක්ෂාව (Privacy & Security)
-- **දත්ත ලොග් නොකිරීම (Zero Logging)**: පරිශීලකයා ටයිප් කරන කිසිදු දත්තයක් හෝ පාස්වර්ඩ් සටහන් කර නොගන්නා අතර අන්තර්ජාලයට යවනු නොලැබේ.
-- **මතකයේ පමණක් රඳවාගන්නා ක්ලිප්බෝඩ් ඉතිහාසය (In-Memory Only)**: ක්ලිප්බෝඩ් ඉතිහාසය පෙරනිමියෙන් අක්‍රිය කර ඇත (opt-in). සක්‍රිය කළ විට පවා එය තාවකාලික RAM මතකයේ පමණක් රඳවා තබන අතර, කිසිදු storage හෝ database එකකට ලියනු නොලැබේ.
-- **ක්ලිප්බෝඩ් ඉක්මන් ඇලවීම**: යෝජනා තීරුවේ පෙන්වන ක්ලිප්බෝඩ් පෙරදසුන පෙරනිමියෙන් අක්‍රියය. Settings තුළ එය සක්‍රිය කළ විට, එක් තට්ටුවකින් ඇලවීමට වත්මන් ක්ලිප්බෝඩ් අයිතමය පෙන්වයි.
-- **සංවේදී දත්ත ආරක්ෂාව**: Android 7.0+ (API 24+) සිට `android.content.extra.IS_SENSITIVE` (`ClipDescription.EXTRA_IS_SENSITIVE`) ලෙස සලකුණු කළ පාස්වර්ඩ් සහ OTPs කිසිසේත්ම ක්ලිප්බෝඩ් ඉතිහාසයට එකතු නොවේ.
-- **ස්වයංක්‍රීයව ඉවත්වීම**: පරිශීලකයා තෝරාගත් කාල සීමාවෙන් පසු ඉතිහාසය ස්වයංක්‍රීයව මැකී යන අතර, සැකසුම අක්‍රිය කළ වහාම මතකයේ ඇති සියල්ල ක්ෂණිකව ඉවත් වේ.
+\`v*\` ආකෘතියේ Git Tag එකක් Push කළ විට **Build and release signed APK** GitHub Actions Workflow එක Tests ධාවනය කර Signed Release APK එක Build කරයි. ඉන්පසු APK එක සහ එහි SHA-256 Checksum එක GitHub Releases වෙත Publish කරයි.
 
-## දායකත්වය
+Release පවත්වාගෙන යන Maintainers විසින් Repository Settings → Secrets and variables → Actions යටතේ පහත Secrets සකසා තිබිය යුතුය:
 
-යෙදුම ගොඩනැගීමේ උපදෙස් සඳහා [දායකත්ව මාර්ගෝපදේශය](CONTRIBUTING.md) බලන්න.
+- \`RELEASE_KEYSTORE_BASE64\`
+- \`RELEASE_KEYSTORE_PASSWORD\`
+- \`RELEASE_KEY_ALIAS\`
+- \`RELEASE_KEY_PASSWORD\`
 
-## බලපත්‍රය (License)
+Secret Values Source Files, Git Commits හෝ Workflow Logs තුළ ඇතුළත් නොකරන්න.
 
-මෙම ව්‍යාපෘතිය **GNU General Public License v3.0 (GPL-3.0)** බලපත්‍රය යටතේ බෙදාහරිනු ලැබේ. වැඩි විස්තර සඳහා [LICENSE](LICENSE) ගොනුව බලන්න.
+## 🤝 දායකත්වය (Contributing)
 
-## ස්තුතිය හා පිළිගැනීම්
+නව අදහස්, Bug Reports සහ Code Contributions සාදරයෙන් පිළිගනිමු. වෙනස්කම් ඉදිරිපත් කිරීමට පෙර [CONTRIBUTING.md](CONTRIBUTING.md) කියවන්න.
 
-අක්ෂර වින්‍යාසය පරීක්ෂා කිරීමේ විශේෂාංගය සංවර්ධනය කිරීම සඳහා [NLnet පදනම](https://nlnet.nl/) අරමුදල් සපයා ඇත.
+Bug එකක් වාර්තා කරන විට Android Version එක, Device තොරතුරු සහ ගැටලුව නැවත ඇතිකරන පියවර සඳහන් කරන්න. පෞද්ගලික පණිවිඩ හෝ සංවේදී Clipboard දත්ත Bug Reports තුළ ඇතුළත් නොකරන්න.
 
+## 📄 බලපත්‍රය (License)
 
-## Upstream project and attribution
+KeyCraft **GNU General Public License v3.0 (GPL-3.0)** යටතේ බෙදාහරිනු ලැබේ. සම්පූර්ණ බලපත්‍ර කොන්දේසි සඳහා [LICENSE](LICENSE) ගොනුව බලන්න.
 
-KeyCraft Sinhala Keyboard is based on [Unexpected Keyboard](https://github.com/Julow/Unexpected-Keyboard) by Julow and contributors. Original copyright notices and the GNU General Public License v3.0 are retained.
+## 🙏 ස්තුතිය සහ පිළිගැනීම් (Credits)
+
+KeyCraft, Julow සහ දායකයන් විසින් සංවර්ධනය කළ [Unexpected Keyboard](https://github.com/Julow/Unexpected-Keyboard) ව්‍යාපෘතිය මත පදනම් වේ. අදාළ Upstream Copyright Notices සහ License කොන්දේසි එලෙසම පවත්වාගෙන යයි. මුල් සංවර්ධකයන්ට සහ මෙම ව්‍යාපෘතියට දායක වූ සියලු දෙනාට ස්තුතියි.
