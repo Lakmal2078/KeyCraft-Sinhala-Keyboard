@@ -316,7 +316,7 @@ def main():
         word_freq[w] = f
 
     # 2. Transliterator words
-    trans_path = os.path.join(os.path.dirname(__file__), "srcs/java/juloo/keyboard2/SinhalaTransliterator.java")
+    trans_path = os.path.join(os.path.dirname(__file__), "srcs/java/com/lakmal/keycraftsinhala/SinhalaTransliterator.java")
     trans_words = load_words_from_transliterator(trans_path)
     for w in trans_words:
         word_freq[w] = 15

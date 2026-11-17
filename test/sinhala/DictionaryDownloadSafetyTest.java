@@ -1,4 +1,4 @@
-package juloo.keyboard2.dict;
+package com.lakmal.keycraftsinhala.dict;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

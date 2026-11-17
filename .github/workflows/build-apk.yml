@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Unexpected Keyboard APK
+    name: Build KeyCraft Sinhala Keyboard APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -63,6 +63,6 @@ jobs:
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: unexpected-keyboard-apk
+          name: keycraft-sinhala-keyboard-apk
           path: build/outputs/apk/debug/*.apk
           retention-days: 14

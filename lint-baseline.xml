@@ -26,7 +26,7 @@
     <issue
         id="UnusedAttribute"
         message="Attribute `directBootAware` is only used in API level 24 and higher (current min is 21)"
-        errorLine1="    &lt;service android:name=&quot;juloo.keyboard2.Keyboard2&quot; android:label=&quot;@string/app_name&quot; android:permission=&quot;android.permission.BIND_INPUT_METHOD&quot; android:exported=&quot;true&quot; android:directBootAware=&quot;true&quot;>"
+        errorLine1="    &lt;service android:name=&quot;com.lakmal.keycraftsinhala.Keyboard2&quot; android:label=&quot;@string/app_name&quot; android:permission=&quot;android.permission.BIND_INPUT_METHOD&quot; android:exported=&quot;true&quot; android:directBootAware=&quot;true&quot;>"
         errorLine2="                                                                                                                                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="AndroidManifest.xml"
@@ -37,7 +37,7 @@
     <issue
         id="UnusedAttribute"
         message="Attribute `directBootAware` is only used in API level 24 and higher (current min is 21)"
-        errorLine1="    &lt;activity android:name=&quot;juloo.keyboard2.SettingsActivity&quot; android:icon=&quot;@mipmap/ic_launcher&quot; android:theme=&quot;@style/settingsTheme&quot; android:exported=&quot;false&quot; android:directBootAware=&quot;true&quot;/>"
+        errorLine1="    &lt;activity android:name=&quot;com.lakmal.keycraftsinhala.SettingsActivity&quot; android:icon=&quot;@mipmap/ic_launcher&quot; android:theme=&quot;@style/settingsTheme&quot; android:exported=&quot;false&quot; android:directBootAware=&quot;true&quot;/>"
         errorLine2="                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="AndroidManifest.xml"
@@ -48,7 +48,7 @@
     <issue
         id="UnusedAttribute"
         message="Attribute `directBootAware` is only used in API level 24 and higher (current min is 21)"
-        errorLine1="    &lt;activity android:name=&quot;juloo.keyboard2.LauncherActivity&quot; android:icon=&quot;@mipmap/ic_launcher&quot; android:theme=&quot;@style/appTheme&quot; android:exported=&quot;true&quot; android:directBootAware=&quot;true&quot;>"
+        errorLine1="    &lt;activity android:name=&quot;com.lakmal.keycraftsinhala.LauncherActivity&quot; android:icon=&quot;@mipmap/ic_launcher&quot; android:theme=&quot;@style/appTheme&quot; android:exported=&quot;true&quot; android:directBootAware=&quot;true&quot;>"
         errorLine2="                                                                                                                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="AndroidManifest.xml"
@@ -59,7 +59,7 @@
     <issue
         id="UnusedAttribute"
         message="Attribute `directBootAware` is only used in API level 24 and higher (current min is 21)"
-        errorLine1="    &lt;activity android:name=&quot;juloo.keyboard2.dict.DictionariesActivity&quot; android:icon=&quot;@mipmap/ic_launcher&quot; android:theme=&quot;@style/appTheme&quot; android:exported=&quot;false&quot; android:directBootAware=&quot;true&quot;/>"
+        errorLine1="    &lt;activity android:name=&quot;com.lakmal.keycraftsinhala.dict.DictionariesActivity&quot; android:icon=&quot;@mipmap/ic_launcher&quot; android:theme=&quot;@style/appTheme&quot; android:exported=&quot;false&quot; android:directBootAware=&quot;true&quot;/>"
         errorLine2="                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="AndroidManifest.xml"
@@ -4649,7 +4649,7 @@
         errorLine1="    _tc = new Theme.Computed(_theme, _config, _keyWidth, _keyboard);"
         errorLine2="          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/Keyboard2View.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/Keyboard2View.java"
             line="287"
             column="11"/>
     </issue>
@@ -4660,7 +4660,7 @@
         errorLine1="    if (VERSION.SDK_INT &lt;= 11)"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/ClipboardHistoryService.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/ClipboardHistoryService.java"
             line="40"
             column="9"/>
     </issue>
@@ -4671,7 +4671,7 @@
         errorLine1="    if (VERSION.SDK_INT &lt; 21)"
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/Keyboard2View.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/Keyboard2View.java"
             line="103"
             column="9"/>
     </issue>
@@ -4682,7 +4682,7 @@
         errorLine1="      if (VERSION.SDK_INT >= 14)"
         errorLine2="          ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/VoiceImeSwitcher.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/VoiceImeSwitcher.java"
             line="143"
             column="11"/>
     </issue>
@@ -5221,7 +5221,7 @@
         errorLine1="    hexLabel.setText(&quot;HEX: &quot;);"
         errorLine2="                     ~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/prefs/ColorPickerPreference.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/prefs/ColorPickerPreference.java"
             line="179"
             column="22"/>
     </issue>
@@ -5232,7 +5232,7 @@
         errorLine1="    btnReset.setText(&quot;Reset&quot;);"
         errorLine2="                     ~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/prefs/ColorPickerPreference.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/prefs/ColorPickerPreference.java"
             line="219"
             column="22"/>
     </issue>
@@ -5243,7 +5243,7 @@
         errorLine1="    presetsTitle.setText(&quot;Presets&quot;);"
         errorLine2="                         ~~~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/prefs/ColorPickerPreference.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/prefs/ColorPickerPreference.java"
             line="227"
             column="26"/>
     </issue>
@@ -5254,7 +5254,7 @@
         errorLine1="      _textR.setText(&quot;Red: &quot; + _seekR.getProgress());"
         errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/prefs/ColorPickerPreference.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/prefs/ColorPickerPreference.java"
             line="326"
             column="22"/>
     </issue>
@@ -5265,7 +5265,7 @@
         errorLine1="      _textR.setText(&quot;Red: &quot; + _seekR.getProgress());"
         errorLine2="                     ~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/prefs/ColorPickerPreference.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/prefs/ColorPickerPreference.java"
             line="326"
             column="22"/>
     </issue>
@@ -5276,7 +5276,7 @@
         errorLine1="      _textG.setText(&quot;Green: &quot; + _seekG.getProgress());"
         errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/prefs/ColorPickerPreference.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/prefs/ColorPickerPreference.java"
             line="328"
             column="22"/>
     </issue>
@@ -5287,7 +5287,7 @@
         errorLine1="      _textG.setText(&quot;Green: &quot; + _seekG.getProgress());"
         errorLine2="                     ~~~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/prefs/ColorPickerPreference.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/prefs/ColorPickerPreference.java"
             line="328"
             column="22"/>
     </issue>
@@ -5298,7 +5298,7 @@
         errorLine1="      _textB.setText(&quot;Blue: &quot; + _seekB.getProgress());"
         errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/prefs/ColorPickerPreference.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/prefs/ColorPickerPreference.java"
             line="330"
             column="22"/>
     </issue>
@@ -5309,7 +5309,7 @@
         errorLine1="      _textB.setText(&quot;Blue: &quot; + _seekB.getProgress());"
         errorLine2="                     ~~~~~~~~">
         <location
-            file="srcs/java/juloo/keyboard2/prefs/ColorPickerPreference.java"
+            file="srcs/java/com/lakmal/keycraftsinhala/prefs/ColorPickerPreference.java"
             line="330"
             column="22"/>
     </issue>

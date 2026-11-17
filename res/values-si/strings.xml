@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_release">Unexpected Keyboard</string>
-    <string name="app_name_debug">Unexpected Keyboard (දෝෂහරණ)</string>
+    <string name="app_name_release">KeyCraft Sinhala Keyboard</string>
+    <string name="brand_tagline">සිංහල ලිවීම ලස්සනට, ඉක්මනට</string>
+    <string name="app_name_debug">KeyCraft Sinhala Keyboard (Debug)</string>
     <string name="short_description">Android සඳහා සැහැල්ලු සහ පුද්ගලිකත්වයට මුල්තැන දෙන යතුරුපුවරුව.</string>
     <string name="store_description">ප්‍රධානතම අංගය වන්නේ යතුරු කොන් දෙසට swipe කිරීමෙන් වැඩි අකුරු ප්‍රමාණයක් ටයිප් කළ හැකි වීමයි.\n\nමෙම යෙදුම මුලින් Termux භාවිතා කරන ක්‍රමලේඛකයින් සඳහා නිර්මාණය කරන ලද්දකි.\nදැන් එදිනෙදා භාවිතයටද ඉතා සුදුසුය.\n\nමෙම යෙදුමේ දැන්වීම් නොමැති අතර එය නිදහස් සහ විවෘත මූලාශ්‍ර මෘදුකාංගයකි.</string>
     <string name="pref_portrait">Portrait මාදිලියේදී</string>
@@ -126,7 +127,7 @@
     <string name="pref_theme_e_high_contrast">ඉහළ ප්‍රතිවිරෝධය (කළු සහ සුදු)</string>
     <string name="pref_theme_e_high_contrast_yellow">ඉහළ ප්‍රතිවිරෝධය (කහ පැහැය)</string>
     <string name="pref_theme_e_lanka_blue">ලංකා නිල් (Lanka Blue)</string>
-    <string name="pref_theme_e_unexpected_keyboard">Unexpected Keyboard</string>
+    <string name="pref_theme_e_unexpected_keyboard">KeyCraft Sinhala Keyboard</string>
     <string name="pref_theme_e_rose_quartz">රෝස් ක්වාර්ට්ස් (Rose Quartz)</string>
     <string name="pref_theme_e_ocean_breeze">සාගර සුළඟ (Ocean Breeze)</string>
     <string name="pref_theme_e_citrus_pop">සිට්‍රස් පොප් (Citrus Pop)</string>
@@ -206,7 +207,7 @@
     <string name="launcher_button_imesettings">යතුරුපුවරුව සක්‍රීය කරන්න</string>
     <string name="launcher_button_imepicker">යතුරුපුවරුව තෝරන්න</string>
     <string name="launcher_button_dictionaries">ශබ්දකෝෂ ස්ථාපනය කරන්න</string>
-    <string name="launcher_description">මෙය අතථ්‍ය යතුරුපුවරුවකි. පහත බොත්තම ක්ලික් කර පද්ධති සැකසුම් වෙත ගොස් Unexpected-Keyboard සක්‍රීය කරන්න.</string>
+    <string name="launcher_description">මෙය අතථ්‍ය යතුරුපුවරුවකි. පහත බොත්තම ක්ලික් කර පද්ධති සැකසුම් වෙත ගොස් KeyCraft Sinhala Keyboard සක්‍රීය කරන්න.</string>
     <string name="launcher_sourcecode">මෙය නොමිලේ සහ විවෘත මූලාශ්‍ර යෙදුමකි. ඔබට එහි කේතය බැලීමට හෝ දෝෂ වාර්තා කිරීමට GitHub වෙත යා හැක.</string>
     <string name="launcher_tryhere">සක්‍රීය කිරීමෙන් පසු, ඔබට මෙහි යතුරුපුවරුව අත්හදා බැලිය හැක:</string>
     <string name="launcher_tryhere_hint">මෙහි ටයිප් කර බලන්න</string>

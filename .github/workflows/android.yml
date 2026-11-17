@@ -87,7 +87,7 @@ jobs:
           script: |
             ./gradlew connectedDebugAndroidTest
             mkdir -p build/uiux-screenshots
-            adb pull /sdcard/Pictures/unexpected-keyboard-uiux/. build/uiux-screenshots/
+            adb pull /sdcard/Pictures/keycraft-sinhala-keyboard-uiux/. build/uiux-screenshots/
             test "$(od -An -tx1 -N8 build/uiux-screenshots/theme-picker-light.png | tr -d ' \n')" = "89504e470d0a1a0a"
             test "$(od -An -tx1 -N8 build/uiux-screenshots/theme-picker-dark.png | tr -d ' \n')" = "89504e470d0a1a0a"
 
@@ -95,7 +95,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: unexpected-keyboard-theme-picker-screenshots
+          name: keycraft-sinhala-keyboard-theme-picker-screenshots
           path: build/uiux-screenshots/
           if-no-files-found: error
           retention-days: 30
@@ -106,6 +106,6 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: unexpected-keyboard-debug-pr
-          path: build/outputs/apk/debug/Unexpected-Keyboard-debug.apk
+          name: keycraft-sinhala-keyboard-debug-pr
+          path: build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk
           retention-days: 7

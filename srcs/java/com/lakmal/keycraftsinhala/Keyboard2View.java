@@ -1,0 +1,855 @@
+package com.lakmal.keycraftsinhala;
+
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.graphics.Canvas;
+import android.graphics.Insets;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.inputmethodservice.InputMethodService;
+import android.os.Build.VERSION;
+import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+import android.os.Bundle;
+import androidx.customview.widget.ExploreByTouchHelper;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
+import java.util.Arrays;
+import java.util.List;
+
+public class Keyboard2View extends View
+  implements View.OnTouchListener, Pointers.IPointerEventHandler
+{
+  private KeyboardData _keyboard;
+
+  /** The key holding the shift key is used to set shift state from
+      autocapitalisation. */
+  private KeyboardData.Key _shift_key;
+
+  /** Used to add fake pointers. */
+  private KeyboardData.Key _compose_key;
+
+  private Pointers _pointers;
+
+  private Pointers.Modifiers _mods;
+
+
+  private Config _config;
+
+  private float _keyWidth;
+  private float _mainLabelSize;
+  private float _subLabelSize;
+  private float _marginRight;
+  private float _marginLeft;
+  private float _marginBottom;
+  private int _insets_left = 0;
+  private int _insets_right = 0;
+  private int _insets_bottom = 0;
+
+  private Theme _theme;
+  private Theme.Computed _tc;
+  private final KeyboardAccessibilityHelper _accessibilityHelper;
+  private static final int ACCESSIBILITY_POINTER_ID = 0x7ffffffe;
+
+  private static RectF _tmpRect = new RectF();
+
+  enum Vertical
+  {
+    TOP,
+    CENTER,
+    BOTTOM
+  }
+
+  public static final float TOUCH_MARGIN_TOLERANCE_PX = 8.0f;
+
+  public Keyboard2View(Context context, AttributeSet attrs)
+  {
+    super(context, attrs);
+    _theme = new Theme(getContext(), attrs);
+    _config = Config.globalConfig();
+    _pointers = new Pointers(this, _config);
+    _accessibilityHelper = new KeyboardAccessibilityHelper(this);
+    ViewCompat.setAccessibilityDelegate(this, _accessibilityHelper);
+    setFocusable(true);
+    setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+    refresh_navigation_bar(context);
+    setHapticFeedbackEnabled(true);
+    setOnTouchListener(this);
+    int layout_id = (attrs == null) ? 0 :
+      attrs.getAttributeResourceValue(null, "layout", 0);
+    if (layout_id == 0)
+      reset();
+    else
+      setKeyboard(KeyboardData.load(getResources(), layout_id));
+  }
+
+  private Window getParentWindow(Context context)
+  {
+    if (context instanceof InputMethodService)
+      return ((InputMethodService)context).getWindow().getWindow();
+    if (context instanceof ContextWrapper)
+      return getParentWindow(((ContextWrapper)context).getBaseContext());
+    return null;
+  }
+
+  public void refresh_navigation_bar(Context context)
+  {
+    if (VERSION.SDK_INT < 21)
+      return;
+    // The intermediate Window is a [Dialog].
+    Window w = getParentWindow(context);
+    w.setNavigationBarColor(_theme.colorNavBar);
+    if (VERSION.SDK_INT < 26)
+      return;
+    int uiFlags = getSystemUiVisibility();
+    if (_theme.isLightNavBar)
+      uiFlags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+    else
+      uiFlags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+    setSystemUiVisibility(uiFlags);
+  }
+
+  public void setKeyboard(KeyboardData kw)
+  {
+    _keyboard = kw;
+    _accessibilityHelper.invalidateRoot();
+    _shift_key = _keyboard.findKeyWithValue(KeyValue.SHIFT);
+    _compose_key = _keyboard.findKeyWithValue(KeyValue.COMPOSE);
+    KeyModifier.set_modmap(_keyboard.modmap);
+    reset();
+  }
+
+  public void reset()
+  {
+    _mods = Pointers.Modifiers.EMPTY;
+    _pointers.clear();
+    requestLayout();
+    invalidate();
+  }
+
+  void set_fake_ptr_latched(KeyboardData.Key key, KeyValue kv, boolean latched,
+      boolean lock)
+  {
+    if (_keyboard == null || key == null)
+      return;
+    _pointers.set_fake_pointer_state(key, kv, latched, lock);
+  }
+
+  /** Called by auto-capitalisation. */
+  public void set_shift_state(boolean latched, boolean lock)
+  {
+    set_fake_ptr_latched(_shift_key, KeyValue.SHIFT, latched, lock);
+  }
+
+  /** Called from [KeyEventHandler]. */
+  public void set_compose_pending(boolean pending)
+  {
+    set_fake_ptr_latched(_compose_key, KeyValue.COMPOSE, pending, false);
+  }
+
+  /** Called from [Keybard2.onUpdateSelection].  */
+  public void set_selection_state(boolean selection_state)
+  {
+    if (_config.editor_config.selection_mode_enabled)
+      set_fake_ptr_latched(KeyboardData.Key.EMPTY,
+          KeyValue.SELECTION_MODE, selection_state, true);
+  }
+
+  public KeyValue modifyKey(KeyValue k, Pointers.Modifiers mods)
+  {
+    return KeyModifier.modify(k, mods);
+  }
+
+  public void onPointerDown(KeyValue k, boolean isSwipe)
+  {
+    updateFlags();
+    _config.handler.key_down(k, isSwipe);
+    invalidate();
+    vibrate();
+    playKeySound();
+  }
+
+  private void playKeySound()
+  {
+    if (_config != null && _config.sound_on_keypress)
+    {
+      playSoundEffect(android.view.SoundEffectConstants.CLICK);
+    }
+  }
+
+  public void onPointerUp(KeyValue k, Pointers.Modifiers mods)
+  {
+    // [key_up] must be called before [updateFlags]. The latter might disable
+    // flags.
+    _config.handler.key_up(k, mods);
+    updateFlags();
+    invalidate();
+  }
+
+  public void onPointerHold(KeyValue k, Pointers.Modifiers mods)
+  {
+    _config.handler.key_up(k, mods);
+    updateFlags();
+  }
+
+  public void onPointerFlagsChanged(boolean shouldVibrate)
+  {
+    updateFlags();
+    invalidate();
+    if (shouldVibrate)
+      vibrate();
+  }
+
+  private void updateFlags()
+  {
+    _mods = _pointers.getModifiers();
+    _config.handler.mods_changed(_mods);
+  }
+
+  @Override
+  public boolean onTouch(View v, MotionEvent event)
+  {
+    int p;
+    switch (event.getActionMasked())
+    {
+      case MotionEvent.ACTION_UP:
+      case MotionEvent.ACTION_POINTER_UP:
+        _pointers.onTouchUp(event.getPointerId(event.getActionIndex()));
+        break;
+      case MotionEvent.ACTION_DOWN:
+      case MotionEvent.ACTION_POINTER_DOWN:
+        p = event.getActionIndex();
+        float tx = event.getX(p);
+        float ty = event.getY(p);
+        KeyboardData.Key key = getKeyAtPosition(tx, ty);
+        if (key != null)
+          _pointers.onTouchDown(tx, ty, event.getPointerId(p), key);
+        break;
+      case MotionEvent.ACTION_MOVE:
+        for (p = 0; p < event.getPointerCount(); p++)
+          _pointers.onTouchMove(event.getX(p), event.getY(p), event.getPointerId(p));
+        break;
+      case MotionEvent.ACTION_CANCEL:
+        _pointers.onTouchCancel();
+        break;
+      default:
+        return (false);
+    }
+    return (true);
+  }
+
+  private KeyboardData.Row getRowAtPosition(float ty)
+  {
+    if (_keyboard == null || _keyboard.rows.isEmpty() || _tc == null)
+      return null;
+    float y = _config.marginTop;
+    if (ty < y)
+      return _keyboard.rows.get(0);
+    for (int i = 0; i < _keyboard.rows.size(); i++)
+    {
+      KeyboardData.Row row = _keyboard.rows.get(i);
+      y += (row.shift + row.height) * _tc.row_height;
+      if (ty < y)
+        return row;
+    }
+    return _keyboard.rows.get(_keyboard.rows.size() - 1);
+  }
+
+  private KeyboardData.Key getKeyAtPosition(float tx, float ty)
+  {
+    KeyboardData.Row row = getRowAtPosition(ty);
+    if (row == null || row.keys.isEmpty())
+      return null;
+    float x = _marginLeft;
+    if (tx < x)
+      return row.keys.get(0);
+    for (int i = 0; i < row.keys.size(); i++)
+    {
+      KeyboardData.Key key = row.keys.get(i);
+      float xLeft = x + key.shift * _keyWidth;
+      float xRight = xLeft + key.width * _keyWidth;
+      if (tx >= xLeft && tx < xRight)
+        return key;
+      if (tx < xLeft)
+        return (i > 0) ? row.keys.get(i - 1) : key;
+      x = xRight;
+    }
+    return row.keys.get(row.keys.size() - 1);
+  }
+
+  private void vibrate()
+  {
+    VibratorCompat.vibrate(this, _config);
+  }
+
+  /** Resolve the keyboard's available width from its parent window, not the full display. */
+  static int resolveAvailableWidth(int widthSpecSize, int displayWidth)
+  {
+    return widthSpecSize > 0 ? widthSpecSize : displayWidth;
+  }
+
+  /** Limit row height to the space actually offered by the IME window. */
+  static float resolveMaxRowHeight(int availableHeight, float verticalMargins,
+      float keysHeight)
+  {
+    if (availableHeight <= 0 || keysHeight <= 0)
+      return Float.POSITIVE_INFINITY;
+    return Math.max(1f, (availableHeight - verticalMargins) / keysHeight);
+  }
+
+  @Override
+  public void onMeasure(int wSpec, int hSpec)
+  {
+    DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
+    int width = resolveAvailableWidth(MeasureSpec.getSize(wSpec), dm.widthPixels);
+    _marginLeft = Math.max(_config.horizontal_margin, _insets_left);
+    _marginRight = Math.max(_config.horizontal_margin, _insets_right);
+    _marginBottom = _config.margin_bottom + _insets_bottom;
+    _keyWidth = (width - _marginLeft - _marginRight) / _keyboard.keysWidth;
+    int heightMode = MeasureSpec.getMode(hSpec);
+    int availableHeight = MeasureSpec.getSize(hSpec);
+    float maxRowHeight = (heightMode == MeasureSpec.UNSPECIFIED || availableHeight <= 0)
+        ? Float.POSITIVE_INFINITY
+        : resolveMaxRowHeight(availableHeight, _config.marginTop + _marginBottom,
+            _keyboard.keysHeight);
+    _tc = new Theme.Computed(_theme, _config, _keyWidth, _keyboard, maxRowHeight);
+    // Compute the size of labels based on the width or the height of keys. The
+    // margin around keys is taken into account. Keys normal aspect ratio is
+    // assumed to be 3/2 for a 10 columns layout. It's generally more, the
+    // width computation is useful when the keyboard is unusually high.
+    float labelBaseSize = Math.min(
+        _tc.row_height - _tc.vertical_margin,
+        (width / 10 - _tc.horizontal_margin) * 3/2
+        ) * _config.characterSize;
+    _mainLabelSize = labelBaseSize * _config.labelTextSize;
+    _subLabelSize = labelBaseSize * _config.sublabelTextSize;
+    int height =
+      (int)(_tc.row_height * _keyboard.keysHeight
+          + _config.marginTop + _marginBottom);
+    setMeasuredDimension(resolveSize(width, wSpec), resolveSize(height, hSpec));
+    _accessibilityHelper.invalidateRoot();
+  }
+
+  Rect _cached_exclusion_rect = new Rect();
+  List<Rect> _cached_exclusion_rects = Arrays.asList(_cached_exclusion_rect);
+  @Override
+  public void onLayout(boolean changed, int left, int top, int right, int bottom)
+  {
+    if (!changed)
+      return;
+    // Since SDK 30, this is done automatically:
+    // https://android.googlesource.com/platform/frameworks/base/+/android11-release/core/java/android/inputmethodservice/InputMethodService.java#852
+    if (VERSION.SDK_INT == 29)
+    {
+      // Disable the back-gesture on the keyboard area
+      _cached_exclusion_rect.set(
+          left + (int)_marginLeft,
+          top + (int)_config.marginTop,
+          right - (int)_marginRight,
+          bottom - (int)_marginBottom);
+      setSystemGestureExclusionRects(_cached_exclusion_rects);
+    }
+  }
+
+  @Override
+  public WindowInsets onApplyWindowInsets(WindowInsets wi)
+  {
+    // LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS is set in [Keyboard2#updateSoftInputWindowLayoutParams] for SDK_INT >= 35.
+    if (VERSION.SDK_INT < 35)
+      return wi;
+    int insets_types =
+      WindowInsets.Type.systemBars()
+      | WindowInsets.Type.displayCutout();
+    Insets insets = wi.getInsets(insets_types);
+    _insets_left = insets.left;
+    _insets_right = insets.right;
+    _insets_bottom = insets.bottom;
+    return WindowInsets.CONSUMED;
+  }
+
+  /** Horizontal and vertical position of the 9 indexes. */
+  static final Paint.Align[] LABEL_POSITION_H = new Paint.Align[]{
+    Paint.Align.CENTER, Paint.Align.LEFT, Paint.Align.RIGHT, Paint.Align.LEFT,
+    Paint.Align.RIGHT, Paint.Align.LEFT, Paint.Align.RIGHT,
+    Paint.Align.CENTER, Paint.Align.CENTER
+  };
+
+  static final Vertical[] LABEL_POSITION_V = new Vertical[]{
+    Vertical.CENTER, Vertical.TOP, Vertical.TOP, Vertical.BOTTOM,
+    Vertical.BOTTOM, Vertical.CENTER, Vertical.CENTER, Vertical.TOP,
+    Vertical.BOTTOM
+  };
+
+  @Override
+  protected void onDraw(Canvas canvas)
+  {
+    if (_tc.keyboard_background_paint != null)
+    {
+      canvas.drawRect(
+              0,
+              0,
+              getWidth(),
+              getHeight(),
+              _tc.keyboard_background_paint);
+    }
+
+    float y = _tc.margin_top;
+    for (int rowIndex = 0; rowIndex < _keyboard.rows.size(); rowIndex++)
+    {
+      KeyboardData.Row row = _keyboard.rows.get(rowIndex);
+      y += row.shift * _tc.row_height;
+      float x = _marginLeft + _tc.margin_left;
+      float keyH = row.height * _tc.row_height - _tc.vertical_margin;
+      for (int keyIndex = 0; keyIndex < row.keys.size(); keyIndex++)
+      {
+        KeyboardData.Key k = row.keys.get(keyIndex);
+        x += k.shift * _keyWidth;
+        float keyW = _keyWidth * k.width - _tc.horizontal_margin;
+        boolean isKeyDown = _pointers.isKeyDown(k);
+        Theme.Computed.Key tc_key;
+        if (isKeyDown)
+          tc_key = _tc.key_activated;
+        else
+          switch (k.role)
+          {
+            case Action: tc_key = _tc.key_action; break;
+            case Space_bar: tc_key = _tc.key_space_bar; break;
+            case Suggestion: tc_key = _tc.key_suggestion; break;
+            default:
+            case Normal: tc_key = _tc.key; break;
+          }
+        drawKeyFrame(canvas, x, y, keyW, keyH, tc_key);
+        if (k.keys[0] != null)
+          drawLabel(canvas, k.keys[0], keyW / 2f + x, y, keyH, isKeyDown, tc_key);
+        for (int i = 1; i < 9; i++)
+        {
+          if (k.keys[i] != null)
+            drawSubLabel(canvas, k.keys[i], x, y, keyW, keyH, i, isKeyDown, tc_key);
+        }
+        drawIndication(canvas, k, x, y, keyW, keyH, _tc);
+        x += _keyWidth * k.width;
+      }
+      y += row.height * _tc.row_height;
+    }
+  }
+
+  /** Number of virtual key nodes exposed to accessibility services. */
+  int accessibilityKeyCount()
+  {
+    if (_keyboard == null)
+      return 0;
+    int count = 0;
+    for (int i = 0; i < _keyboard.rows.size(); i++)
+      count += _keyboard.rows.get(i).keys.size();
+    return count;
+  }
+
+  KeyboardData.Key accessibilityKeyAt(int index)
+  {
+    if (_keyboard == null || index < 0)
+      return null;
+    for (int i = 0; i < _keyboard.rows.size(); i++)
+    {
+      List<KeyboardData.Key> keys = _keyboard.rows.get(i).keys;
+      if (index < keys.size())
+        return keys.get(index);
+      index -= keys.size();
+    }
+    return null;
+  }
+
+  /** Set virtual key bounds in this view's local coordinates. */
+  void accessibilityBounds(int keyIndex, Rect out)
+  {
+    if (_keyboard == null || _tc == null || keyIndex < 0)
+    {
+      out.setEmpty();
+      return;
+    }
+    int index = 0;
+    float y = _tc.margin_top;
+    for (int rowIndex = 0; rowIndex < _keyboard.rows.size(); rowIndex++)
+    {
+      KeyboardData.Row row = _keyboard.rows.get(rowIndex);
+      y += row.shift * _tc.row_height;
+      float x = _marginLeft + _tc.margin_left;
+      float keyH = row.height * _tc.row_height - _tc.vertical_margin;
+      for (int keyIndexInRow = 0; keyIndexInRow < row.keys.size(); keyIndexInRow++)
+      {
+        KeyboardData.Key key = row.keys.get(keyIndexInRow);
+        x += key.shift * _keyWidth;
+        float keyW = _keyWidth * key.width - _tc.horizontal_margin;
+        if (index == keyIndex)
+        {
+          out.set((int)Math.floor(x), (int)Math.floor(y),
+              (int)Math.ceil(x + keyW), (int)Math.ceil(y + keyH));
+          return;
+        }
+        index++;
+        x += _keyWidth * key.width;
+      }
+      y += row.height * _tc.row_height;
+    }
+    out.setEmpty();
+  }
+
+  boolean performAccessibilityClick(int keyIndex)
+  {
+    KeyboardData.Key key = accessibilityKeyAt(keyIndex);
+    if (key == null)
+      return false;
+    if (key.keys[0] != null)
+    {
+      Rect bounds = new Rect();
+      accessibilityBounds(keyIndex, bounds);
+      if (bounds.isEmpty())
+        return false;
+      float x = (bounds.left + bounds.right) / 2f;
+      float y = (bounds.top + bounds.bottom) / 2f;
+      _pointers.onTouchDown(x, y, ACCESSIBILITY_POINTER_ID, key);
+      _pointers.onTouchUp(ACCESSIBILITY_POINTER_ID);
+      return true;
+    }
+    // Some custom layouts define a key only through a directional/sublabel value.
+    // Activate its first defined value instead of exposing an inert virtual button.
+    for (int i = 1; i < key.keys.length; i++)
+    {
+      if (key.keys[i] != null)
+      {
+        Pointers.Modifiers mods = _mods;
+        KeyValue value = modifyKey(key.keys[i], mods);
+        if (value == null)
+          return false;
+        onPointerDown(value, false);
+        onPointerUp(value, mods);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static String accessibilityLabelForKey(KeyboardData.Key key)
+  {
+    if (key == null)
+      return "Keyboard key";
+    KeyValue value = key.keys[0];
+    if (value == null)
+    {
+      for (int i = 1; i < key.keys.length; i++)
+      {
+        if (key.keys[i] != null)
+        {
+          value = key.keys[i];
+          break;
+        }
+      }
+    }
+    if (value == null)
+      return "Empty key";
+
+    switch (value.getKind())
+    {
+      case Editing:
+        switch (value.getEditing())
+        {
+          case BACKSPACE: return "Backspace";
+          case FORWARD_DELETE_WORD: return "Forward delete word";
+          case DELETE_WORD: return "Delete word";
+          case SPACE_BAR: return "Space";
+          case COPY: return "Copy";
+          case CUT: return "Cut";
+          case PASTE: return "Paste";
+          case PASTE_PLAIN: return "Paste as plain text";
+          case SELECT_ALL: return "Select all";
+          case UNDO: return "Undo";
+          case REDO: return "Redo";
+          default: return humanize(value.getEditing().name());
+        }
+      case Modifier:
+        switch (value.getModifier())
+        {
+          case SHIFT: return "Shift";
+          case CTRL: return "Control";
+          case ALT: return "Alt";
+          case META: return "Meta";
+          case FN: return "Function";
+          default: return humanize(value.getModifier().name());
+        }
+      case Event:
+        switch (value.getEvent())
+        {
+          case HIDE_SELF: return "Hide keyboard";
+          case CHANGE_METHOD_PICKER: return "Change keyboard";
+          case SWITCH_TEXT: return "Switch to text layout";
+          case SWITCH_NUMERIC: return "Switch to numeric layout";
+          case SWITCH_EMOJI: return "Open emoji keyboard";
+          case SWITCH_CLIPBOARD: return "Open clipboard history";
+          case SWITCH_VOICE_TYPING: return "Voice typing";
+          default: return humanize(value.getEvent().name());
+        }
+      default:
+        String label = value.getString();
+        return (label == null || label.length() == 0)
+            ? humanize(value.getKind().name()) : label;
+    }
+  }
+
+  private static String humanize(String value)
+  {
+    String lower = value.replace('_', ' ').toLowerCase(java.util.Locale.ROOT);
+    if (lower.length() == 0)
+      return "Keyboard key";
+    return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+  }
+
+  @Override
+  public boolean dispatchHoverEvent(MotionEvent event)
+  {
+    return _accessibilityHelper.dispatchHoverEvent(event)
+        || super.dispatchHoverEvent(event);
+  }
+
+  @Override
+  public void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect)
+  {
+    super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+    _accessibilityHelper.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
+  }
+
+  @Override
+  public void onDetachedFromWindow()
+  {
+    super.onDetachedFromWindow();
+  }
+
+  /** Draw borders and background of the key. */
+  void drawKeyFrame(Canvas canvas, float x, float y, float keyW, float keyH,
+      Theme.Computed.Key tc)
+  {
+    float r = tc.border_radius;
+    float w = tc.border_width;
+    float padding = w / 2.f;
+    _tmpRect.set(x + padding, y + padding, x + keyW - padding, y + keyH - padding);
+    canvas.drawRoundRect(_tmpRect, r, r, tc.bg_paint);
+    if (w > 0.f && tc.border_left_paint != null)
+    {
+      canvas.drawRoundRect(_tmpRect, r, r, tc.border_left_paint);
+    }
+  }
+
+  /** Clip to draw a border at a time. This allows to call [drawRoundRect]
+      several time with the same parameters but a different Paint. */
+  void drawBorder(Canvas canvas, float clipl, float clipt, float clipr,
+      float clipb, Paint paint, Theme.Computed.Key tc)
+  {
+    float r = tc.border_radius;
+    canvas.save();
+    canvas.clipRect(clipl, clipt, clipr, clipb);
+    canvas.drawRoundRect(_tmpRect, r, r, paint);
+    canvas.restore();
+  }
+
+  private int labelColor(KeyValue k, boolean isKeyDown, boolean sublabel, Theme.Computed.Key tc)
+  {
+    if (_config.custom_colors_enabled)
+    {
+      if (tc == _tc.key_action || tc == _tc.key_activated || isKeyDown)
+      {
+        int text = Theme.getContrastColor(_config.custom_accent_color);
+        return sublabel ? Theme.adjustLight(text, 0.35f) : text;
+      }
+      else
+      {
+        int text = Theme.getContrastColor(_config.custom_bg_color);
+        if (sublabel)
+          return Theme.adjustLight(text, 0.35f);
+        if (k.hasFlagsAny(KeyValue.FLAG_SECONDARY | KeyValue.FLAG_GREYED))
+          return Theme.adjustLight(text, 0.5f);
+        return text;
+      }
+    }
+    if (isKeyDown)
+    {
+      int flags = _pointers.getKeyFlags(k);
+      if (flags != -1)
+      {
+        if ((flags & Pointers.FLAG_P_LOCKED) != 0)
+          return _theme.lockedColor;
+        return _theme.activatedColor;
+      }
+      return _theme.pressedColor;
+    }
+    if (k.hasFlagsAny(KeyValue.FLAG_SECONDARY | KeyValue.FLAG_GREYED))
+    {
+      if (k.hasFlagsAny(KeyValue.FLAG_GREYED))
+        return _theme.greyedLabelColor;
+      return _theme.secondaryLabelColor;
+    }
+    return sublabel ? _theme.subLabelColor : _theme.labelColor;
+  }
+
+  private void drawLabel(Canvas canvas, KeyValue kv, float x, float y,
+      float keyH, boolean isKeyDown, Theme.Computed.Key tc)
+  {
+    kv = modifyKey(kv, _mods);
+    if (kv == null)
+      return;
+    String str = kv.getString();
+    if (str == null || str.isEmpty())
+      return;
+    float textSize = scaleTextSize(kv, true);
+    Paint p = tc.label_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), labelColor(kv, isKeyDown, false, tc), textSize);
+    float textW = p.measureText(str);
+    float maxW = _keyWidth - tc.border_width * 2f - 4f;
+    if (textW > maxW && maxW > 0)
+    {
+      textSize = Math.max(8f, textSize * (maxW / textW));
+      p = tc.label_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), labelColor(kv, isKeyDown, false, tc), textSize);
+    }
+    canvas.drawText(str, x, (keyH - p.ascent() - p.descent()) / 2f + y, p);
+  }
+
+  public static boolean isComplexScript(String label)
+  {
+    if (label == null)
+      return false;
+    for (int ci = 0; ci < label.length(); ci++)
+    {
+      char ch = label.charAt(ci);
+      if ((ch >= '\u0D80' && ch <= '\u0DFF') || ch == '\u200D' || ch == '\u200C')
+        return true;
+    }
+    return false;
+  }
+
+  private void drawSubLabel(Canvas canvas, KeyValue kv, float x, float y,
+      float keyW, float keyH, int sub_index, boolean isKeyDown,
+      Theme.Computed.Key tc)
+  {
+    Paint.Align a = LABEL_POSITION_H[sub_index];
+    Vertical v = LABEL_POSITION_V[sub_index];
+    kv = modifyKey(kv, _mods);
+    if (kv == null)
+      return;
+    String label = kv.getString();
+    if (label == null || label.isEmpty())
+      return;
+    float textSize = scaleTextSize(kv, false);
+    Paint p = tc.sublabel_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), labelColor(kv, isKeyDown, true, tc), textSize, a);
+    float subPadding = _config.keyPadding;
+    if (v == Vertical.CENTER)
+      y += (keyH - p.ascent() - p.descent()) / 2f;
+    else
+      y += (v == Vertical.TOP) ? subPadding - p.ascent() : keyH - subPadding - p.descent();
+    if (a == Paint.Align.CENTER)
+      x += keyW / 2f;
+    else
+      x += (a == Paint.Align.LEFT) ? subPadding : keyW - subPadding;
+
+    int label_len = label.length();
+    boolean isComplexScript = isComplexScript(label);
+    if (!isComplexScript && label_len > 3 && kv.getKind() == KeyValue.Kind.String)
+      label_len = 3;
+
+    float textW = p.measureText(label, 0, label_len);
+    float maxSubW = keyW * 0.46f;
+    if (textW > maxSubW && maxSubW > 0)
+    {
+      textSize = Math.max(6f, textSize * (maxSubW / textW));
+      p = tc.sublabel_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), labelColor(kv, isKeyDown, true, tc), textSize, a);
+    }
+    canvas.drawText(label, 0, label_len, x, y, p);
+  }
+
+  private void drawIndication(Canvas canvas, KeyboardData.Key k, float x,
+      float y, float keyW, float keyH, Theme.Computed tc)
+  {
+    if (k.indication == null || k.indication.equals(""))
+      return;
+    Paint p = tc.indication_paint;
+    p.setTextSize(_subLabelSize);
+    canvas.drawText(k.indication, 0, k.indication.length(),
+        x + keyW / 2f, (keyH - p.ascent() - p.descent()) * 4/5 + y, p);
+  }
+
+  private float scaleTextSize(KeyValue k, boolean main_label)
+  {
+    float smaller_font = k.hasFlagsAny(KeyValue.FLAG_SMALLER_FONT) ? 0.75f : 1.f;
+    float label_size = main_label ? _mainLabelSize : _subLabelSize;
+    return label_size * smaller_font;
+  }
+
+  /** Exposes each drawn key as a focusable virtual node for TalkBack. */
+  private static final class KeyboardAccessibilityHelper extends ExploreByTouchHelper
+  {
+    private final Keyboard2View _host;
+    private final Rect _bounds = new Rect();
+
+    KeyboardAccessibilityHelper(Keyboard2View host)
+    {
+      super(host);
+      _host = host;
+    }
+
+    @Override
+    protected int getVirtualViewAt(float x, float y)
+    {
+      int count = _host.accessibilityKeyCount();
+      for (int i = 0; i < count; i++)
+      {
+        _host.accessibilityBounds(i, _bounds);
+        if (_bounds.contains((int)x, (int)y))
+          return i;
+      }
+      return INVALID_ID;
+    }
+
+    @Override
+    protected void getVisibleVirtualViews(List<Integer> virtualViewIds)
+    {
+      int count = _host.accessibilityKeyCount();
+      for (int i = 0; i < count; i++)
+        virtualViewIds.add(i);
+    }
+
+    @Override
+    protected void onPopulateNodeForVirtualView(int virtualViewId,
+        AccessibilityNodeInfoCompat node)
+    {
+      KeyboardData.Key key = _host.accessibilityKeyAt(virtualViewId);
+      _host.accessibilityBounds(virtualViewId, _bounds);
+      node.setBoundsInParent(_bounds);
+      node.setClassName("android.widget.Button");
+      node.setText(Keyboard2View.accessibilityLabelForKey(key));
+      node.setContentDescription(Keyboard2View.accessibilityLabelForKey(key));
+      node.setClickable(true);
+      node.setFocusable(true);
+      node.setEnabled(key != null
+          && !"Empty key".equals(Keyboard2View.accessibilityLabelForKey(key)));
+      if (key != null
+          && !"Empty key".equals(Keyboard2View.accessibilityLabelForKey(key)))
+        node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
+    }
+
+    @Override
+    protected boolean onPerformActionForVirtualView(int virtualViewId,
+        int action, Bundle arguments)
+    {
+      if (action == AccessibilityNodeInfoCompat.ACTION_CLICK
+          && _host.performAccessibilityClick(virtualViewId))
+      {
+        sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED);
+        return true;
+      }
+      return false;
+    }
+  }
+}

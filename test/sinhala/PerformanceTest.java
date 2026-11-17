@@ -1,4 +1,4 @@
-package juloo.keyboard2;
+package com.lakmal.keycraftsinhala;
 
 import java.util.List;
 import org.junit.Test;

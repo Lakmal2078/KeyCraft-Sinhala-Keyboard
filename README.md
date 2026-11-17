@@ -1,4 +1,4 @@
-# Unexpected Keyboard [<img src="https://hosted.weblate.org/widget/unexpected-keyboard/svg-badge.svg" alt="පරිවර්තන තත්ත්වය" />](https://hosted.weblate.org/engage/unexpected-keyboard/)
+# KeyCraft Sinhala Keyboard [<img src="https://hosted.weblate.org/widget/unexpected-keyboard/svg-badge.svg" alt="පරිවර්තන තත්ත්වය" />](https://hosted.weblate.org/engage/unexpected-keyboard/)
 
 **සිංහල**
 
@@ -10,9 +10,9 @@
 
 ## 📥 Download
 
-[**Latest Release – GitHub**](https://github.com/Lakmal2078/Unexpected-Keyboard/releases/latest)
+**KeyCraft release:** නව KeyCraft GitHub repository එක සහ release page එක ප්‍රකාශයට පත් කළ පසු මෙහි එක් කරනු ඇත.
 
-APK එක සහ SHA-256 checksum එක GitHub Releases වෙතින් ලබාගත හැක.
+දැනට development build එක පමණක් සකස් කර ඇත. පළමු signed release එක වෙනම KeyCraft repository එක සකස් කිරීමෙන් පසු නිකුත් කරනු ඇත.
 
 Android සඳහා නිර්මාණය කළ සැහැල්ලු, පෞද්ගලිකත්වයට මුල්තැන දෙන තිරයේ යතුරුපුවරුවකි.
 
@@ -24,7 +24,7 @@ https://github.com/Julow/Unexpected-Keyboard/assets/2310568/28f8f6fe-ac13-46f3-8
 
 මෙම යෙදුම මුලින්ම නිර්මාණය කර තිබුණේ Termux භාවිත කරන ක්‍රමලේඛකයන් සඳහාය. දැන් එය එදිනෙදා භාවිතයටත් ඉතා සුදුසුය.
 
-මෙම යෙදුමේ දැන්වීම් අඩංගු නොවන අතර, එය විවෘත මූලාශ්‍ර මෘදුකාංගයකි.
+මෙම යෙදුමේ දැන්වීම් අඩංගු නොවන අතර, එය **GNU General Public License v3.0 (GPL-3.0)** බලපත්‍රය යටතේ නිකුත් කර ඇති විවෘත මූලාශ්‍ර මෘදුකාංගයකි ([LICENSE](LICENSE)).
 
 **භාවිතය:** යතුරුවල කොනවල දක්වා ඇති සංකේත භාවිත කිරීමට, ඔබේ ඇඟිල්ල ඒ සංකේතය ඇති දිශාවට යතුර මතින් ස්වයිප් කරන්න. උදාහරණයක් ලෙස, පහළ-වම් කෙළවර දෙසට ස්වයිප් කළ විට Settings (සැකසීම්) විවෘත වේ.
 
@@ -34,7 +34,7 @@ https://github.com/Julow/Unexpected-Keyboard/assets/2310568/28f8f6fe-ac13-46f3-8
 
 ## යෙදුමේ පරිවර්තන වැඩිදියුණු කිරීමට උදව් කරන්න
 
-[Weblate හරහා](https://hosted.weblate.org/engage/unexpected-keyboard/) යෙදුමේ පරිවර්තන වැඩිදියුණු කිරීමට දායක වන්න.
+පරිවර්තන දායකත්වය සඳහා මුල් upstream [Unexpected Keyboard Weblate ව්‍යාපෘතිය](https://hosted.weblate.org/engage/unexpected-keyboard/) භාවිතා වේ; KeyCraft සඳහා වෙනම translation project එකක් පසුව සකස් කළ හැක.
 
 [<img src="https://hosted.weblate.org/widget/unexpected-keyboard/multi-auto.svg" alt="පරිවර්තන තත්ත්වය" />](https://hosted.weblate.org/engage/unexpected-keyboard/)
 
@@ -53,7 +53,7 @@ Debug build එකේදී keystore එකක් නොමැති නම් �
 ```sh
 ./gradlew assembleDebug
 ```
-- **Output APK**: `build/outputs/apk/debug/Unexpected-Keyboard-debug.apk`
+- **Output APK**: `build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk`
 - (මෙන්ම `app/build/outputs/apk/debug/app-debug.apk` වෙතද copy වේ)
 
 #### 2. Release APK එක බිල්ඩ් කිරීම (Signed)
@@ -81,7 +81,7 @@ set -a
 set +a
 ./gradlew assembleRelease
 ```
-- **Output APK**: `build/outputs/apk/release/Unexpected-Keyboard-release.apk`
+- **Output APK**: `build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk`
 - Release APK එකෙහි ප්‍රමාණය සහ විස්තර වාර්තාවක් `build/reports/apk-release-report.txt` හි ස්වයංක්‍රීයව ජනනය වේ.
 
 **ආරක්ෂාව:** `.env` හෝ production keystore ගොනු Git වෙත commit/push නොකරන්න. `.env` යනු විශ්වාසදායක ඔබේම shell-compatible file එකක් පමණක් විය යුතුය.
@@ -104,15 +104,15 @@ Android දුරකථනය තුළ Termux හෝ PRoot Linux පරිස�
    ```sh
    # Debug APK
    # PRoot:
-   cp build/outputs/apk/debug/Unexpected-Keyboard-debug.apk /sdcard/Download/
+   cp build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk /sdcard/Download/
    # Termux:
-   cp build/outputs/apk/debug/Unexpected-Keyboard-debug.apk ~/storage/shared/Download/
+   cp build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk ~/storage/shared/Download/
 
    # Signed Release APK (පළමුව .env configure කර bash ./build_release.sh ධාවනය කරන්න)
    # PRoot:
-   cp build/outputs/apk/release/Unexpected-Keyboard-release.apk /sdcard/Download/
+   cp build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk /sdcard/Download/
    # Termux:
-   cp build/outputs/apk/release/Unexpected-Keyboard-release.apk ~/storage/shared/Download/
+   cp build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk ~/storage/shared/Download/
    ```
 
 #### 4. වෙනත් විධාන
@@ -128,13 +128,22 @@ Android දුරකථනය තුළ Termux හෝ PRoot Linux පරිස�
 - **දත්ත ලොග් නොකිරීම (Zero Logging)**: පරිශීලකයා ටයිප් කරන කිසිදු දත්තයක් හෝ පාස්වර්ඩ් සටහන් කර නොගන්නා අතර අන්තර්ජාලයට යවනු නොලැබේ.
 - **මතකයේ පමණක් රඳවාගන්නා ක්ලිප්බෝඩ් ඉතිහාසය (In-Memory Only)**: ක්ලිප්බෝඩ් ඉතිහාසය පෙරනිමියෙන් අක්‍රිය කර ඇත (opt-in). සක්‍රිය කළ විට පවා එය තාවකාලික RAM මතකයේ පමණක් රඳවා තබන අතර, කිසිදු storage හෝ database එකකට ලියනු නොලැබේ.
 - **ක්ලිප්බෝඩ් ඉක්මන් ඇලවීම**: යෝජනා තීරුවේ පෙන්වන ක්ලිප්බෝඩ් පෙරදසුන පෙරනිමියෙන් අක්‍රියය. Settings තුළ එය සක්‍රිය කළ විට, එක් තට්ටුවකින් ඇලවීමට වත්මන් ක්ලිප්බෝඩ් අයිතමය පෙන්වයි.
-- **සංවේදී දත්ත ආරක්ෂාව**: Android 13+ (API 33+) හිදී `ClipDescription.EXTRA_IS_SENSITIVE` ලෙස සලකුණු කළ පාස්වර්ඩ් සහ OTPs කිසිසේත්ම ක්ලිප්බෝඩ් ඉතිහාසයට එකතු නොවේ.
+- **සංවේදී දත්ත ආරක්ෂාව**: Android 7.0+ (API 24+) සිට `android.content.extra.IS_SENSITIVE` (`ClipDescription.EXTRA_IS_SENSITIVE`) ලෙස සලකුණු කළ පාස්වර්ඩ් සහ OTPs කිසිසේත්ම ක්ලිප්බෝඩ් ඉතිහාසයට එකතු නොවේ.
 - **ස්වයංක්‍රීයව ඉවත්වීම**: පරිශීලකයා තෝරාගත් කාල සීමාවෙන් පසු ඉතිහාසය ස්වයංක්‍රීයව මැකී යන අතර, සැකසුම අක්‍රිය කළ වහාම මතකයේ ඇති සියල්ල ක්ෂණිකව ඉවත් වේ.
 
 ## දායකත්වය
 
 යෙදුම ගොඩනැගීමේ උපදෙස් සඳහා [දායකත්ව මාර්ගෝපදේශය](CONTRIBUTING.md) බලන්න.
 
+## බලපත්‍රය (License)
+
+මෙම ව්‍යාපෘතිය **GNU General Public License v3.0 (GPL-3.0)** බලපත්‍රය යටතේ බෙදාහරිනු ලැබේ. වැඩි විස්තර සඳහා [LICENSE](LICENSE) ගොනුව බලන්න.
+
 ## ස්තුතිය හා පිළිගැනීම්
 
 අක්ෂර වින්‍යාසය පරීක්ෂා කිරීමේ විශේෂාංගය සංවර්ධනය කිරීම සඳහා [NLnet පදනම](https://nlnet.nl/) අරමුදල් සපයා ඇත.
+
+
+## Upstream project and attribution
+
+KeyCraft Sinhala Keyboard is based on [Unexpected Keyboard](https://github.com/Julow/Unexpected-Keyboard) by Julow and contributors. Original copyright notices and the GNU General Public License v3.0 are retained.

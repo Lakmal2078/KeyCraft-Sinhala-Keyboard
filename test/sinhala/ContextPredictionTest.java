@@ -1,9 +1,9 @@
-package juloo.keyboard2;
+package com.lakmal.keycraftsinhala;
 
 import android.os.Handler;
 import android.view.inputmethod.InputConnection;
 import java.util.List;
-import juloo.keyboard2.suggestions.Suggestions;
+import com.lakmal.keycraftsinhala.suggestions.Suggestions;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

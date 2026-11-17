@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_release">Unexpected Keyboard</string>
-    <string name="app_name_debug">Unexpected Keyboard (Debug)</string>
+    <string name="app_name_release">KeyCraft Sinhala Keyboard</string>
+    <string name="brand_tagline">Type Sinhala beautifully and quickly</string>
+    <string name="app_name_debug">KeyCraft Sinhala Keyboard (Debug)</string>
     <string name="short_description">Lightweight and privacy-conscious virtual keyboard for Android.</string>
     <string name="store_description">The main feature is that you can type more characters by swiping the keys towards the corners.\n\nThis application was originally designed for programmers using Termux.\nNow perfect for everyday use.\n\nThis application contains no ads and is Open Source.</string>
     <string name="pref_portrait">In portrait mode</string>
@@ -126,7 +127,7 @@
     <string name="pref_theme_e_high_contrast">High Contrast (Black &amp; White)</string>
     <string name="pref_theme_e_high_contrast_yellow">High Contrast (Yellow)</string>
     <string name="pref_theme_e_lanka_blue">Lanka Blue</string>
-    <string name="pref_theme_e_unexpected_keyboard">Unexpected Keyboard</string>
+    <string name="pref_theme_e_unexpected_keyboard">KeyCraft Sinhala Keyboard</string>
     <string name="pref_theme_e_rose_quartz">Rose Quartz</string>
     <string name="pref_theme_e_ocean_breeze">Ocean Breeze</string>
     <string name="pref_theme_e_citrus_pop">Citrus Pop</string>
@@ -206,7 +207,7 @@
     <string name="launcher_button_imesettings">Enable keyboard</string>
     <string name="launcher_button_imepicker">Select keyboard</string>
     <string name="launcher_button_dictionaries">Install dictionaries</string>
-    <string name="launcher_description">This application is a virtual keyboard. Go to the system settings by clicking on the button below and enable Unexpected-Keyboard.</string>
+    <string name="launcher_description">This application is a virtual keyboard. Go to the system settings by clicking on the button below and enable KeyCraft Sinhala Keyboard.</string>
     <string name="launcher_sourcecode">This is a free and open source application. You can find the source code or report bugs on GitHub.</string>
     <string name="launcher_tryhere">After enabling, you can try the keyboard here:</string>
     <string name="launcher_tryhere_hint">Try here</string>

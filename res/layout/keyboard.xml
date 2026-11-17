@@ -8,11 +8,11 @@
     <ImageButton android:id="@+id/toolbar_btn_clipboard" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_clipboard" android:contentDescription="@string/quick_toolbar_clipboard_desc"/>
     <ImageButton android:id="@+id/toolbar_btn_theme" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_palette" android:contentDescription="@string/quick_toolbar_theme_desc"/>
   </LinearLayout>
-  <juloo.keyboard2.suggestions.CandidatesView android:id="@+id/candidates_view" style="@style/candidates_view">
+  <com.lakmal.keycraftsinhala.suggestions.CandidatesView android:id="@+id/candidates_view" style="@style/candidates_view">
     <TextView android:id="@+id/candidates_emoji" style="@style/candidates_emoji"/>
     <TextView android:id="@+id/candidates_left" style="@style/candidates_item"/>
     <TextView android:id="@+id/candidates_middle" style="@style/candidates_item"/>
     <TextView android:id="@+id/candidates_right" style="@style/candidates_item"/>
-  </juloo.keyboard2.suggestions.CandidatesView>
-  <juloo.keyboard2.Keyboard2View android:id="@+id/keyboard_view" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+  </com.lakmal.keycraftsinhala.suggestions.CandidatesView>
+  <com.lakmal.keycraftsinhala.Keyboard2View android:id="@+id/keyboard_view" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 </LinearLayout>

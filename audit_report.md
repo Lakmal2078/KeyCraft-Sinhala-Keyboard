@@ -28,8 +28,8 @@
 
 ## 3. Detailed Evidence
 - **Manifest:** `AndroidManifest.xml`
-- **Clipboard History Service (security/privacy):** `srcs/java/juloo/keyboard2/ClipboardHistoryService.java`
-- **Clipboard History Toggle (user‑controlled):** `srcs/java/juloo/keyboard2/ClipboardHistoryCheckBox.java`
+- **Clipboard History Service (security/privacy):** `srcs/java/com/lakmal/keycraftsinhala/ClipboardHistoryService.java`
+- **Clipboard History Toggle (user‑controlled):** `srcs/java/com/lakmal/keycraftsinhala/ClipboardHistoryCheckBox.java`
 - **Gradle signing config (release):** `build.gradle.kts`
 - **ProGuard activation:** `build.gradle.kts`
 

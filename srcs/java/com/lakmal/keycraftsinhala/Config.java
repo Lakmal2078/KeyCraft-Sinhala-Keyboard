@@ -1,0 +1,605 @@
+package com.lakmal.keycraftsinhala;
+
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.graphics.Typeface;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Map;
+import juloo.cdict.Cdict;
+import com.lakmal.keycraftsinhala.dict.Dictionaries;
+import com.lakmal.keycraftsinhala.prefs.CustomExtraKeysPreference;
+import com.lakmal.keycraftsinhala.prefs.ExtraKeysPreference;
+import com.lakmal.keycraftsinhala.prefs.LayoutsPreference;
+
+public class Config
+{
+  // Keep in sync with the theme preference's default in res/xml/settings.xml.
+  static final String DEFAULT_THEME = "graphite_pro";
+
+  /**
+   * Width of the Android phones is around 300-600dp in portrait, 600-1400dp in landscape,
+   * depending on the user's size settings.
+   *
+   * 600 dp seems a reasonable midpoint to determine whether the current orientation of the device is "wide"
+   * (landsacpe, tablet, unfolded foldable etc.) or not, to switch to a different layout.
+   */
+  public static final int WIDE_DEVICE_THRESHOLD = 600;
+
+  private final SharedPreferences _prefs;
+
+  // From resources
+  public final float marginTop;
+  public final float keyPadding;
+
+  public final float labelTextSize;
+  public final float sublabelTextSize;
+
+  // From preferences
+  /** [null] represent the [system] layout. */
+  public List<KeyboardData> layouts;
+  public boolean show_numpad = false;
+  // From the 'numpad_layout' option, also apply to the numeric pane.
+  public boolean inverse_numpad = false;
+  public boolean add_number_row;
+  public boolean number_row_symbols;
+  public float swipe_dist_px;
+  public float slide_step_px;
+  public boolean suggestions_enabled;
+  public boolean suggestions_add_space;
+  // Let the system handle vibration when false.
+  public boolean vibrate_custom;
+  // Control the vibration if [vibrate_custom] is true.
+  public long vibrate_duration;
+  public boolean sound_on_keypress;
+  public long longPressTimeout;
+  public long longPressInterval;
+  public boolean keyrepeat_enabled;
+  public float margin_bottom;
+  public int keyboard_rows_height_pixels;
+  public int screenHeightPixels;
+  public float horizontal_margin;
+  public float key_vertical_margin;
+  public float key_horizontal_margin;
+  public int labelBrightness; // 0 - 255
+  public int keyboardOpacity; // 0 - 255
+  public float customBorderRadius; // 0 - 1
+  public float customBorderLineWidth; // dp
+  public int keyOpacity; // 0 - 255
+  public int keyActivatedOpacity; // 0 - 255
+  public boolean double_tap_lock_shift;
+  public float characterSize; // Ratio
+  public int theme; // Values are R.style.*
+  public boolean theme_follows_system = false;
+  public boolean autocapitalisation;
+  public KeyValue change_method_key_replacement;
+  public NumberLayout selected_number_layout;
+  public boolean borderConfig;
+  /** User-selected key corner style; "theme" preserves the theme-defined radius. */
+  public String keyShape = "theme";
+  public int circle_sensitivity;
+  public boolean clipboard_history_enabled;
+  public int clipboard_history_duration;
+  public boolean space_bar_auto_complete;
+  public boolean sinhala_transliteration;
+  public boolean physical_keyboard_hide;
+  public Typeface custom_font = null;
+  public boolean high_contrast_labels;
+  public boolean quick_calculator_enabled;
+  public boolean smart_snippets_enabled;
+  public boolean clipboard_suggestion_enabled;
+  public boolean show_quick_toolbar;
+  public boolean custom_colors_enabled = false;
+  public int custom_bg_color = 0xFF1E1E2E;
+  public int custom_accent_color = 0xFF3D5AFE;
+
+  // Dynamically set
+  /** Configuration options implied by the connected editor. */
+  public EditorConfig editor_config;
+  public boolean shouldOfferVoiceTyping;
+  public ExtraKeys extra_keys_subtype;
+  public Map<KeyValue, KeyboardData.PreferredPos> extra_keys_param;
+  public Map<KeyValue, KeyboardData.PreferredPos> extra_keys_custom;
+  public DeviceLocales device_locales = null;
+  public Cdict current_dictionary = null; // Might be 'null'.
+  public Cdict emoji_dictionary = null; // Might be 'null'.
+  public String current_dictionary_name = null; // Internal name for the current dictionary
+  /** Whether to show the dictionary switching button in the candidates view. */
+  public boolean should_show_dictionary_switch = false;
+  public IKeyEventHandler handler;
+  public boolean orientation_landscape = false;
+  public boolean foldable_unfolded = false;
+  public boolean wide_screen = false;
+  /** Index in 'layouts' of the currently used layout. See
+      [get_current_layout()] and [set_current_layout()]. */
+  int current_layout_narrow;
+  int current_layout_wide;
+  /** Whether to automatically split the layout. */
+  public boolean split_layout;
+
+  /** Package-private constructor for testing and proxy subclassing */
+  Config()
+  {
+    _prefs = null;
+    marginTop = 0f;
+    keyPadding = 0f;
+    labelTextSize = 0.33f;
+    sublabelTextSize = 0.22f;
+    editor_config = new EditorConfig();
+  }
+
+  private Config(SharedPreferences prefs, Resources res,
+      Boolean foldableUnfolded, Dictionaries dicts)
+  {
+    _prefs = prefs;
+    editor_config = new EditorConfig();
+    // static values
+    marginTop = res.getDimension(R.dimen.margin_top);
+    keyPadding = res.getDimension(R.dimen.key_padding);
+    labelTextSize = 0.33f;
+    sublabelTextSize = 0.22f;
+    // from prefs
+    refresh(res, foldableUnfolded, dicts);
+    // initialized later
+    shouldOfferVoiceTyping = false;
+    extra_keys_subtype = null;
+  }
+
+  /*
+   ** Reload prefs
+   */
+  public void refresh(Resources res, Boolean foldableUnfolded, Dictionaries dicts)
+  {
+    DisplayMetrics dm = res.getDisplayMetrics();
+    orientation_landscape = res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    foldable_unfolded = foldableUnfolded;
+
+    float characterSizeScale = 1.f;
+    String show_numpad_s = _prefs.getString("show_numpad", "never");
+    show_numpad = "always".equals(show_numpad_s);
+    int keyboardHeightPercent;
+    if (orientation_landscape)
+    {
+      if ("landscape".equals(show_numpad_s))
+        show_numpad = true;
+      keyboardHeightPercent = _prefs.getInt(foldable_unfolded ? "keyboard_height_landscape_unfolded" : "keyboard_height_landscape", 50);
+      characterSizeScale = 1.25f;
+    }
+    else
+    {
+      keyboardHeightPercent = _prefs.getInt(foldable_unfolded ? "keyboard_height_unfolded" : "keyboard_height", 35);
+    }
+    layouts = LayoutsPreference.load_from_preferences(res, _prefs);
+    inverse_numpad = _prefs.getString("numpad_layout", "high_first").equals("low_first");
+    String number_row = _prefs.getString("number_row", "no_number_row");
+    add_number_row = !number_row.equals("no_number_row");
+    number_row_symbols = number_row.equals("symbols");
+    suggestions_enabled = _prefs.getBoolean("suggestions", true);
+    suggestions_add_space = _prefs.getBoolean("suggestions_add_space", true);
+    // The baseline for the swipe distance correspond to approximately the
+    // width of a key in portrait mode, as most layouts have 10 columns.
+    // Multipled by the DPI ratio because most swipes are made in the diagonals.
+    // The option value uses an unnamed scale where the baseline is around 25.
+    float dpi_ratio = Math.max(dm.xdpi, dm.ydpi) / Math.min(dm.xdpi, dm.ydpi);
+    float swipe_scaling = Math.min(dm.widthPixels, dm.heightPixels) / 10.f * dpi_ratio;
+    float swipe_dist_value = Float.valueOf(_prefs.getString("swipe_dist", "15"));
+    swipe_dist_px = swipe_dist_value / 25.f * swipe_scaling;
+    float slider_sensitivity = Float.valueOf(_prefs.getString("slider_sensitivity", "30")) / 100.f;
+    slide_step_px = slider_sensitivity * swipe_scaling;
+    vibrate_custom = _prefs.getBoolean("vibrate_custom", false);
+    vibrate_duration = _prefs.getInt("vibrate_duration", 20);
+    sound_on_keypress = _prefs.getBoolean("sound_on_keypress", false);
+    longPressTimeout = _prefs.getInt("longpress_timeout", 600);
+    longPressInterval = _prefs.getInt("longpress_interval", 65);
+    keyrepeat_enabled = _prefs.getBoolean("keyrepeat_enabled", true);
+    margin_bottom = get_dip_pref_oriented(dm, "margin_bottom", 7, 3);
+    key_vertical_margin = get_dip_pref(dm, "key_vertical_margin", 1.5f) / 100;
+    key_horizontal_margin = get_dip_pref(dm, "key_horizontal_margin", 2) / 100;
+    // Label brightness is used as the alpha channel
+    labelBrightness = _prefs.getInt("label_brightness", 100) * 255 / 100;
+    // Keyboard opacity
+    keyboardOpacity = _prefs.getInt("keyboard_opacity", 100) * 255 / 100;
+    keyOpacity = _prefs.getInt("key_opacity", 100) * 255 / 100;
+    keyActivatedOpacity = _prefs.getInt("key_activated_opacity", 100) * 255 / 100;
+    // keyboard border settings
+    borderConfig = _prefs.getBoolean("border_config", false);
+    keyShape = _prefs.getString("key_shape", "theme");
+    customBorderRadius = _prefs.getInt("custom_border_radius", 0) / 100.f;
+    customBorderLineWidth = get_dip_pref(dm, "custom_border_line_width", 0);
+    screenHeightPixels = dm.heightPixels;
+    // Row height is proportional to the screen size.
+    // The keyboard is keyboardHeightPercent of the screen height on 16/9
+    // screens (or less) and with a 3.95 high layout (in KeyboardData unit)
+    float base_height = Math.min(dm.heightPixels, dm.widthPixels * 16.f / 9.f);
+    keyboard_rows_height_pixels = (int)(base_height * keyboardHeightPercent / 395);
+    horizontal_margin =
+      get_dip_pref_oriented(dm, "horizontal_margin", 3, 28);
+    double_tap_lock_shift = _prefs.getBoolean("lock_double_tap", false);
+    characterSize =
+      _prefs.getFloat("character_size", 1.15f)
+      * characterSizeScale;
+    String theme_name = _prefs.getString("theme", DEFAULT_THEME);
+    theme_follows_system = "system".equals(theme_name) || "monet".equals(theme_name);
+    theme = getThemeId(res, theme_name, _prefs);
+    autocapitalisation = _prefs.getBoolean("autocapitalisation", true);
+    change_method_key_replacement = get_change_method_key_replacement(_prefs);
+    extra_keys_param = ExtraKeysPreference.get_extra_keys(_prefs);
+    extra_keys_custom = CustomExtraKeysPreference.get(_prefs);
+    selected_number_layout = NumberLayout.of_string(_prefs.getString("number_entry_layout", "pin"));
+    current_layout_narrow = _prefs.getInt("current_layout_portrait", 0);
+    current_layout_wide = _prefs.getInt("current_layout_landscape", 0);
+    circle_sensitivity = Integer.valueOf(_prefs.getString("circle_sensitivity", "2"));
+    clipboard_history_enabled = _prefs.getBoolean("clipboard_history_enabled", false);
+    clipboard_history_duration = Integer.parseInt(_prefs.getString("clipboard_history_duration", "5"));
+    space_bar_auto_complete = _prefs.getBoolean("space_bar_auto_complete", false);
+    sinhala_transliteration = _prefs.getBoolean("sinhala_transliteration", true);
+    physical_keyboard_hide = _prefs.getString("physical_keyboard_behavior", "hide").equals("hide");
+    custom_font = get_custom_font(_prefs.getString("keyboard_font", "default"));
+    high_contrast_labels = _prefs.getBoolean("high_contrast_labels", false);
+    quick_calculator_enabled = _prefs.getBoolean("quick_calculator_enabled", true);
+    smart_snippets_enabled = _prefs.getBoolean("smart_snippets_enabled", true);
+    clipboard_suggestion_enabled = _prefs.getBoolean("clipboard_suggestion_enabled", false);
+    show_quick_toolbar = _prefs.getBoolean("show_quick_toolbar", true);
+    custom_colors_enabled = _prefs.getBoolean("custom_colors_enabled", false);
+    custom_bg_color = _prefs.getInt("custom_bg_color", 0xFF1E1E2E);
+    custom_accent_color = _prefs.getInt("custom_accent_color", 0xFF3D5AFE);
+    float screen_width_dp = dm.widthPixels / dm.density;
+    wide_screen = screen_width_dp >= WIDE_DEVICE_THRESHOLD;
+    split_layout = get_split_layout();
+  }
+
+  public int get_current_layout()
+  {
+    return (wide_screen)
+            ? current_layout_wide : current_layout_narrow;
+  }
+
+  public void set_current_layout(int l)
+  {
+    if (wide_screen)
+      current_layout_wide = l;
+    else
+      current_layout_narrow = l;
+
+    SharedPreferences.Editor e = _prefs.edit();
+    e.putInt("current_layout_portrait", current_layout_narrow);
+    e.putInt("current_layout_landscape", current_layout_wide);
+    e.apply();
+  }
+
+  public void set_clipboard_history_enabled(boolean e)
+  {
+    clipboard_history_enabled = e;
+    _prefs.edit().putBoolean("clipboard_history_enabled", e).apply();
+  }
+
+  private float get_dip_pref(DisplayMetrics dm, String pref_name, float def)
+  {
+    float value;
+    try { value = _prefs.getInt(pref_name, -1); }
+    catch (Exception e) { value = _prefs.getFloat(pref_name, -1f); }
+    if (value < 0f)
+      value = def;
+    return (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, dm));
+  }
+
+  /** [get_dip_pref] depending on orientation. */
+  float get_dip_pref_oriented(DisplayMetrics dm, String pref_base_name, float def_port, float def_land)
+  {
+    final String suffix;
+    if (foldable_unfolded) {
+      suffix = orientation_landscape ? "_landscape_unfolded" : "_portrait_unfolded";
+    } else {
+      suffix = orientation_landscape ? "_landscape" : "_portrait";
+    }
+
+    float def = orientation_landscape ? def_land : def_port;
+    return get_dip_pref(dm, pref_base_name + suffix, def);
+  }
+
+  public static boolean isNightMode(int uiMode)
+  {
+    return (uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+  }
+
+  static int getThemeId(Resources res, String theme_name)
+  {
+    return getThemeId(res, theme_name, null);
+  }
+
+  static int getThemeId(Resources res, String theme_name, SharedPreferences prefs)
+  {
+    int uiMode = (res == null || res.getConfiguration() == null) ? 0 :
+        res.getConfiguration().uiMode;
+    boolean night = isNightMode(uiMode);
+    switch (theme_name)
+    {
+      case "system":
+        if (prefs != null)
+        {
+          String pairTheme = night
+              ? prefs.getString("night_theme", "dark")
+              : prefs.getString("day_theme", "light");
+          if (pairTheme != null && !"system".equals(pairTheme))
+          {
+            return getThemeId(res, pairTheme, null);
+          }
+        }
+        return night ? R.style.Dark : R.style.Light;
+      case "monet":
+        return night ? R.style.MonetDark : R.style.MonetLight;
+      case "light": return R.style.Light;
+      case "black": return R.style.Black;
+      case "oled_black": return R.style.OledBlack;
+      case "dark": return R.style.Dark;
+      case "white": return R.style.White;
+      case "desert": return R.style.Desert;
+      case "jungle": return R.style.Jungle;
+      case "monetlight": return R.style.MonetLight;
+      case "monetdark": return R.style.MonetDark;
+      case "rosepine": return R.style.RosePine;
+      case "everforestlight": return R.style.EverforestLight;
+      case "cobalt": return R.style.Cobalt;
+      case "dracula": return R.style.Dracula;
+      case "catppuccin_mocha": return R.style.CatppuccinMocha;
+      case "catppuccin_latte": return R.style.CatppuccinLatte;
+      case "tokyo_night": return R.style.TokyoNight;
+      case "nord": return R.style.Nord;
+      case "cyberpunk_neon": return R.style.CyberpunkNeon;
+      case "sunset_glow": return R.style.SunsetGlow;
+      case "lanka_maroon": return R.style.LankaMaroon;
+      case "emerald_forest": return R.style.EmeraldForest;
+      case "midnight_purple": return R.style.MidnightPurple;
+      case "midnight_ocean": return R.style.MidnightOcean;
+      case "graphite_pro": return R.style.GraphitePro;
+      case "quiet_teal": return R.style.QuietTeal;
+      case "matrix_green": return R.style.MatrixGreen;
+      case "arctic_blue": return R.style.ArcticBlue;
+      case "royal_gold": return R.style.RoyalGold;
+      case "sinhala_sand": return R.style.SinhalaSand;
+      case "soft_lavender": return R.style.SoftLavender;
+      case "gruvbox_dark": return R.style.GruvboxDark;
+      case "gruvbox_light": return R.style.GruvboxLight;
+      case "solarized_dark": return R.style.SolarizedDark;
+      case "sepia_warm": return R.style.SepiaWarm;
+      case "high_contrast": return R.style.HighContrast;
+      case "high_contrast_yellow": return R.style.HighContrastYellow;
+      case "lanka_blue": return R.style.LankaBlue;
+      case "unexpected_keyboard": return R.style.UnexpectedKeyboard;
+      case "rose_quartz": return R.style.RoseQuartz;
+      case "ocean_breeze": return R.style.OceanBreeze;
+      case "citrus_pop": return R.style.CitrusPop;
+      case "copper_night": return R.style.CopperNight;
+      case "berry_noir": return R.style.BerryNoir;
+      case "mint_matcha": return R.style.MintMatcha;
+      case "glass": return R.style.Glass;
+      case "aurora_flow": return R.style.AuroraFlow;
+      case "zen_minimal": return R.style.ZenMinimal;
+      case "soft_3d": return R.style.Soft3D;
+      case "pixel_retro": return R.style.PixelRetro;
+      // Deprecated aliases for backwards compatibility
+      case "epaperblack":
+      case "altblack":
+        return R.style.Black;
+      case "epaper":
+        return R.style.White;
+      case "pine":
+      case "forest_mist":
+        return R.style.EmeraldForest;
+      case "quantum_neon":
+      case "sinhala_tech":
+      case "amoled_cyan":
+        return R.style.CyberpunkNeon;
+      case "cyber_purple":
+        return R.style.MidnightPurple;
+      case "neon_rose":
+      case "gradientpurplepink":
+        return R.style.SunsetGlow;
+      case "sinhala_heritage":
+        return R.style.LankaMaroon;
+      case "aurora":
+      case "ocean_teal":
+        return R.style.MidnightOcean;
+      default:
+        return night ? R.style.Dark : R.style.Light;
+    }
+  }
+
+  private static Typeface get_custom_font(String font_name)
+  {
+    switch (font_name)
+    {
+      case "sans_bold": return Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
+      case "serif": return Typeface.create(Typeface.SERIF, Typeface.NORMAL);
+      case "monospace": return Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL);
+      case "rounded":
+        try { return Typeface.create("sans-serif-rounded", Typeface.NORMAL); }
+        catch (Throwable t) { return Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); }
+      case "default":
+      default: return null;
+    }
+  }
+
+  private static KeyValue get_change_method_key_replacement(SharedPreferences prefs)
+  {
+    switch (prefs.getString("change_method_key_replacement", "prev"))
+    {
+      case "prev": return KeyValue.CHANGE_METHOD_PREV;
+      case "next": return KeyValue.CHANGE_METHOD_NEXT;
+      default:
+      case "picker": return KeyValue.CHANGE_METHOD;
+    }
+  }
+
+  final boolean get_split_layout()
+  {
+    switch (_prefs.getString("split_layout", "wide"))
+    {
+      case "wide": return wide_screen;
+      case "landscape": return orientation_landscape;
+      default: return false;
+    }
+  }
+
+  private static Config _globalConfig = null;
+
+  public static void initGlobalConfig(SharedPreferences prefs, Resources res,
+      Boolean foldableUnfolded, Dictionaries dicts)
+  {
+    migrate(prefs);
+    _globalConfig = new Config(prefs, res, foldableUnfolded, dicts);
+    LayoutModifier.init(_globalConfig, res);
+  }
+
+  public static Config globalConfig()
+  {
+    return _globalConfig;
+  }
+
+  public static SharedPreferences globalPrefs()
+  {
+    return _globalConfig._prefs;
+  }
+
+  public static interface IKeyEventHandler
+  {
+    public void key_down(KeyValue value, boolean is_swipe);
+    public void key_up(KeyValue value, Pointers.Modifiers mods);
+    public void mods_changed(Pointers.Modifiers mods);
+    public void suggestion_entered(String text);
+    public void finish_composing();
+  }
+
+  /** Config migrations. */
+
+  private static int CONFIG_VERSION = 6;
+
+  /** Map legacy theme preferences to the supported curated theme catalog. */
+  static String migrateThemePreference(String theme)
+  {
+    if (theme == null) return DEFAULT_THEME;
+    switch (theme)
+    {
+      case "system": case "dark": case "light": case "black": case "oled_black":
+      case "white": case "monet": case "graphite_pro": case "gruvbox_dark":
+      case "solarized_dark": case "dracula": case "nord": case "tokyo_night":
+      case "catppuccin_mocha": case "catppuccin_latte": case "sinhala_sand":
+      case "lanka_maroon": case "high_contrast":
+        return theme;
+      case "monetlight": case "monetdark":
+        return "monet";
+      case "gruvbox_light": case "everforestlight": case "sepia_warm":
+      case "desert": case "soft_lavender": case "rose_quartz": case "ocean_breeze": case "citrus_pop":
+      case "mint_matcha": case "glass": case "soft_3d": case "zen_minimal":
+        return "light";
+      case "epaper": return "white";
+      case "epaperblack": case "altblack": return "black";
+      case "rosepine": case "midnight_purple": case "midnight_ocean":
+      case "arctic_blue": case "cobalt": case "quiet_teal": case "copper_night":
+      case "berry_noir": case "aurora_flow": case "pixel_retro":
+      case "unexpected_keyboard": case "lanka_blue":
+        return "graphite_pro";
+      case "jungle": case "emerald_forest": case "pine": case "forest_mist":
+        return "sinhala_sand";
+      case "cyberpunk_neon": case "matrix_green": case "sunset_glow":
+      case "royal_gold": case "quantum_neon": case "sinhala_tech":
+      case "amoled_cyan": case "cyber_purple": case "neon_rose":
+      case "gradientpurplepink": case "sinhala_heritage": case "aurora":
+      case "ocean_teal":
+        return "lanka_maroon";
+      case "high_contrast_yellow":
+        return "high_contrast";
+      default:
+        return DEFAULT_THEME;
+    }
+  }
+
+  /** Normalize stale values that no longer exist in the numpad preference list. */
+  static String migrateShowNumpadPreference(String value)
+  {
+    if ("never".equals(value) || "landscape".equals(value) || "always".equals(value))
+      return value;
+    return "never";
+  }
+
+  public static void migrate(SharedPreferences prefs)
+  {
+    int saved_version = prefs.getInt("version", 0);
+    Logs.debug_config_migration(saved_version, CONFIG_VERSION);
+    if (saved_version == CONFIG_VERSION)
+      return;
+    SharedPreferences.Editor e = prefs.edit();
+    e.putInt("version", CONFIG_VERSION);
+    // Migrations might run on an empty [prefs] for new installs, in this case
+    // they set the default values of complex options.
+    switch (saved_version)
+    {
+      case 0:
+        // Primary, secondary and custom layout options are merged into the new
+        // Layouts option. This also sets the default value.
+        List<LayoutsPreference.Layout> l = new ArrayList<LayoutsPreference.Layout>();
+        l.add(migrate_layout(prefs.getString("layout", "system")));
+        String snd_layout = prefs.getString("second_layout", "none");
+        if (snd_layout != null && !snd_layout.equals("none"))
+          l.add(migrate_layout(snd_layout));
+        String custom_layout = prefs.getString("custom_layout", "");
+        if (custom_layout != null && !custom_layout.equals(""))
+          l.add(LayoutsPreference.CustomLayout.parse(custom_layout));
+        LayoutsPreference.save_to_preferences(e, l);
+        // Fallthrough
+      case 1:
+        boolean add_number_row = prefs.getBoolean("number_row", false);
+        e.putString("number_row", add_number_row ? "no_symbols" : "no_number_row");
+        // Fallthrough
+      case 2:
+        if (!prefs.contains("number_entry_layout")) {
+          e.putString("number_entry_layout", prefs.getBoolean("pin_entry_enabled", true) ? "pin" : "number");
+        }
+        // Fallthrough
+      case 3:
+        // Only migrate this option when the legacy preference exists. On a fresh
+        // install, keep the XML default ("prev") instead of writing "picker".
+        if (prefs.contains("switch_input_immediate"))
+          e.putString("change_method_key_replacement",
+              prefs.getBoolean("switch_input_immediate", false) ? "prev" : "picker");
+        // Fallthrough
+      case 4:
+        // Curate the theme catalog without discarding existing user choices.
+        if (prefs.contains("theme"))
+          e.putString("theme", migrateThemePreference(prefs.getString("theme", DEFAULT_THEME)));
+        if (prefs.contains("day_theme"))
+          e.putString("day_theme", migrateThemePreference(prefs.getString("day_theme", "light")));
+        if (prefs.contains("night_theme"))
+          e.putString("night_theme", migrateThemePreference(prefs.getString("night_theme", "dark")));
+        Set<String> oldFavorites = prefs.getStringSet("favorite_themes", null);
+        if (oldFavorites != null)
+        {
+          Set<String> migratedFavorites = new HashSet<>();
+          for (String favorite : oldFavorites)
+            migratedFavorites.add(migrateThemePreference(favorite));
+          e.putStringSet("favorite_themes", migratedFavorites);
+        }
+        // Fallthrough
+      case 5:
+        // Remove the invalid legacy XML default ("1") from the ListPreference.
+        if (prefs.contains("show_numpad"))
+          e.putString("show_numpad",
+              migrateShowNumpadPreference(prefs.getString("show_numpad", "never")));
+        // Fallthrough
+      default: break;
+    }
+    e.apply();
+  }
+
+  private static LayoutsPreference.Layout migrate_layout(String name)
+  {
+    if (name == null || name.equals("system"))
+      return new LayoutsPreference.SystemLayout();
+    return new LayoutsPreference.NamedLayout(name);
+  }
+}

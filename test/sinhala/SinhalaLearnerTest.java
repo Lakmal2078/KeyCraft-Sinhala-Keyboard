@@ -1,4 +1,4 @@
-package juloo.keyboard2;
+package com.lakmal.keycraftsinhala;
 
 import android.content.SharedPreferences;
 import java.util.ArrayList;

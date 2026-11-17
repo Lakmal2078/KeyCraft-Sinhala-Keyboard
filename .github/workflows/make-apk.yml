@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build Unexpected Keyboard APK
+    name: Build KeyCraft Sinhala Keyboard APK
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -107,7 +107,7 @@ jobs:
 
       - name: Generate release APK SHA-256
         run: |
-          apk="build/outputs/apk/release/Unexpected-Keyboard-release.apk"
+          apk="build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk"
           test -s "$apk"
           sha256sum "$apk" > "$apk.sha256"
           cat "$apk.sha256"
@@ -115,10 +115,10 @@ jobs:
       - name: Upload signed release APK and checksum
         uses: actions/upload-artifact@v4
         with:
-          name: unexpected-keyboard-release
+          name: keycraft-sinhala-keyboard-release
           path: |
-            build/outputs/apk/release/Unexpected-Keyboard-release.apk
-            build/outputs/apk/release/Unexpected-Keyboard-release.apk.sha256
+            build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk
+            build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk.sha256
           retention-days: 7
 
       - name: Remove release signing key
@@ -136,7 +136,7 @@ jobs:
       - name: Download signed release APK
         uses: actions/download-artifact@v4
         with:
-          name: unexpected-keyboard-release
+          name: keycraft-sinhala-keyboard-release
           path: dist
 
       - name: Publish to GitHub Releases
@@ -145,7 +145,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
           files: |
-            dist/Unexpected-Keyboard-release.apk
-            dist/Unexpected-Keyboard-release.apk.sha256
+            dist/KeyCraft-Sinhala-Keyboard-release.apk
+            dist/KeyCraft-Sinhala-Keyboard-release.apk.sha256
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,11 +1,11 @@
 # Comprehensive Audit & Verification Report: Unexpected Keyboard (Sinhala & Multilingual)
 
-**Document Version:** 3.0  
-**Generated:** November 2026  
-**Application ID:** `juloo.keyboard2`  
-**Version:** 2.1.6 (Version Code: 59)  
-**Target Repository:** `https://github.com/Lakmal2078/Unexpected-Keyboard.git`  
-**Upstream Base:** `https://github.com/Julow/Unexpected-Keyboard.git`  
+**Document Version:** 3.0
+**Generated:** November 2026
+**Application ID:** `com.lakmal.keycraftsinhala`
+**Version:** 2.1.6 (Version Code: 59)
+**Target Repository:** `https://github.com/Lakmal2078/Unexpected-Keyboard.git`
+**Upstream Base:** `https://github.com/Julow/Unexpected-Keyboard.git`
 
 ---
 

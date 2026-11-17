@@ -4,7 +4,7 @@
 
 - [ ] Run `./gradlew clean testReleaseUnitTest assembleRelease --no-daemon`.
 - [ ] Confirm all release unit tests pass; record the test count and report path.
-- [ ] Confirm the release APK exists at `build/outputs/apk/release/Unexpected-Keyboard-release.apk`.
+- [ ] Confirm the release APK exists at `build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk`.
 - [ ] Record APK size and SHA-256 (`sha256sum`).
 - [ ] Verify APK signature with `apksigner verify --verbose --print-certs <apk>`; record signer certificate digest and verified schemes. Do not change signing keys or signing configuration.
 - [ ] Inspect the R8 mapping and usage outputs under `build/outputs/mapping/release/`; retain `mapping.txt` for this exact release artifact.

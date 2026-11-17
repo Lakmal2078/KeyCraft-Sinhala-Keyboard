@@ -1,10 +1,10 @@
 # This docker image is used to build the release APK in a reproducible
 # environment.
 # mkdir -p release
-# docker build -t unexpected-keyboard-release -f release.Dockerfile .
+# docker build -t keycraft-sinhala-keyboard-release -f release.Dockerfile .
 # docker run -v "$PWD/release:/release" \
 # -e RELEASE_KEYSTORE -e RELEASE_KEY_ALIAS -e RELEASE_KEYSTORE_PASSWORD \
-# -e RELEASE_KEY_PASSWORD unexpected-keyboard-release
+# -e RELEASE_KEY_PASSWORD keycraft-sinhala-keyboard-release
 
 FROM gradle:8.14-jdk17
 
@@ -26,4 +26,4 @@ COPY --chown=gradle:gradle . .
 RUN rm -rf build .gradle .idea
 
 CMD sh -c 'gradle clean assembleRelease && \
-  cp build/outputs/apk/release/Unexpected-Keyboard-release.apk /release'
+  cp build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk /release'

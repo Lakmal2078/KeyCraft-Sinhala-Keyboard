@@ -24,15 +24,15 @@ dependencies {
 
 
 android {
-  namespace = "juloo.keyboard2"
+  namespace = "com.lakmal.keycraftsinhala"
   compileSdkVersion = "android-36"
 
   defaultConfig {
-    applicationId = "juloo.keyboard2"
+    applicationId = "com.lakmal.keycraftsinhala"
     minSdk = 21
     targetSdk { version = release(36) }
-    versionCode = 60
-    versionName = "2.1.8"
+    versionCode = 1
+    versionName = "1.0.0"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
@@ -162,7 +162,7 @@ val genLayoutsList by tasks.registering(Exec::class) {
 
 val genSinhalaDict by tasks.registering(Exec::class) {
   inputs.file(projectDir.resolve("gen_sinhala_dict.py"))
-  inputs.file(projectDir.resolve("srcs/java/juloo/keyboard2/SinhalaTransliterator.java"))
+  inputs.file(projectDir.resolve("srcs/java/com/lakmal/keycraftsinhala/SinhalaTransliterator.java"))
   outputs.file(projectDir.resolve("assets/dict/si.dict"))
   doFirst { println("\nGenerating Sinhala dictionary (assets/dict/si.dict)") }
   workingDir = projectDir
@@ -182,7 +182,7 @@ val genMethodXml by tasks.registering(Exec::class) {
 
 val checkKeyboardLayouts by tasks.registering(Exec::class) {
   inputs.dir(projectDir.resolve("srcs/layouts"))
-  inputs.file(projectDir.resolve("srcs/java/juloo/keyboard2/KeyValue.java"))
+  inputs.file(projectDir.resolve("srcs/java/com/lakmal/keycraftsinhala/KeyValue.java"))
   outputs.file(projectDir.resolve("check_layout.output"))
   doFirst { println("\nChecking layouts") }
   workingDir = projectDir
@@ -191,7 +191,7 @@ val checkKeyboardLayouts by tasks.registering(Exec::class) {
 
 val compileComposeSequences by tasks.registering(Exec::class) {
   val `in` = projectDir.resolve("srcs/compose")
-  val out = projectDir.resolve("srcs/java/juloo/keyboard2/ComposeKeyData.java")
+  val out = projectDir.resolve("srcs/java/com/lakmal/keycraftsinhala/ComposeKeyData.java")
   inputs.dir(`in`)
   outputs.file(out)
   doFirst { println("\nGenerating $out") }
@@ -234,7 +234,7 @@ tasks.named("preBuild") {
 
 val copyDebugApkToAppPath by tasks.registering(Copy::class) {
   from(layout.buildDirectory.dir("outputs/apk/debug"))
-  include("Unexpected-Keyboard-debug.apk")
+  include("KeyCraft-Sinhala-Keyboard-debug.apk")
   into(rootProject.layout.projectDirectory.dir("app/build/outputs/apk/debug"))
   rename { "app-debug.apk" }
 }

@@ -38,7 +38,7 @@ None confirmed.
 | AUD-06 | Maintainability Issue | `README.md:14`; `SinhalaInputHandler.java:12-65` | A helper advertises browser-specific grapheme deletion, but repository code search found no production call site. The main input path instead uses `KeyEventHandler`'s `InputConnection` composing/commit APIs. | README no longer promises an unconnected browser-specific optimization. Keep the helper unadvertised until explicit integration and editor/device tests exist. |
 | AUD-07 | Maintainability Issue | `build.gradle.kts:35,45,93`; `.github/workflows/android.yml`; `.github/workflows/make-apk.yml` | The app-side `juloo.cdict.Cdict` implementation is pure Java; no JNI native declaration or `System.loadLibrary` call was found. CI nevertheless built `libcdict_java.so` and Gradle configured native library packaging. | Removed unused ABI/JNI packaging configuration and NDK build steps from CI. The vendor submodule and makefile remain in the tree; deleting vendored source is a separate repository-history decision. |
 | AUD-08 | Risk | `.github/workflows/check-generated.yml` | The generated-file workflow checked the layout list, compose data and method XML, but not the physical Sinhala layout emitted by `gen_sinhala_phonetic_layout.py`. | Added a Python unit-test step and a checked-in-output drift check; this check passed on the follow-up commit. |
-| AUD-09 | Risk | `srcs/java/juloo/keyboard2/SinhalaInputHandler.java` | Java `BreakIterator` grapheme boundaries can differ by Android/runtime version for complex script sequences; the helper does not have a production integration/device-level test. | Do not route production replacement through it without API-level tests for ZWJ, combining marks, selection ranges, and browsers. |
+| AUD-09 | Risk | `srcs/java/com/lakmal/keycraftsinhala/SinhalaInputHandler.java` | Java `BreakIterator` grapheme boundaries can differ by Android/runtime version for complex script sequences; the helper does not have a production integration/device-level test. | Do not route production replacement through it without API-level tests for ZWJ, combining marks, selection ranges, and browsers. |
 
 ## Architecture review
 
@@ -78,7 +78,7 @@ The parser's vowel/consonant arrays are ordered longest-first in the relevant ca
 - Android Gradle Plugin 8.13.2, JDK 17 in CI, Android API 36, minSdk 21, targetSdk 36, JUnit 4 and Mockito were observed.
 - Existing CI includes JVM unit tests, emulator instrumentation, debug APK build, lint and generated-file checks.
 - `security-scan.yml` runs dependency reporting and Android lint but does not invoke a dedicated vulnerability scanner; treat the workflow name as broader than the checks it currently performs.
-- New tests are located under `test/sinhala/` (Java files retain package `juloo.keyboard2` to match existing test conventions) plus a Python generator test. CI runs the Python tests and checks generated XML drift.
+- New tests are located under `test/sinhala/` (Java files retain package `com.lakmal.keycraftsinhala` to match existing test conventions) plus a Python generator test. CI runs the Python tests and checks generated XML drift.
 
 ## Performance
 
