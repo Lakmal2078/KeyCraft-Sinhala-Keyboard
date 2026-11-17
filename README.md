@@ -4,18 +4,15 @@
 
 ---
 
-⚠️ Google සමාගම විවෘත මූලාශ්‍ර Android ප්‍රජාව විනාශ කිරීමට උත්සාහ කරයි.
-
-වැඩිදුර තොරතුරු සඳහා [keepandroidopen.org](https://keepandroidopen.org/) සහ [F-Droid බ්ලොගය](https://f-droid.org/en/2025/09/29/google-developer-registration-decree.html) බලන්න.
+⚠️ Google සමාගමේ Android developer registration ප්‍රතිපත්ති පිළිබඳ වැඩිදුර තොරතුරු [keepandroidopen.org](https://keepandroidopen.org/) වෙතින් ලබාගත හැක.
 
 ---
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="F-Droid වෙතින් ලබාගන්න"
-     height="80">](https://f-droid.org/packages/juloo.keyboard2/)
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Google Play වෙතින් ලබාගන්න"
-     height="80">](https://play.google.com/store/apps/details?id=juloo.keyboard2)
+## 📥 Download
+
+[**Latest Release – GitHub**](https://github.com/Lakmal2078/Unexpected-Keyboard/releases/latest)
+
+APK එක සහ SHA-256 checksum එක GitHub Releases වෙතින් ලබාගත හැක.
 
 Android සඳහා නිර්මාණය කළ සැහැල්ලු, පෞද්ගලිකත්වයට මුල්තැන දෙන තිරයේ යතුරුපුවරුවකි.
 
