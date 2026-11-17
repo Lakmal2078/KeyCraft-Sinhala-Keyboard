@@ -80,11 +80,11 @@ android {
       val targetKeystore = if (keystore.exists() && keystore.isFile) keystore else file("${rootDir}/release.keystore")
       storeFile = targetKeystore
       val rawPass = System.getenv("RELEASE_KEYSTORE_PASSWORD")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
-      storePassword = if (!rawPass.isNullOrBlank()) rawPass else "***REMOVED***"
+      storePassword = rawPass.orEmpty()
       val rawAlias = System.getenv("RELEASE_KEY_ALIAS")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
       keyAlias = if (!rawAlias.isNullOrBlank()) rawAlias else "release"
       val rawKeyPass = System.getenv("RELEASE_KEY_PASSWORD")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
-      keyPassword = if (!rawKeyPass.isNullOrBlank()) rawKeyPass else "***REMOVED***"
+      keyPassword = rawKeyPass.orEmpty()
     }
   }
 
