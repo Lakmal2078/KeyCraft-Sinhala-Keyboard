@@ -55,7 +55,7 @@ public final class Dictionaries
     }
     catch (Throwable t)
     {
-      android.util.Log.e("com.lakmal.keycraftsinhala", "Dictionaries: failed to load " + name, t);
+      android.util.Log.e(Logs.TAG, "Dictionaries: failed to load " + name, t);
     }
   }
 
@@ -83,7 +83,7 @@ public final class Dictionaries
     }
     catch (Throwable t)
     {
-      android.util.Log.e("com.lakmal.keycraftsinhala", "Dictionaries: load failed for " + dict_name, t);
+      android.util.Log.e(Logs.TAG, "Dictionaries: load failed for " + dict_name, t);
       return null;
     }
   }

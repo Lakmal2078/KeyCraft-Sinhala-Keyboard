@@ -16,6 +16,8 @@ buildSrc/build
 /_build
 /release
 __pycache__
+*.class
+.attach_pid*
 .env
 .env.*
 !.env.example

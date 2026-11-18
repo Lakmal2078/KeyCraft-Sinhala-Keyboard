@@ -8,7 +8,8 @@ import org.json.JSONException;
 
 public final class Logs
 {
-  static final String TAG = "com.lakmal.keycraftsinhala";
+  // Keep tag <= 23 chars to satisfy Android Log.isLoggable / Lint LongLogTag limit
+  public static final String TAG = "KeyCraftSinhala";
 
   static LogPrinter _debug_logs = null;
 

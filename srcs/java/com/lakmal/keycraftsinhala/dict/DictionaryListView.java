@@ -207,7 +207,7 @@ public class DictionaryListView extends LinearLayout
         byte[] digest = md.digest(data);
         StringBuilder sb = new StringBuilder();
         for (byte b : digest) sb.append(String.format("%02x", b));
-        android.util.Log.i("com.lakmal.keycraftsinhala", "Verified dictionary " + dict_name + " SHA-256: " + sb.toString());
+        android.util.Log.i(Logs.TAG, "Verified dictionary " + dict_name + " SHA-256: " + sb.toString());
       }
       catch (Throwable ignored) {}
       _dictionaries.install(dict_name, data);
