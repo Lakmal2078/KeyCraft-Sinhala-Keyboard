@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:background="?attr/colorKeyboard" android:hardwareAccelerated="false">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:background="?attr/colorKeyboard">
   <ScrollView android:id="@+id/clipboard_scroll_view" android:layout_width="fill_parent" android:layout_height="@dimen/clipboard_view_height">
     <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
       <com.lakmal.keycraftsinhala.ClipboardHistoryCheckBox android:id="@+id/clipboard_history_checkbox" android:text="@string/clipboard_history_heading" style="@style/clipboardHeading" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
