@@ -15,9 +15,10 @@
 |----------|----------|----------|----------------|
 | **Clear‑text traffic** | ✅ Low (mitigated) | `android:usesCleartextTraffic="false"` in `AndroidManifest.xml` (line 14). | No action needed – already disabled.
 | **Exported service without proper protection** | ⚠️ Medium | `Keyboard2` service declared as `android:exported="true"` (manifest line 16) but protected by `android.permission.BIND_INPUT_METHOD`. | Verify that no other components are unintentionally exported. Consider setting `android:exported="false"` for non‑IME services.
-| **Signing configuration** | ✅ Low (guarded) | Release signing strictly guards `RELEASE_KEYSTORE` environment variables with clear build-time validation in `build.gradle.kts`. | Maintained; CI / local builds gracefully fall back to debug or fail fast if release secrets are missing. |
+| **Signing configuration** | ✅ Low (guarded) | Release tasks require an explicit keystore path or Base64 keystore, store password, key alias and key password; Gradle verifies the keystore, alias and private key before packaging. | Keep signing secrets in the CI secret store or a permission-restricted local `.env`; release builds fail fast and never fall back to debug signing. |
+| **App-data backup** | ✅ Low (hardened) | `android:allowBackup="false"`; legacy and Android 12+ extraction rules exclude root, files, databases, shared preferences and external app data. | Keep backup and device-transfer disabled for keyboard data; update manifest and both rules files together if policy changes. |
 | **Local secret storage** | ❌ Info | No usage of `EncryptedSharedPreferences` or Android Keystore observed in source. Sensitive data (e.g., clipboard history) stays in‑memory only – good, but any future feature storing tokens must use Keystore. | Add guidelines to store any future secrets with `EncryptedSharedPreferences` or `android.security.keystore`. |
-| **ProGuard / R8** | ⚠️ Info | `isMinifyEnabled = false` and `isShrinkResources = false` currently in `build.gradle.kts` release build to maintain parity with debug runtime behavior while investigating dictionary/suggestion regressions. | Complete release smoke tests and re-enable R8/resource shrinking for production release hardening. |
+| **ProGuard / R8** | ⚠️ Info | `isMinifyEnabled = true` and `isShrinkResources = true` are enabled in the current `build.gradle.kts` release build. | Keep R8/resource shrinking enabled and run the release smoke-test checklist for every production release. |
 | **Clipboard handling** | ✅ Low | `ClipboardHistoryService` stores clipboard only in RAM and respects Android sensitivity flags. | No changes needed; note that Incognito tabs may block system clipboard – provide optional Paste key (already configurable). |
 | **WebView usage** | ❌ Info | No `WebView` component detected in the codebase. | No action required. |
 | **Permissions** | ✅ Low | Only `VIBRATE` and `INTERNET` permissions (`AndroidManifest.xml`). `INTERNET` is required for optional dictionaries; no dangerous permissions. | Compliant. |
@@ -65,7 +66,7 @@
 ---
 
 ## 5. Conclusion
-The **Unexpected Keyboard** project follows many best‑practice security measures: it disables clear‑text traffic, uses in‑memory clipboard history, and ships with ProGuard/R8 for release builds. The primary areas for improvement are **exported component hardening**, **secure handling of signing credentials**, and **accessibility compliance**. Addressing the remediation items above will bring the app to a robust production‑ready state.
+The **KeyCraft Sinhala Keyboard** project follows many best‑practice security measures: it disables clear‑text traffic, uses in‑memory clipboard history, and ships with ProGuard/R8 for release builds. The primary areas for improvement are **exported component hardening**, **secure handling of signing credentials**, and **accessibility compliance**. Addressing the remediation items above will bring the app to a robust production‑ready state.
 
 ---
 

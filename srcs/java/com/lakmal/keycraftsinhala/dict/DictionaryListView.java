@@ -115,15 +115,21 @@ public class DictionaryListView extends LinearLayout
      {
        public void run()
        {
-         r.run();
-         post(new Runnable()
-             {
-               public void run()
+         try
+         {
+           r.run();
+         }
+         finally
+         {
+           post(new Runnable()
                {
-                 _pending.remove(name);
-                 refresh();
-               }
-             });
+                 public void run()
+                 {
+                   _pending.remove(name);
+                   refresh();
+                 }
+               });
+         }
        }
      }).start();
     refresh();

@@ -49,7 +49,7 @@ The generator requires Python 3.11 or newer (`StrEnum`). It raises a `LayoutGenE
 Run all Sinhala-focused Python checks:
 
 ```sh
-python3 -m unittest discover -s test/sinhala -p 'test_*.py'
+python3 scripts/run_sinhala_python_tests.py
 python3 gen_sinhala_phonetic_layout.py
 git diff --exit-code -- srcs/layouts/sinhala_phonetic.xml
 ```

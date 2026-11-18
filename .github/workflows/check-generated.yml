@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - master
+      - main
+      - keycraft-branding
   pull_request:
 
 permissions:
@@ -62,7 +64,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Test Sinhala layout generator
-        run: python3 -m unittest discover -s test/sinhala -p 'test_*.py'
+        run: python3 scripts/run_sinhala_python_tests.py
       - name: Verify generated Sinhala layout is up to date
         run: |
           python3 gen_sinhala_phonetic_layout.py

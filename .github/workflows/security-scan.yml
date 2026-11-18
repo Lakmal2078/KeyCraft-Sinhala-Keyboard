@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - master
+      - keycraft-branding
       - main
   pull_request:
     branches:
+      - keycraft-branding
       - master
       - main
   schedule:

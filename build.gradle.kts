@@ -1,4 +1,5 @@
 import buildlogic.InitDebugKeystore
+import buildlogic.ValidateReleaseSigning
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import java.io.FileOutputStream
 import java.util.Base64
@@ -21,6 +22,25 @@ dependencies {
   androidTestImplementation("androidx.test:runner:1.6.2")
 }
 
+
+
+
+val releaseKeystoreEnv = System.getenv("RELEASE_KEYSTORE")?.trim().orEmpty()
+val releaseKeystoreBase64 = System.getenv("RELEASE_KEYSTORE_BASE64").orEmpty()
+val releaseKeystoreFile = run {
+  val configured = if (releaseKeystoreEnv.isBlank()) rootProject.file("release.keystore")
+    else rootProject.file(releaseKeystoreEnv)
+  if (!configured.isFile && releaseKeystoreBase64.isNotBlank()) {
+    try {
+      configured.parentFile?.mkdirs()
+      configured.writeBytes(Base64.getDecoder().decode(releaseKeystoreBase64))
+    }
+    catch (e: IllegalArgumentException) {
+      throw GradleException("RELEASE_KEYSTORE_BASE64 is not valid Base64.")
+    }
+  }
+  configured
+}
 
 
 android {
@@ -65,27 +85,10 @@ android {
     }
 
     create("release") {
-      val rawKs = System.getenv("RELEASE_KEYSTORE")?.trim()
-      val ksName = if (rawKs.isNullOrBlank()) "release.keystore" else rawKs
-      val configuredKeystore = file(ksName)
-      val keystore = if (configuredKeystore.isAbsolute) configuredKeystore else file("${rootDir}/$ksName")
-      if (!keystore.exists() || !keystore.isFile) {
-        val b64 = System.getenv("RELEASE_KEYSTORE_BASE64")
-        if (!b64.isNullOrBlank()) {
-          runCatching {
-            val cleanB64 = b64.replace(Regex("[^A-Za-z0-9+/=]"), "")
-            keystore.writeBytes(Base64.getDecoder().decode(cleanB64))
-          }
-        }
-      }
-      val targetKeystore = if (keystore.exists() && keystore.isFile) keystore else file("${rootDir}/release.keystore")
-      storeFile = targetKeystore
-      val rawPass = System.getenv("RELEASE_KEYSTORE_PASSWORD")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
-      storePassword = rawPass.orEmpty()
-      val rawAlias = System.getenv("RELEASE_KEY_ALIAS")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
-      keyAlias = if (!rawAlias.isNullOrBlank()) rawAlias else "release"
-      val rawKeyPass = System.getenv("RELEASE_KEY_PASSWORD")?.replace("=", "")?.replace("\"", "")?.replace("'", "")?.trim()
-      keyPassword = rawKeyPass.orEmpty()
+      storeFile = releaseKeystoreFile
+      storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD").orEmpty()
+      keyAlias = System.getenv("RELEASE_KEY_ALIAS")?.trim().orEmpty()
+      keyPassword = System.getenv("RELEASE_KEY_PASSWORD").orEmpty()
     }
   }
 
@@ -133,6 +136,21 @@ android {
     baseline = file("lint-baseline.xml")
   }
 }
+
+
+val validateReleaseSigning by tasks.registering(ValidateReleaseSigning::class) {
+  keystoreFile.set(releaseKeystoreFile)
+  keystoreReferenceProvided.set(
+    releaseKeystoreEnv.isNotBlank() || releaseKeystoreBase64.isNotBlank()
+  )
+}
+
+tasks.configureEach {
+  if (name in setOf("validateSigningRelease", "packageRelease", "assembleRelease", "bundleRelease", "signReleaseBundle")) {
+    dependsOn(validateReleaseSigning)
+  }
+}
+
 
 val buildKeyboardFont by tasks.registering(Exec::class) {
   val `in` = projectDir.resolve("srcs/special_font")

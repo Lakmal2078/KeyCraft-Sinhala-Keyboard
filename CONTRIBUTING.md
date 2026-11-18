@@ -8,10 +8,20 @@ The application uses Gradle and can be used with Android Studio, but using
 Android Studio is not required. The build dependencies are:
 - OpenJDK 17
 - Android SDK: build tools, platform `android-36`
-- Android NDK `27.2.12479018` (native dictionary library)
 - Python 3.x (required for `gen_layouts.py`, `gen_method_xml.py`, `check_layout.py`, compose compiler)
 - fontforge (required for compiling special font icons in `srcs/special_font`)
 - keytool (from JDK, used to generate local debug keystore)
+
+Verify that both Java tools use JDK 17 before running Gradle:
+
+```sh
+java -version
+javac -version
+printf 'JAVA_HOME=%s\n' "${JAVA_HOME:-}"
+```
+
+Set `JAVA_HOME` to the JDK 17 installation and ensure `$JAVA_HOME/bin` is on
+`PATH` if either command resolves to another Java installation.
 
 Make sure the Git submodules are initialized and point to the right revision:
 
@@ -19,27 +29,14 @@ Make sure the Git submodules are initialized and point to the right revision:
 git submodule update --init --recursive
 ```
 
-Native dictionary binaries are built from the pinned submodule source and are
-not checked into Git. Before building an APK (including in Android Studio), run:
-
-```sh
-sdkmanager "ndk;27.2.12479018"
-"$ANDROID_HOME/ndk/27.2.12479018/ndk-build" \
-  NDK_PROJECT_PATH=. \
-  APP_BUILD_SCRIPT=vendor/Android.mk \
-  APP_ABI="arm64-v8a x86_64" \
-  APP_PLATFORM=android-21 \
-  NDK_LIBS_OUT=libs
-```
-
-Set `ANDROID_HOME` to your Android SDK path first. Nix users can use
-`"$ANDROID_SDK_ROOT/ndk-bundle/ndk-build"` with the same arguments instead.
-Rebuild the native libraries after updating the cdict submodule or native build
-configuration. Both APK workflows perform this step on a clean checkout.
+The dictionary reader used by the app is implemented in pure Java. The legacy
+`vendor/cdict` submodule is retained for source-history/reference purposes but
+is not compiled or packaged by the Android app; an Android NDK build is not
+required.
 
 See `.env.example` for environment variable options when signing debug and release APKs.
 
-For Android Studio users, no more setup is needed after the native build.
+For Android Studio users, no additional native-library build step is required.
 
 For Nix users, the right environment can be obtained with `nix-shell ./shell.nix`.
 Instructions to install Nix are [here](https://wiki.nixos.org/wiki/Nix_Installation_Guide).
@@ -49,6 +46,17 @@ location of your Android SDK by either:
 - Setting the `ANDROID_HOME` environment variable to point to the android sdk or
 - Creating the file `local.properties` and writing
   `sdk.dir=<location_of_android_home>` into it.
+
+Running tests:
+
+```sh
+python3 scripts/run_sinhala_python_tests.py
+./gradlew test
+./gradlew lintDebug
+```
+
+The Python discovery root is `test/sinhala`; running discovery from `test`
+currently skips these tests because that directory is not a Python package.
 
 Building the debug apk:
 

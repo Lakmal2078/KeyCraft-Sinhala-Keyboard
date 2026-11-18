@@ -6,13 +6,13 @@
 
 KeyCraft යනු සිංහල සහ දෛනික ටයිප් කිරීම පහසු කරවන, Android සඳහා නිර්මාණය කළ අභිරුචිකරණය කළ හැකි Keyboard යෙදුමකි. Singlish → Sinhala පරිවර්තනය, Swipe Typing, විවිධ Keyboard Layouts, Themes සහ Productivity Tools එකම යෙදුමකින් ලබා දෙයි.
 
-[**⬇️ KeyCraft v1.0.0 Download කරන්න**](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.0.0) · [Source Code](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard) · [Bug එකක් වාර්තා කරන්න](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues)
+[**⬇️ KeyCraft v1.1.0 Download කරන්න**](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.0) · [Source Code](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard) · [Bug එකක් වාර්තා කරන්න](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues)
 
 ---
 
 ## 📥 Download සහ Install කිරීම
 
-1. [KeyCraft v1.0.0 Release පිටුවට](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.0.0) යන්න.
+1. [KeyCraft v1.1.0 Release පිටුවට](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.0) යන්න.
 2. **KeyCraft-Sinhala-Keyboard-release.apk** ගොනුව Download කරන්න.
 3. Download කළ APK එක විවෘත කර Android ඉල්ලන්නේ නම් එම Source එකෙන් Install කිරීමට අවසර දෙන්න.
 4. KeyCraft විවෘත කර තිරයේ පෙන්වන පියවර අනුගමනය කර Keyboard එක Enable කර Default Keyboard ලෙස තෝරන්න.
@@ -42,6 +42,7 @@ KeyCraft යනු සිංහල සහ දෛනික ටයිප් කි
 - Optional Dictionaries Download කිරීමට Internet Permission භාවිත වේ.
 - Clipboard පහසුකම් සැකසුම් මඟින් පාලනය කළ හැක. Clipboard History හෝ Preview සක්‍රිය කිරීමට පෙර ඒවායේ Settings පරීක්ෂා කරන්න.
 - KeyCraft තුළ දැන්වීම් (Ads) නොමැත.
+- Keyboard preferences සහ app data cloud backup හෝ device-to-device transfer වෙත backup නොවේ.
 
 KeyCraft විවෘත මූලාශ්‍ර (Open Source) ව්‍යාපෘතියකි. Source Code එක පරීක්ෂා කර යෙදුමේ Permissions සහ ක්‍රියාකාරීත්වය පිළිබඳව වැඩිදුර සොයා බැලිය හැක.
 
@@ -51,7 +52,6 @@ KeyCraft විවෘත මූලාශ්‍ර (Open Source) ව්‍යා�
 
 - JDK 17
 - Android SDK — Android Platform 36 සහ ඊට ගැළපෙන Build Tools
-- Android NDK \`27.2.12479018\` (Native Dictionary Component සඳහා)
 - Python 3
 - FontForge
 - Git සහ Submodule Support
@@ -69,7 +69,22 @@ cd KeyCraft-Sinhala-Keyboard
 git submodule update --init --recursive
 ~~~
 
-සම්පූර්ණ Development Environment සහ Native Build උපදෙස් සඳහා [CONTRIBUTING.md](CONTRIBUTING.md) බලන්න.
+Dictionary reader එක pure Java බැවින් Android NDK අවශ්‍ය නොවේ. සම්පූර්ණ Development Environment උපදෙස් සඳහා [CONTRIBUTING.md](CONTRIBUTING.md) බලන්න.
+
+### Tests ධාවනය කිරීම
+
+Sinhala Python generator tests සඳහා නිවැරදි discovery path එක:
+
+~~~sh
+python3 scripts/run_sinhala_python_tests.py
+~~~
+
+Android JVM unit tests සහ lint:
+
+~~~sh
+./gradlew test
+./gradlew lintDebug
+~~~
 
 ### Debug APK එක Build කිරීම
 

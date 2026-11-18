@@ -5,8 +5,10 @@ on:
     branches:
       - main
       - master
+      - keycraft-branding
   pull_request:
     branches:
+      - keycraft-branding
       - main
       - master
 
@@ -40,6 +42,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      - name: Run Sinhala Python tests
+        run: python3 scripts/run_sinhala_python_tests.py
 
       - name: Check keyboard theme contrast
         run: python3 check_theme_contrast.py

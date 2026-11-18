@@ -1,8 +1,8 @@
 # Repository Audit Report
 
-**Audited repository:** `Lakmal2078/Unexpected-Keyboard`  
-**Base commit inspected:** `a57e2d10fcc3f1bf4ea53c296957f871168c560a`  
-**Scope:** source, Android manifest/build scripts, generator, generated Sinhala layout, tests, workflows, and native-library integration. The local Gradle/Android build was not executed in this audit environment; CI remains the authoritative compile/device-test check.
+**Audited repository:** `Lakmal2078/KeyCraft-Sinhala-Keyboard`
+**Base commit inspected:** `afc11ae9`
+**Scope:** source, Android manifest/build scripts, generator, generated Sinhala layout, tests, workflows, and native-library integration. The baseline audit was performed at the recorded commit; follow-up remediation is being validated on the active `keycraft-branding` branch. CI remains the authoritative emulator/device-test check.
 
 ## Executive summary
 
@@ -60,7 +60,7 @@ The parser's vowel/consonant arrays are ordered longest-first in the relevant ca
 - **Native-format/parser security (AUD-10):** `Cdict.of_bytes()` performs full iterative trie offset/node walks within the trie data bounds, detects cycles/repeated node offsets, validates packed array formats, enforces semantic bounds on branch word indices and alias targets against frequency table length, and is covered by deterministic malformed-header and mutation fuzz tests.
 - Source/Gradle inspection found no analytics, crash-reporting or advertising SDK dependency and no observed typed-text upload path. This is a bounded source audit, not proof about every downstream-built APK or dependency at runtime.
 - The IME service is exported with Android's `BIND_INPUT_METHOD` permission, as required for an input method. Launcher is exported for its launcher intent; Settings and Dictionaries activities are not exported. No content provider or broadcast receiver is declared in the manifest.
-- `allowBackup=false`; backup and device-transfer rules also exclude application data. This is conservative and consistent with a keyboard's sensitive-data surface.
+- `allowBackup=false`; legacy backup and Android 12+ cloud-backup/device-transfer rules explicitly exclude root, files, databases, shared preferences, and external app data. This is conservative and consistent with a keyboard's sensitive-data surface.
 - Sensitive editor handling is present in `EditorConfig`, `CurrentlyTypedWord`, `KeyEventHandler` and `Suggestions`; existing tests verify that password/private editor typing is not read for suggestions or transliterated.
 - Clipboard history is intentionally in-memory, opt-in and capped; pinned clipboard content is a distinct user action and should be disclosed/documented separately from transient clipboard history.
 - `no ads` is consistent with the inspected source/dependency tree, but only the shipped APK and all resolved dependencies can fully confirm release behavior.
@@ -95,7 +95,7 @@ A numeric baseline was not measured because this environment could inspect and e
 
 ## Release checklist
 
-- [ ] `python3 -m unittest discover -s test/sinhala -p 'test_*.py'`
+- [ ] `python3 scripts/run_sinhala_python_tests.py` (must discover and run at least one test).
 - [ ] `./gradlew test`
 - [ ] `./gradlew connectedDebugAndroidTest`
 - [ ] `./gradlew lintDebug`
