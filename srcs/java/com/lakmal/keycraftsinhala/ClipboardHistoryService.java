@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Handler;
 import java.util.ArrayList;
@@ -68,6 +69,15 @@ public final class ClipboardHistoryService
   {
     if (_paste_callback != null)
       _paste_callback.paste_from_clipboard_pane(clip);
+  }
+
+  /** Send the image at [uri] to the editor. Returns [false] when the focused
+      app does not accept it. */
+  public static boolean paste_image(Uri uri, String mime)
+  {
+    if (_paste_callback == null)
+      return false;
+    return _paste_callback.paste_image_from_clipboard_pane(uri, mime);
   }
 
   public static synchronized void on_destroy()
@@ -211,6 +221,47 @@ public final class ClipboardHistoryService
       _listener.on_clipboard_history_change();
   }
 
+  /** Add an image clip (GIF, PNG, JPEG, WebP) to the history. Like text
+      entries it lives only in memory and expires with the same TTL. */
+  public synchronized void add_image_clip(Uri uri, String mime)
+  {
+    if (!Config.globalConfig().clipboard_history_enabled)
+      return;
+    if (uri == null || !"content".equals(uri.getScheme())
+        || !ContentCommitter.is_supported_mime(mime))
+      return;
+    clear_expired_and_get_history();
+    if (!_history.isEmpty() && uri.equals(_history.get(0).uri))
+      return;
+    if (_history.size() >= MAX_HISTORY_SIZE)
+      _history.remove(_history.size() - 1);
+    String label = "[" + ("image/gif".equals(mime) ? "GIF" : "Image") + "]";
+    int ttl = get_history_ttl_minutes();
+    long now_ms = System.currentTimeMillis();
+    _history.add(0, new HistoryEntry(label, uri, mime,
+        ttl < 0 ? Long.MAX_VALUE : now_ms + TimeUnit.MINUTES.toMillis(ttl)));
+    schedule_expiry(now_ms);
+    if (_listener != null)
+      _listener.on_clipboard_history_change();
+  }
+
+  /** Current entries (text and image) with expired ones removed. */
+  public synchronized List<HistoryEntry> get_entries()
+  {
+    clear_expired_and_get_history();
+    return new ArrayList<HistoryEntry>(_history);
+  }
+
+  /** Removes exactly this entry, without touching the system clipboard. */
+  public synchronized void remove_entry(HistoryEntry entry)
+  {
+    if (!_history.remove(entry))
+      return;
+    schedule_expiry(System.currentTimeMillis());
+    if (_listener != null)
+      _listener.on_clipboard_history_change();
+  }
+
   public synchronized void clear_history()
   {
     _handler.removeCallbacks(_expire_history);
@@ -243,9 +294,17 @@ public final class ClipboardHistoryService
     int count = clip.getItemCount();
     for (int i = 0; i < count; i++)
     {
-      CharSequence text = clip.getItemAt(i).getText();
+      ClipData.Item item = clip.getItemAt(i);
+      CharSequence text = item.getText();
       if (text != null)
         add_clip(text.toString());
+      else if (item.getUri() != null)
+      {
+        // Read the MIME type only for image items, never for text clips.
+        String mime = clip.getDescription() == null ? null
+            : clip.getDescription().getMimeType(0);
+        add_image_clip(item.getUri(), mime);
+      }
     }
   }
 
@@ -294,14 +353,27 @@ public final class ClipboardHistoryService
 
   static final class HistoryEntry
   {
+    /** Text shown in the list. For images this is a label such as "[GIF]". */
     public final String content;
+
+    /** Non-null only for image entries. */
+    public final Uri uri;
+    /** MIME type of the image entry, or [null] for text entries. */
+    public final String mime;
 
     /** Time at which the entry expires. */
     public final long expiry_timestamp;
 
     public HistoryEntry(String c, long expiry)
     {
+      this(c, null, null, expiry);
+    }
+
+    public HistoryEntry(String c, Uri u, String m, long expiry)
+    {
       content = c;
+      uri = u;
+      mime = m;
       expiry_timestamp = expiry;
     }
   }
@@ -309,5 +381,12 @@ public final class ClipboardHistoryService
   public interface ClipboardPasteCallback
   {
     public void paste_from_clipboard_pane(String content);
+
+    /** Commits an image to the focused app. Returns [false] when it is not
+        accepted. Default: images are not supported. */
+    public default boolean paste_image_from_clipboard_pane(Uri uri, String mime)
+    {
+      return false;
+    }
   }
 }

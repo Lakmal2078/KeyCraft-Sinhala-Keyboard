@@ -46,10 +46,15 @@ public final class EditorConfig
       browsing. */
   public boolean is_password_input;
 
+  /** The editor info of the focused field, used to commit content (GIF etc.).
+      Set by [refresh]. */
+  public EditorInfo info = null;
+
   public EditorConfig() {}
 
   public void refresh(EditorInfo info, Resources res)
   {
+    this.info = info;
     int inputType = info.inputType & InputType.TYPE_MASK_CLASS;
     int options = info.imeOptions;
     /* Selection mode.

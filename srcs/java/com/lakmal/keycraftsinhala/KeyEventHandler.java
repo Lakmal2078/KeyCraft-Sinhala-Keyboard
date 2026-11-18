@@ -480,6 +480,23 @@ public final class KeyEventHandler
     conn.commitText(text, 1);
   }
 
+  /** Commits image content (GIF, PNG, JPEG, WebP) to the focused app.
+      Returns [false] when the app does not accept the MIME type. */
+  public boolean commit_content(android.net.Uri uri, String mime)
+  {
+    InputConnection conn = _recv.getCurrentInputConnection();
+    if (conn == null)
+      return false;
+    finish_composing();
+    return ContentCommitter.commit(conn, _config.editor_config.info, uri, mime);
+  }
+
+  @Override
+  public boolean paste_image_from_clipboard_pane(android.net.Uri uri, String mime)
+  {
+    return commit_content(uri, mime);
+  }
+
   void replace_surrounding_text(int remove_before, int remove_after,
       String new_text)
   {

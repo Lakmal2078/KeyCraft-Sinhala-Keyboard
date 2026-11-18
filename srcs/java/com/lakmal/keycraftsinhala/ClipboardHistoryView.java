@@ -15,7 +15,9 @@ import java.util.List;
 public final class ClipboardHistoryView extends NonScrollListView
   implements ClipboardHistoryService.OnClipboardHistoryChange
 {
+  /** Display labels, parallel to [_entries]. */
   List<String> _history;
+  List<ClipboardHistoryService.HistoryEntry> _entries;
   ClipboardHistoryService _service;
   ClipboardEntriesAdapter _adapter;
 
@@ -23,23 +25,32 @@ public final class ClipboardHistoryView extends NonScrollListView
   {
     super(ctx, attrs);
     _history = Collections.EMPTY_LIST;
+    _entries = Collections.emptyList();
     _adapter = this.new ClipboardEntriesAdapter();
     _service = ClipboardHistoryService.get_service(ctx);
     if (_service != null)
-    {
-      _history = _service.clear_expired_and_get_history();
-    }
+      refresh_entries();
     setAdapter(_adapter);
   }
 
+  private void refresh_entries()
+  {
+    _entries = _service.get_entries();
+    List<String> labels = new ArrayList<String>(_entries.size());
+    for (ClipboardHistoryService.HistoryEntry entry : _entries)
+      labels.add(entry.content);
+    _history = labels;
+  }
+
   /** The history entry at index [pos] is removed from the history and added to
-      the list of pinned clipboards. */
+      the list of pinned clipboards. Image entries cannot be pinned. */
   public void pin_entry(int pos)
   {
-    if (_service == null || pos < 0 || pos >= _history.size())
+    if (_service == null || pos < 0 || pos >= _entries.size())
       return;
-    String clip = _history.get(pos);
-    if (!_service.contains_history_entry(clip))
+    ClipboardHistoryService.HistoryEntry entry = _entries.get(pos);
+    String clip = entry.content;
+    if (entry.uri != null || !_service.contains_history_entry(clip))
     {
       update_data();
       return;
@@ -49,12 +60,20 @@ public final class ClipboardHistoryView extends NonScrollListView
     _service.remove_history_entry(clip);
   }
 
-  /** Paste the specified entry, then remove it from clipboard history. */
+  /** Paste the specified entry, then remove it from clipboard history. An
+      image is removed only when the focused app accepts it. */
   public void paste_entry(int pos)
   {
-    if (_service == null || pos < 0 || pos >= _history.size())
+    if (_service == null || pos < 0 || pos >= _entries.size())
       return;
-    String clip = _history.get(pos);
+    ClipboardHistoryService.HistoryEntry entry = _entries.get(pos);
+    if (entry.uri != null)
+    {
+      if (ClipboardHistoryService.paste_image(entry.uri, entry.mime))
+        _service.remove_entry(entry);
+      return;
+    }
+    String clip = entry.content;
     if (_service.contains_history_entry(clip))
     {
       ClipboardHistoryService.paste(clip);
@@ -81,7 +100,7 @@ public final class ClipboardHistoryView extends NonScrollListView
   {
     if (_service == null)
       return;
-    _history = _service.clear_expired_and_get_history();
+    refresh_entries();
     _adapter.notifyDataSetChanged();
     invalidate();
   }
