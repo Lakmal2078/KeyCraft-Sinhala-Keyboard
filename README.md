@@ -1,5 +1,7 @@
 # KeyCraft Sinhala Keyboard
 
+KeyCraft is a free, open-source Sinhala keyboard for Android. Type in Singlish and convert it to Sinhala with on-device transliteration, swipe typing, customizable layouts and themes. Built for fast, flexible everyday Sinhala typing without ads.
+
 **සිංහල ලිවීම ලස්සනට, ඉක්මනට**
 
 *Type Sinhala beautifully and quickly.*

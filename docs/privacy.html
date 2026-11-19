@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KeyCraft Privacy &amp; Open Source</title>
+  <meta name="description" content="Learn how KeyCraft handles keyboard input, optional dictionary downloads and clipboard features. Free, ad-free and open source under GPL-3.0.">
+  <meta name="theme-color" content="#101827">
+  <link rel="canonical" href="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/privacy.html">
+  <link rel="icon" type="image/png" href="/KeyCraft-Sinhala-Keyboard/assets/favicon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="KeyCraft Privacy &amp; Open Source">
+  <meta property="og:description" content="Understand KeyCraft's on-device Sinhala typing, optional network access, clipboard controls and GPL-3.0 source code.">
+  <meta property="og:url" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/privacy.html">
+  <meta property="og:image" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-keycraft.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="KeyCraft Privacy &amp; Open Source">
+  <meta name="twitter:description" content="Understand KeyCraft's on-device Sinhala typing, optional network access, clipboard controls and GPL-3.0 source code.">
+  <meta name="twitter:image" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-keycraft.png">
+  <style>
+    :root { color-scheme:dark; --bg:#101827; --panel:#182438; --text:#edf3fb; --muted:#aab8ca; --accent:#69e0c0; --line:#2a3a51; }
+    * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--text); font:16px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    a { color:var(--accent); text-underline-offset:4px; } main { width:min(800px,calc(100% - 40px)); margin:0 auto; padding:56px 0 80px; }
+    .back { color:var(--muted); text-decoration:none; } h1 { font-size:clamp(2.2rem,6vw,3.5rem); line-height:1.1; margin:30px 0 12px; letter-spacing:-.04em; }
+    .intro { color:var(--muted); font-size:1.12rem; } h2 { margin:34px 0 8px; font-size:1.35rem; } .panel { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px; margin:24px 0; }
+    li { margin:8px 0; } footer { border-top:1px solid var(--line); margin-top:44px; padding-top:20px; color:var(--muted); font-size:.9rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="/KeyCraft-Sinhala-Keyboard/">← Back to KeyCraft</a>
+    <h1>Privacy &amp; Open Source</h1>
+    <p class="intro">KeyCraft is built to make Sinhala typing useful without ads. This page describes the app behaviour documented in the project and its source code.</p>
+    <div class="panel"><strong>At a glance</strong><ul><li>Free and open source under GNU GPL-3.0.</li><li>No advertisements are included in the app.</li><li>Sinhala transliteration is performed on your device.</li><li>Internet access is used to download optional dictionaries when you request them.</li></ul></div>
+    <h2>Keyboard input and transliteration</h2>
+    <p>Singlish-to-Sinhala transliteration is processed locally on your Android device. The project does not describe sending the text you type to a remote transliteration service.</p>
+    <h2>Network access and dictionaries</h2>
+    <p>KeyCraft requests internet access so you can download optional dictionaries. A dictionary download contacts the configured dictionary source. You can choose whether to use this optional feature.</p>
+    <h2>Clipboard features</h2>
+    <p>Clipboard History and clipboard previews are optional features controlled through the app's settings. Review those settings and Android clipboard permissions before enabling clipboard-related features. Do not paste sensitive information into apps unless you intend to share it.</p>
+    <h2>Ads, analytics and tracking</h2>
+    <p>KeyCraft contains no ads. This page makes no broader claim about third-party Android services or the behaviour of other apps installed on your device; review the source and your device settings for details relevant to your setup.</p>
+    <h2>Backups</h2>
+    <p>KeyCraft keyboard preferences and app data are excluded from cloud backup and device-to-device transfer, as documented in the project.</p>
+    <h2>Open-source code and license</h2>
+    <p>You can inspect, build, modify and contribute to KeyCraft using the public repository. KeyCraft is distributed under the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License version 3.0 (GPL-3.0)</a>.</p>
+    <ul><li><a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard">Source code on GitHub</a></li><li><a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/blob/keycraft-branding/LICENSE">Full license text</a></li><li><a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues">Report an issue or ask a question</a></li></ul>
+    <footer>KeyCraft Sinhala Keyboard · <a href="/KeyCraft-Sinhala-Keyboard/">Home</a></footer>
+  </main>
+</body>
+</html>

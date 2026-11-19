@@ -1,1 +1,1 @@
-Lightweight and privacy-conscious virtual keyboard for Android.
+Sinhala keyboard for Android with Singlish typing, swipe typing and themes.
