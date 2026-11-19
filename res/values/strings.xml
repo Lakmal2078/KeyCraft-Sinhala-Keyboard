@@ -314,5 +314,6 @@
   <string name="quick_toolbar_settings_desc">Keyboard settings</string>
   <string name="quick_toolbar_clipboard_desc">Clipboard history</string>
   <string name="quick_toolbar_theme_desc">Choose keyboard theme</string>
+  <string name="candidates_show_toolbar_desc">Show quick actions</string>
 </resources>
 

@@ -44,6 +44,7 @@ public class Keyboard2 extends InputMethodService
   private CandidatesView _candidates_view;
   private ViewGroup _quick_toolbar;
   private boolean _has_active_suggestions = false;
+  private boolean _show_quick_toolbar_override = false;
   private Suggestions _suggestions;
   private KeyEventHandler _keyeventhandler;
   /** If not 'null', the layout to use instead of [_config.current_layout]. */
@@ -179,6 +180,17 @@ public class Keyboard2 extends InputMethodService
     _candidates_view = (CandidatesView)_keyboard_container_view.findViewById(R.id.candidates_view);
     _quick_toolbar = (ViewGroup)_keyboard_container_view.findViewById(R.id.quick_toolbar);
     setup_quick_toolbar();
+    View candidatesToolbarToggle = _keyboard_container_view.findViewById(R.id.candidates_toolbar_toggle);
+    if (candidatesToolbarToggle != null)
+      candidatesToolbarToggle.setOnClickListener(new View.OnClickListener()
+      {
+        @Override
+        public void onClick(View v)
+        {
+          _show_quick_toolbar_override = true;
+          update_top_bar_visibility();
+        }
+      });
   }
 
   private void setup_quick_toolbar()
@@ -193,19 +205,7 @@ public class Keyboard2 extends InputMethodService
         @Override
         public void onClick(View v)
         {
-          if (_emojiPane == null)
-            _emojiPane = (ViewGroup)inflate_view(R.layout.emoji_pane);
-          // Keep the emoji pane aligned with the configured keyboard size.
-          View emojiGrid = _emojiPane.findViewById(R.id.emoji_grid);
-          if (emojiGrid != null)
-          {
-            ViewGroup.LayoutParams lp = emojiGrid.getLayoutParams();
-            if (lp != null)
-            {
-              lp.height = _config.keyboard_rows_height_pixels * 3;
-              emojiGrid.setLayoutParams(lp);
-            }
-          }
+          ensure_emoji_pane();
           setInputView(_emojiPane);
         }
       });
@@ -347,6 +347,49 @@ public class Keyboard2 extends InputMethodService
             btn.clearColorFilter();
         }
       }
+    }
+  }
+
+  /** Inflate the emoji pane and size its grid to the active keyboard viewport. */
+  private void ensure_emoji_pane()
+  {
+    if (_emojiPane == null)
+      _emojiPane = (ViewGroup)inflate_view(R.layout.emoji_pane);
+
+    View grid = _emojiPane.findViewById(R.id.emoji_grid);
+    View groupBar = _emojiPane.findViewById(R.id.emoji_group_bar);
+    View bottomRow = _emojiPane.findViewById(R.id.emoji_bottom_row);
+    if (grid == null)
+      return;
+
+    int targetHeight = _keyboard_container_view != null
+        ? _keyboard_container_view.getHeight() : 0;
+    if (targetHeight <= 0 && _keyboard_container_view != null)
+      targetHeight = _keyboard_container_view.getMeasuredHeight();
+
+    int width = _keyboard_container_view != null ? _keyboard_container_view.getWidth() : 0;
+    if (width <= 0)
+      width = getResources().getDisplayMetrics().widthPixels;
+
+    int fixedHeight = 0;
+    View[] fixedViews = new View[] { groupBar, bottomRow };
+    for (View fixedView : fixedViews)
+    {
+      if (fixedView == null)
+        continue;
+      fixedView.measure(
+          View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+          View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+      fixedHeight += fixedView.getMeasuredHeight();
+    }
+
+    int gridHeight = targetHeight > fixedHeight
+        ? targetHeight - fixedHeight : _config.keyboard_rows_height_pixels * 3;
+    ViewGroup.LayoutParams gridParams = grid.getLayoutParams();
+    if (gridParams != null)
+    {
+      gridParams.height = Math.max(0, gridHeight);
+      grid.setLayoutParams(gridParams);
     }
   }
 
@@ -508,7 +551,12 @@ public class Keyboard2 extends InputMethodService
     boolean show_toolbar = _config.show_quick_toolbar && !_config.split_layout;
     if (show_toolbar)
     {
-      if (can_show_candidates && _has_active_suggestions)
+      if (_show_quick_toolbar_override && can_show_candidates && _has_active_suggestions)
+      {
+        _quick_toolbar.setVisibility(View.VISIBLE);
+        _candidates_view.setVisibility(View.GONE);
+      }
+      else if (can_show_candidates && _has_active_suggestions)
       {
         _candidates_view.setVisibility(View.VISIBLE);
         if (_quick_toolbar != null)
@@ -532,16 +580,6 @@ public class Keyboard2 extends InputMethodService
   private void refresh_candidates_view()
   {
     _has_active_suggestions = false;
-    float row_height = _config.keyboard_rows_height_pixels * (1 - _config.key_vertical_margin);
-    if (_quick_toolbar != null)
-    {
-      ViewGroup.LayoutParams lp = _quick_toolbar.getLayoutParams();
-      if (lp != null)
-      {
-        lp.height = (int)row_height;
-        _quick_toolbar.setLayoutParams(lp);
-      }
-    }
     if (should_show_candidates())
     {
       _candidates_view.refresh_config(_config);
@@ -858,8 +896,7 @@ public class Keyboard2 extends InputMethodService
           break;
 
         case SWITCH_EMOJI:
-          if (_emojiPane == null)
-            _emojiPane = (ViewGroup)inflate_view(R.layout.emoji_pane);
+          ensure_emoji_pane();
           setInputView(_emojiPane);
           break;
 
@@ -962,6 +999,7 @@ public class Keyboard2 extends InputMethodService
     {
       _has_active_suggestions = (suggestions != null)
           && (suggestions.count > 0 || suggestions.emoji_suggestion != null);
+      _show_quick_toolbar_override = false;
       _candidates_view.set_candidates(suggestions);
       update_top_bar_visibility();
     }

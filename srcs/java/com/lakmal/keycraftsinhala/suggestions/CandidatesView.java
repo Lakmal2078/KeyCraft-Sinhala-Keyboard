@@ -107,10 +107,8 @@ public class CandidatesView extends LinearLayout
   {
     // Make the candidates view about as high as a keyboard row.
     float row_height = config.keyboard_rows_height_pixels * (1 - config.key_vertical_margin);
-    ViewGroup.MarginLayoutParams p =
-      (ViewGroup.MarginLayoutParams)getLayoutParams();
-    p.height = (int)row_height;
-    setLayoutParams(p);
+    // The contextual toolbar and candidate strip share a fixed 48dp viewport.
+    // Match candidate text size to the keyboard row without changing bar height.
     // Match the size of labels on the keyboard.
     float text_size = row_height * config.characterSize * config.labelTextSize;
     for (int i = 0; i < NUM_CANDIDATES; i++)

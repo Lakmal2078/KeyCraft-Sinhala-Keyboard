@@ -313,4 +313,5 @@
   <string name="quick_toolbar_settings_desc">යතුරුපුවරු සැකසුම්</string>
   <string name="quick_toolbar_clipboard_desc">පිටපත් කළ පෙළ ඉතිහාසය</string>
   <string name="quick_toolbar_theme_desc">යතුරුපුවරු තේමාව තෝරන්න</string>
+  <string name="candidates_show_toolbar_desc">ක්ෂණික ක්‍රියා පෙන්වන්න</string>
 </resources>
