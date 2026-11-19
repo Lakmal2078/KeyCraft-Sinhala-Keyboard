@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- QWERTY layout with terminal-friendly modifiers and raw navigation keys. -->
+<keyboard name="Termux Coding" bottom_row="false" script="latin">
+  <row>
+    <key shift="0.5" c="q" ne="1" se="!" nw="loc esc"/>
+    <key c="w" ne="2" sw="@"/>
+    <key c="e" ne="3" sw="#"/>
+    <key c="r" ne="4" sw="$"/>
+    <key c="t" ne="5" sw="%"/>
+    <key c="y" ne="6" sw="^"/>
+    <key c="u" ne="7" sw="&amp;"/>
+    <key c="i" ne="8" sw="*"/>
+    <key c="o" ne="9" sw="("/>
+    <key c="p" ne="0" sw=")"/>
+  </row>
+  <row>
+    <key shift="1.0" c="a" nw="loc tab" ne="`" sw="?"/>
+    <key c="s" ne="~" sw="&quot;"/>
+    <key c="d" ne="-" sw="'"/>
+    <key c="f" ne="_" sw=":"/>
+    <key c="g" ne="+" sw=","/>
+    <key c="h" ne="=" sw="."/>
+    <key c="j" ne="{" sw="["/>
+    <key c="k" ne="}" sw="]"/>
+    <key c="l" ne="|" sw="\\"/>
+  </row>
+  <row>
+    <key shift="0.6" width="1.4" role="action" c="shift" ne="loc capslock"/>
+    <key c="z"/>
+    <key c="x"/>
+    <key c="c" ne="&lt;"/>
+    <key c="v" ne="&gt;"/>
+    <key c="b"/>
+    <key c="n" ne="/"/>
+    <key c="m" ne=";"/>
+    <key width="1.4" role="action" c="backspace" ne="delete"/>
+  </row>
+  <row height="0.95">
+    <key width="1.0" role="action" c="ctrl" key1="loc switch_greekmath" key2="loc meta" key3="loc switch_clipboard" key4="switch_numeric"/>
+    <key width="1.0" role="action" c="alt" key1="loc alt" key2="loc change_method" key5="fn" key3="switch_emoji" key4="config"/>
+    <key width="0.85" role="action" c="esc"/>
+    <key width="0.85" role="action" c="tab"/>
+    <key width="1.0" role="action" c="toggle_language" key4="change_dictionary"/>
+    <key width="3.5" role="space_bar" c="space" key7="switch_forward" key8="switch_backward" key5="cursor_left" key6="cursor_right"/>
+    <key width="1.2" role="action" c="loc compose" key7="up" key6="right" key5="left" key8="down" key1="loc home" key2="loc page_up" key3="loc end" key4="loc page_down"/>
+    <key width="1.6" role="action" c="enter" key1="loc voice_typing" key2="action"/>
+  </row>
+</keyboard>
