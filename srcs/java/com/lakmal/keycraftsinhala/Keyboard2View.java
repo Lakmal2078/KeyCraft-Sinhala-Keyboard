@@ -250,17 +250,18 @@ public class Keyboard2View extends View
   {
     if (_keyboard == null || _keyboard.rows.isEmpty() || _tc == null)
       return null;
-    float y = _config.marginTop;
-    if (ty < y)
-      return _keyboard.rows.get(0);
+
+    float y = _tc.margin_top;
     for (int i = 0; i < _keyboard.rows.size(); i++)
     {
       KeyboardData.Row row = _keyboard.rows.get(i);
-      y += (row.shift + row.height) * _tc.row_height;
-      if (ty < y)
+      float top = y + row.shift * _tc.row_height;
+      float bottom = top + row.height * _tc.row_height;
+      if (ty >= top && ty < bottom)
         return row;
+      y = bottom;
     }
-    return _keyboard.rows.get(_keyboard.rows.size() - 1);
+    return null;
   }
 
   private KeyboardData.Key getKeyAtPosition(float tx, float ty)
