@@ -146,7 +146,7 @@ Bug එකක් වාර්තා කරන විට Android Version එක, 
 
 ## 📄 බලපත්‍රය (License)
 
-KeyCraft **GNU General Public License v3.0 (GPL-3.0)** යටතේ බෙදාහරිනු ලැබේ. සම්පූර්ණ බලපත්‍ර කොන්දේසි සඳහා [LICENSE](LICENSE) ගොනුව බලන්න.
+KeyCraft **GNU General Public License v3.0 (GPL-3.0)** යටතේ බෙදාහරිනු ලැබේ. සම්පූර්ණ බලපත්‍ර කොන්දේසි සඳහා [LICENSE](LICENSE) ගොනුව බලන්න. Bundled third-party assets සහ ඒවායේ බලපත්‍ර සඳහා [Third-party notices](docs/THIRD_PARTY_NOTICES.md) බලන්න.
 
 ## 🙏 ස්තුතිය සහ පිළිගැනීම් (Credits)
 

@@ -1,0 +1,2 @@
+Updated the app icon and aligned Android and website branding.
+Improved source-build support for independent app repositories.

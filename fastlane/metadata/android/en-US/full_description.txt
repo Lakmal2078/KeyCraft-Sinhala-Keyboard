@@ -1,6 +1,21 @@
-The main feature is that you can type more characters by swiping the keys towards the corners.
+KeyCraft is a free and open-source Sinhala keyboard for Android. Type in Singlish and convert it to Sinhala with on-device transliteration, word suggestions, customizable layouts and themes.
 
-This application was originally designed for programmers using Termux.
-Now perfect for everyday use.
+FEATURES
 
-This application contains no ads and is Open Source.
+• Sinhala transliteration: type in Singlish and get Sinhala text as you type.
+• Word suggestions: use bundled Sinhala and English dictionaries for word completion.
+• Swipe typing: swipe towards key corners to enter additional characters and symbols.
+• Custom layouts: choose keyboard layouts and configure extra keys.
+• Themes and appearance: customize colors, key shapes, borders, fonts, spacing and keyboard size.
+• Productivity tools: quick calculator, text shortcuts and quick-action toolbar.
+• Clipboard tools: optional clipboard history and quick paste.
+• Typing controls: number row, numpad, key repeat, auto-capitalization and vibration settings.
+
+PRIVACY
+
+• Sinhala transliteration is processed on your device.
+• KeyCraft contains no advertisements or analytics trackers.
+• Internet access is used only when you choose to download optional dictionaries.
+• Keyboard input is not sent to a server.
+
+KeyCraft is based on Unexpected Keyboard and is released under GNU GPL-3.0. The source code and third-party notices are available from the project website.

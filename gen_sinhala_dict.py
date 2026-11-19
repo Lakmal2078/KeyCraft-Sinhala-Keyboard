@@ -12,9 +12,8 @@ import re
 import struct
 import sys
 import unicodedata
-import urllib.request
 
-# Offline fallback list of core high-frequency Sinhala words in case internet is not reachable
+# Core high-frequency Sinhala words supplementing the bundled source dictionary
 CORE_SINHALA_WORDS = [
     ("මම", 15), ("ඔයා", 15), ("අපි", 15), ("එයා", 15), ("ඔබ", 15),
     ("මට", 15), ("ඔයාට", 15), ("අපිට", 15), ("එයාට", 15), ("ඔබට", 15),
@@ -101,24 +100,22 @@ def load_words_from_transliterator(file_path):
 
 
 def load_words_from_libreoffice():
-    url = "https://raw.githubusercontent.com/LibreOffice/dictionaries/master/si_LK/si_LK.dic"
+    """Load the vendored, licensed Sinhala word list without network access."""
+    source_path = os.path.join(
+        os.path.dirname(__file__), "srcs/dictionaries/si_LK.dic"
+    )
     words = set()
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            content = resp.read().decode("utf-8")
-            for line in content.splitlines()[1:]:
-                line = line.strip()
-                if not line:
-                    continue
-                word = line.split("/")[0].strip()
-                # Keep only normalized, structurally plausible Sinhala tokens.
-                cleaned = clean_sinhala_word(word)
-                if cleaned:
-                    words.add(cleaned)
-        print(f"Loaded {len(words)} words from LibreOffice repository.")
-    except Exception as e:
-        print(f"Notice: Could not load remote LibreOffice dictionary ({e}). Using local/embedded wordlist.")
+    with open(source_path, "r", encoding="utf-8") as source:
+        next(source, None)  # Hunspell word-count header
+        for line in source:
+            line = line.strip()
+            if not line:
+                continue
+            word = line.split("/", 1)[0].strip()
+            cleaned = clean_sinhala_word(word)
+            if cleaned:
+                words.add(cleaned)
+    print(f"Loaded {len(words)} words from the vendored LibreOffice dictionary.")
     return words
 
 

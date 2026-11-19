@@ -27,6 +27,13 @@ dependencies {
 
 val releaseKeystoreEnv = System.getenv("RELEASE_KEYSTORE")?.trim().orEmpty()
 val releaseKeystoreBase64 = System.getenv("RELEASE_KEYSTORE_BASE64").orEmpty()
+val releaseSigningRequested = listOf(
+  releaseKeystoreEnv,
+  releaseKeystoreBase64,
+  System.getenv("RELEASE_KEYSTORE_PASSWORD").orEmpty(),
+  System.getenv("RELEASE_KEY_ALIAS").orEmpty(),
+  System.getenv("RELEASE_KEY_PASSWORD").orEmpty(),
+).any(String::isNotBlank)
 val releaseKeystoreFile = run {
   val configured = if (releaseKeystoreEnv.isBlank()) rootProject.file("release.keystore")
     else rootProject.file(releaseKeystoreEnv)
@@ -51,8 +58,8 @@ android {
     applicationId = "com.lakmal.keycraftsinhala"
     minSdk = 21
     targetSdk { version = release(36) }
-    versionCode = 2
-    versionName = "1.1.0"
+    versionCode = 3
+    versionName = "1.1.1"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
@@ -101,7 +108,11 @@ android {
         "proguard-rules.pro")
       isDebuggable = false
       resValue("string", "app_name", "@string/app_name_release")
-      signingConfig = signingConfigs["release"]
+      // F-Droid builds and other source-based distributors must be able to
+      // produce an unsigned APK; the repository signs it after verification.
+      if (releaseSigningRequested) {
+        signingConfig = signingConfigs["release"]
+      }
     }
 
     named("debug") {
@@ -146,7 +157,9 @@ val validateReleaseSigning by tasks.registering(ValidateReleaseSigning::class) {
 }
 
 tasks.configureEach {
-  if (name in setOf("validateSigningRelease", "packageRelease", "assembleRelease", "bundleRelease", "signReleaseBundle")) {
+  if (releaseSigningRequested && name in setOf(
+      "validateSigningRelease", "packageRelease", "assembleRelease", "bundleRelease", "signReleaseBundle"
+    )) {
     dependsOn(validateReleaseSigning)
   }
 }
