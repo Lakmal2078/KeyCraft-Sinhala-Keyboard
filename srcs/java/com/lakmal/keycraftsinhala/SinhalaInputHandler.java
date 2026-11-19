@@ -2,7 +2,6 @@ package com.lakmal.keycraftsinhala;
 
 import android.text.TextUtils;
 import android.view.inputmethod.InputConnection;
-import java.text.BreakIterator;
 
 public class SinhalaInputHandler {
 
@@ -14,16 +13,14 @@ public class SinhalaInputHandler {
             return;
         }
 
-        // 1. Batch Edit භාවිතයෙන් Browser UI Lag / Flicker අවම කිරීම
         ic.beginBatchEdit();
-
         try {
-            // 2. Composing Region එක Clear කිරීම
             ic.finishComposingText();
 
             if (composingLength > 0) {
-                // 3. Sinhala Complex Unicode Graphemes (පිළි/බැඳි අකුරු/ZWJ) අනුව Delete කිරීම
-                CharSequence beforeText = ic.getTextBeforeCursor(composingLength * 4, 0);
+                // Allow room for multi-code-point Sinhala conjuncts and combining marks.
+                int surroundingLength = (int) Math.min((long) composingLength * 16, 4096L);
+                CharSequence beforeText = ic.getTextBeforeCursor(surroundingLength, 0);
                 int deleteCodeUnits = calculateGraphemeCodeUnits(beforeText, composingLength);
 
                 if (deleteCodeUnits > 0) {
@@ -31,57 +28,70 @@ public class SinhalaInputHandler {
                 }
             }
 
-            // 4. Sinhala Unicode Text එක Commit කිරීම
             ic.commitText(suggestionText, 1);
-
         } finally {
             ic.endBatchEdit();
         }
     }
 
     /**
-     * Sinhala ZWJ (\u200D) සහ Compound Characters සඳහා Grapheme Code Units ගණනය කිරීම.
+     * Returns the UTF-16 code-unit length of the requested trailing grapheme clusters.
+     * This avoids BreakIterator because Android's character iterator can split Sinhala
+     * dependent vowels and virama/ZWJ conjunct sequences.
      */
     static int calculateGraphemeCodeUnits(CharSequence text, int graphemeCount) {
-        if (TextUtils.isEmpty(text)) {
+        if (TextUtils.isEmpty(text) || graphemeCount <= 0) {
             return 0;
         }
 
-        BreakIterator iterator = BreakIterator.getCharacterInstance();
-        iterator.setText(text.toString());
-
-        int end = iterator.last();
+        int end = text.length();
         int start = end;
         int count = 0;
 
         while (count < graphemeCount && start > 0) {
-            int boundary = iterator.previous();
-            if (boundary == BreakIterator.DONE) {
-                start = 0;
-                break;
-            }
-
-            // Android/JDK BreakIterator may split after ZWJ in Sinhala
-            // virama-ZWJ-consonant sequences. Merge that boundary back into
-            // the preceding grapheme before counting it.
-            while (isSinhalaConjunctBoundary(text, boundary)) {
-                boundary = iterator.previous();
-                if (boundary == BreakIterator.DONE) {
-                    boundary = 0;
-                    break;
-                }
-            }
-
-            start = boundary;
+            start = previousGraphemeStart(text, start);
             count++;
         }
 
         return end - start;
     }
 
-    static boolean isSinhalaConjunctBoundary(CharSequence text, int boundary) {
-        return boundary >= 2
-                && text.charAt(boundary - 1) == '\u200D'
-                && text.charAt(boundary - 2) == '\u0DCA';
+    private static int previousGraphemeStart(CharSequence text, int end) {
+        int cursor = end - Character.charCount(Character.codePointBefore(text, end));
+        boolean attachPrevious = isGraphemeExtender(Character.codePointBefore(text, end));
+
+        while (cursor > 0) {
+            int codePoint = Character.codePointBefore(text, cursor);
+            int previous = cursor - Character.charCount(codePoint);
+
+            if (attachPrevious) {
+                cursor = previous;
+                attachPrevious = isGraphemeExtender(codePoint);
+            } else if (isJoinerOrSinhalaVirama(codePoint)) {
+                cursor = previous;
+                attachPrevious = true;
+            } else {
+                break;
+            }
+        }
+
+        return cursor;
+    }
+
+    private static boolean isJoinerOrSinhalaVirama(int codePoint) {
+        return codePoint == 0x0DCA || codePoint == 0x200C || codePoint == 0x200D;
+    }
+
+    private static boolean isGraphemeExtender(int codePoint) {
+        int type = Character.getType(codePoint);
+        return type == Character.NON_SPACING_MARK
+                || type == Character.COMBINING_SPACING_MARK
+                || type == Character.ENCLOSING_MARK
+                || codePoint == 0x200C // Zero Width Non-Joiner
+                || codePoint == 0x200D // Zero Width Joiner
+                || (codePoint >= 0x1F3FB && codePoint <= 0x1F3FF) // Emoji modifiers
+                || (codePoint >= 0xFE00 && codePoint <= 0xFE0F) // Variation selectors
+                || (codePoint >= 0xE0100 && codePoint <= 0xE01EF)
+                || (codePoint >= 0xE0020 && codePoint <= 0xE007F); // Emoji tags
     }
 }

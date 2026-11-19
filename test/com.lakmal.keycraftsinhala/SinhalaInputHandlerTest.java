@@ -29,4 +29,17 @@ public class SinhalaInputHandlerTest
   {
     assertEquals(2, SinhalaInputHandler.calculateGraphemeCodeUnits("කෙ", 1));
   }
+
+  @Test
+  public void doesNotMergeAdjacentSinhalaGraphemes()
+  {
+    assertEquals(1, SinhalaInputHandler.calculateGraphemeCodeUnits("කෙඅ", 1));
+    assertEquals(3, SinhalaInputHandler.calculateGraphemeCodeUnits("කෙඅ", 2));
+  }
+
+  @Test
+  public void keepsUtf16SurrogatePairsTogether()
+  {
+    assertEquals(2, SinhalaInputHandler.calculateGraphemeCodeUnits("A😀", 1));
+  }
 }
