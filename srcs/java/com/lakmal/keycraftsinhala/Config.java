@@ -167,12 +167,12 @@ public class Config
     {
       if ("landscape".equals(show_numpad_s))
         show_numpad = true;
-      keyboardHeightPercent = _prefs.getInt(foldable_unfolded ? "keyboard_height_landscape_unfolded" : "keyboard_height_landscape", 30);
+      keyboardHeightPercent = _prefs.getInt(foldable_unfolded ? "keyboard_height_landscape_unfolded" : "keyboard_height_landscape", 42);
       characterSizeScale = 1.25f;
     }
     else
     {
-      keyboardHeightPercent = _prefs.getInt(foldable_unfolded ? "keyboard_height_unfolded" : "keyboard_height", 25);
+      keyboardHeightPercent = _prefs.getInt(foldable_unfolded ? "keyboard_height_unfolded" : "keyboard_height", 30);
     }
     layouts = LayoutsPreference.load_from_preferences(res, _prefs);
     inverse_numpad = _prefs.getString("numpad_layout", "high_first").equals("low_first");
@@ -216,7 +216,10 @@ public class Config
     // The keyboard is keyboardHeightPercent of the screen height on 16/9
     // screens (or less) and with a 3.95 high layout (in KeyboardData unit)
     float base_height = Math.min(dm.heightPixels, dm.widthPixels * 16.f / 9.f);
-    keyboard_rows_height_pixels = (int)(base_height * keyboardHeightPercent / 395);
+    int preferredRowHeight = (int)(base_height * keyboardHeightPercent / 395);
+    int minimumRowHeight = (int)TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP, 48, dm);
+    keyboard_rows_height_pixels = Math.max(preferredRowHeight, minimumRowHeight);
     horizontal_margin =
       get_dip_pref_oriented(dm, "horizontal_margin", 3, 28);
     double_tap_lock_shift = _prefs.getBoolean("lock_double_tap", false);
