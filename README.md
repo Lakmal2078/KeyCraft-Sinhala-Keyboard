@@ -8,13 +8,13 @@ KeyCraft is a free, open-source Sinhala keyboard for Android. Type in Singlish a
 
 KeyCraft යනු සිංහල සහ දෛනික ටයිප් කිරීම පහසු කරවන, Android සඳහා නිර්මාණය කළ අභිරුචිකරණය කළ හැකි Keyboard යෙදුමකි. Singlish → Sinhala පරිවර්තනය, Swipe Typing, විවිධ Keyboard Layouts, Themes සහ Productivity Tools එකම යෙදුමකින් ලබා දෙයි.
 
-[**⬇️ KeyCraft v1.1.0 Download කරන්න**](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.0) · [Source Code](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard) · [Bug එකක් වාර්තා කරන්න](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues)
+[**⬇️ KeyCraft v1.1.1 Download කරන්න**](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.1) · [Source Code](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard) · [Bug එකක් වාර්තා කරන්න](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues)
 
 ---
 
 ## 📥 Download සහ Install කිරීම
 
-1. [KeyCraft v1.1.0 Release පිටුවට](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.0) යන්න.
+1. [KeyCraft v1.1.1 Release පිටුවට](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.1) යන්න.
 2. **KeyCraft-Sinhala-Keyboard-release.apk** ගොනුව Download කරන්න.
 3. Download කළ APK එක විවෘත කර Android ඉල්ලන්නේ නම් එම Source එකෙන් Install කිරීමට අවසර දෙන්න.
 4. KeyCraft විවෘත කර තිරයේ පෙන්වන පියවර අනුගමනය කර Keyboard එක Enable කර Default Keyboard ලෙස තෝරන්න.
