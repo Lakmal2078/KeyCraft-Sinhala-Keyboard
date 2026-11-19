@@ -268,9 +268,9 @@ public class Keyboard2View extends View
     KeyboardData.Row row = getRowAtPosition(ty);
     if (row == null || row.keys.isEmpty())
       return null;
-    float x = _marginLeft;
+    float x = _marginLeft + _tc.margin_left;
     if (tx < x)
-      return row.keys.get(0);
+      return null;
     for (int i = 0; i < row.keys.size(); i++)
     {
       KeyboardData.Key key = row.keys.get(i);
@@ -279,10 +279,10 @@ public class Keyboard2View extends View
       if (tx >= xLeft && tx < xRight)
         return key;
       if (tx < xLeft)
-        return (i > 0) ? row.keys.get(i - 1) : key;
+        return null;
       x = xRight;
     }
-    return row.keys.get(row.keys.size() - 1);
+    return null;
   }
 
   private void vibrate()
