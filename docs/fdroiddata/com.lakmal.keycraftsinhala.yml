@@ -1,0 +1,20 @@
+Categories:
+  - System
+License: GPL-3.0-only
+AuthorName: Lakmal
+WebSite: https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/
+SourceCode: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard
+IssueTracker: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues
+Changelog: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases
+CurrentVersion: 1.1.1
+CurrentVersionCode: 3
+RepoType: git
+Repo: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard.git
+Builds:
+  - versionName: 1.1.1
+    versionCode: 3
+    commit: c3aa8f3d7151982410e3b69a7e28712f2750161f
+    gradle:
+      - yes
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v1\.

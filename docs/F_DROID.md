@@ -51,9 +51,9 @@ word-list source and both upstream license notices are retained in
 ## Metadata template
 
 Copy the following into `fdroiddata/metadata/com.lakmal.keycraftsinhala.yml`
-after the `v1.1.1` release commit is finalized. Replace the placeholder with
-the full 40-character Git commit SHA; F-Droid build metadata must not use a
-branch or tag name in the `commit` field.
+after the `v1.1.1` tag is published. A draft is already prepared at
+`docs/fdroiddata/com.lakmal.keycraftsinhala.yml`; its `commit` field points to
+the full source commit SHA and must remain a full hash, not a branch or tag name.
 
 ```yaml
 Categories:
@@ -71,7 +71,7 @@ Repo: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard.git
 Builds:
   - versionName: 1.1.1
     versionCode: 3
-    commit: REPLACE_WITH_FULL_COMMIT_SHA
+    commit: c3aa8f3d7151982410e3b69a7e28712f2750161f
     gradle:
       - yes
 AutoUpdateMode: Version
