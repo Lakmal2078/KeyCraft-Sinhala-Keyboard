@@ -248,7 +248,8 @@ public class Keyboard2View extends View
 
   private KeyboardData.Row getRowAtPosition(float ty)
   {
-    if (_keyboard == null || _keyboard.rows.isEmpty() || _tc == null)
+    if (_keyboard == null || _keyboard.rows.isEmpty() || _tc == null
+        || ty < 0 || ty >= getMeasuredHeight())
       return null;
 
     float y = _tc.margin_top;
