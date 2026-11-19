@@ -33,4 +33,4 @@ fi
 
 export RELEASE_KEYSTORE="${KEYSTORE_PATH}"
 cd "${ROOT_DIR}"
-exec ./gradlew clean assembleRelease
+exec ./gradlew clean assembleRelease --no-daemon --max-workers=1

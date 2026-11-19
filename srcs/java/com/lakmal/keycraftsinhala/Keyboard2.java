@@ -293,20 +293,7 @@ public class Keyboard2 extends InputMethodService
         @Override
         public void onClick(View v)
         {
-          if (_clipboard_pane == null)
-            _clipboard_pane = (ViewGroup)inflate_view(R.layout.clipboard_pane);
-          // Clipboard history scrolls within the same height budget as the keyboard.
-          View clipboardScroll = _clipboard_pane.findViewById(R.id.clipboard_scroll_view);
-          if (clipboardScroll != null)
-          {
-            ViewGroup.LayoutParams lp = clipboardScroll.getLayoutParams();
-            if (lp != null)
-            {
-              lp.height = _config.keyboard_rows_height_pixels * 3;
-              clipboardScroll.setLayoutParams(lp);
-            }
-          }
-          setInputView(_clipboard_pane);
+          showClipboardPane();
         }
       });
     }
@@ -361,6 +348,45 @@ public class Keyboard2 extends InputMethodService
         }
       }
     }
+  }
+
+  /** Keep the clipboard pane at the exact measured height of the active keyboard. */
+  private void showClipboardPane()
+  {
+    if (_clipboard_pane == null)
+      _clipboard_pane = (ViewGroup)inflate_view(R.layout.clipboard_pane);
+
+    int targetHeight = _keyboard_container_view.getHeight();
+    if (targetHeight <= 0)
+      targetHeight = _keyboard_container_view.getMeasuredHeight();
+
+    View clipboardBottomRow = _clipboard_pane.findViewById(R.id.clipboard_bottom_row);
+    View clipboardScroll = _clipboard_pane.findViewById(R.id.clipboard_scroll_view);
+    if (targetHeight > 0 && clipboardBottomRow != null && clipboardScroll != null)
+    {
+      int width = _keyboard_container_view.getWidth();
+      if (width <= 0)
+        width = getResources().getDisplayMetrics().widthPixels;
+      clipboardBottomRow.measure(
+          View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+          View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+
+      ViewGroup.LayoutParams paneParams = _clipboard_pane.getLayoutParams();
+      if (paneParams == null)
+        paneParams = new ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, targetHeight);
+      else
+        paneParams.height = targetHeight;
+      _clipboard_pane.setLayoutParams(paneParams);
+
+      ViewGroup.LayoutParams scrollParams = clipboardScroll.getLayoutParams();
+      if (scrollParams != null)
+      {
+        scrollParams.height = Math.max(0, targetHeight - clipboardBottomRow.getMeasuredHeight());
+        clipboardScroll.setLayoutParams(scrollParams);
+      }
+    }
+    setInputView(_clipboard_pane);
   }
 
   private void launch_translate()
@@ -838,9 +864,7 @@ public class Keyboard2 extends InputMethodService
           break;
 
         case SWITCH_CLIPBOARD:
-          if (_clipboard_pane == null)
-            _clipboard_pane = (ViewGroup)inflate_view(R.layout.clipboard_pane);
-          setInputView(_clipboard_pane);
+          showClipboardPane();
           break;
 
         case SWITCH_BACK_EMOJI:

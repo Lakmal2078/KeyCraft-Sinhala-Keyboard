@@ -8,5 +8,5 @@
       <com.lakmal.keycraftsinhala.ClipboardPinView android:id="@+id/clipboard_pin_view" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:divider="?attr/clipboard_divider_color" android:dividerHeight="?attr/clipboard_divider_height"/>
     </LinearLayout>
   </ScrollView>
-  <com.lakmal.keycraftsinhala.Keyboard2View layout="@xml/clipboard_bottom_row" android:layout_width="fill_parent" android:layout_height="wrap_content" android:background="?attr/colorKeyboard"/>
+  <com.lakmal.keycraftsinhala.Keyboard2View android:id="@+id/clipboard_bottom_row" layout="@xml/clipboard_bottom_row" android:layout_width="fill_parent" android:layout_height="wrap_content" android:background="?attr/colorKeyboard"/>
 </LinearLayout>
