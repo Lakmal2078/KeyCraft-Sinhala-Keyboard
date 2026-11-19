@@ -133,7 +133,7 @@ public class AuditRegressionDeviceTest
   public void themePickerScreenshotsRenderInLightAndDarkModes() throws Exception
   {
     Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-    File screenshotDirectory = new File(context.getFilesDir(), "unexpected-keyboard-uiux");
+    File screenshotDirectory = new File(context.getFilesDir(), "keycraft-sinhala-keyboard-uiux");
     assertTrue("Screenshot directory must be available",
         screenshotDirectory.isDirectory() || screenshotDirectory.mkdirs());
 
@@ -196,7 +196,7 @@ public class AuditRegressionDeviceTest
     if (Build.VERSION.SDK_INT >= 29)
     {
       values.put(MediaStore.MediaColumns.RELATIVE_PATH,
-          Environment.DIRECTORY_PICTURES + "/unexpected-keyboard-uiux");
+          Environment.DIRECTORY_PICTURES + "/keycraft-sinhala-keyboard-uiux");
       values.put(MediaStore.MediaColumns.IS_PENDING, 1);
     }
 

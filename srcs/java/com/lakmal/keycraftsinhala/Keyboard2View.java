@@ -248,19 +248,21 @@ public class Keyboard2View extends View
 
   private KeyboardData.Row getRowAtPosition(float ty)
   {
-    if (_keyboard == null || _keyboard.rows.isEmpty() || _tc == null)
+    if (_keyboard == null || _keyboard.rows.isEmpty() || _tc == null
+        || ty < 0 || ty >= getMeasuredHeight())
       return null;
-    float y = _config.marginTop;
-    if (ty < y)
-      return _keyboard.rows.get(0);
+
+    float y = _tc.margin_top;
     for (int i = 0; i < _keyboard.rows.size(); i++)
     {
       KeyboardData.Row row = _keyboard.rows.get(i);
-      y += (row.shift + row.height) * _tc.row_height;
-      if (ty < y)
+      float top = y + row.shift * _tc.row_height;
+      float bottom = top + row.height * _tc.row_height;
+      if (ty >= top && ty < bottom)
         return row;
+      y = bottom;
     }
-    return _keyboard.rows.get(_keyboard.rows.size() - 1);
+    return null;
   }
 
   private KeyboardData.Key getKeyAtPosition(float tx, float ty)
@@ -268,9 +270,9 @@ public class Keyboard2View extends View
     KeyboardData.Row row = getRowAtPosition(ty);
     if (row == null || row.keys.isEmpty())
       return null;
-    float x = _marginLeft;
+    float x = _marginLeft + _tc.margin_left;
     if (tx < x)
-      return row.keys.get(0);
+      return null;
     for (int i = 0; i < row.keys.size(); i++)
     {
       KeyboardData.Key key = row.keys.get(i);
@@ -279,10 +281,10 @@ public class Keyboard2View extends View
       if (tx >= xLeft && tx < xRight)
         return key;
       if (tx < xLeft)
-        return (i > 0) ? row.keys.get(i - 1) : key;
+        return null;
       x = xRight;
     }
-    return row.keys.get(row.keys.size() - 1);
+    return null;
   }
 
   private void vibrate()
