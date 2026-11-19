@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Keyboard data is intentionally excluded from legacy Android backup. -->
+<!-- Back up only the user configuration. Temporary files, dictionaries, clipboard data and databases stay local. -->
 <full-backup-content>
-    <exclude domain="root" path="."/>
-    <exclude domain="file" path="."/>
-    <exclude domain="database" path="."/>
-    <exclude domain="sharedpref" path="."/>
-    <exclude domain="external" path="."/>
+    <include domain="sharedpref" path="com.lakmal.keycraftsinhala_preferences.xml"/>
+    <include domain="device_sharedpref" path="com.lakmal.keycraftsinhala_preferences.xml"/>
 </full-backup-content>

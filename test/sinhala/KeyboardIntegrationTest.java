@@ -40,9 +40,27 @@ public class KeyboardIntegrationTest
 
     handler.key_up(KeyValue.makeCharKey('a'), Pointers.Modifiers.EMPTY);
     verify(connection).setComposingText("ක", 1);
+    verify(connection, times(2)).beginBatchEdit();
+    verify(connection, times(2)).endBatchEdit();
 
     handler.key_up(KeyValue.getKeyByName("space"), Pointers.Modifiers.EMPTY);
     verify(connection).commitText("ක ", 1);
+    verify(connection, times(3)).beginBatchEdit();
+    verify(connection, times(3)).endBatchEdit();
+  }
+
+  @Test
+  public void selectedSinhalaSuggestionCommitsComposingSpanAtomically()
+  {
+    handler.key_up(KeyValue.makeCharKey('k'), Pointers.Modifiers.EMPTY);
+    handler.key_up(KeyValue.makeCharKey('a'), Pointers.Modifiers.EMPTY);
+
+    handler.suggestion_entered("කොහොමද", false);
+
+    verify(connection).commitText("කොහොමද", 1);
+    verify(connection, times(3)).beginBatchEdit();
+    verify(connection, times(3)).endBatchEdit();
+    assertEquals(0, handler._sinhala_buffer.length());
   }
 
   @Test

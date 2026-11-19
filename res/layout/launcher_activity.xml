@@ -28,5 +28,7 @@
     </LinearLayout>
     <TextView style="@style/paragraph" android:text="@string/launcher_sourcecode"/>
     <TextView style="@style/paragraph" android:text="@string/launcher_repo_url" android:autoLink="web" android:linksClickable="true"/>
+    <TextView style="@style/paragraph" android:text="@string/launcher_issue_tracker_url" android:autoLink="web" android:linksClickable="true"/>
+    <TextView style="@style/paragraph" android:text="@string/launcher_license_url" android:autoLink="web" android:linksClickable="true"/>
   </LinearLayout>
 </ScrollView>

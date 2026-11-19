@@ -42,7 +42,7 @@ public class SinhalaInputHandler {
     /**
      * Sinhala ZWJ (\u200D) සහ Compound Characters සඳහා Grapheme Code Units ගණනය කිරීම.
      */
-    private static int calculateGraphemeCodeUnits(CharSequence text, int graphemeCount) {
+    static int calculateGraphemeCodeUnits(CharSequence text, int graphemeCount) {
         if (TextUtils.isEmpty(text)) {
             return 0;
         }
@@ -51,16 +51,37 @@ public class SinhalaInputHandler {
         iterator.setText(text.toString());
 
         int end = iterator.last();
+        int start = end;
         int count = 0;
-        int targetOffset = end;
 
-        while (count < graphemeCount && targetOffset != BreakIterator.DONE) {
-            targetOffset = iterator.previous();
-            if (targetOffset != BreakIterator.DONE) {
-                count++;
+        while (count < graphemeCount && start > 0) {
+            int boundary = iterator.previous();
+            if (boundary == BreakIterator.DONE) {
+                start = 0;
+                break;
             }
+
+            // Android/JDK BreakIterator may split after ZWJ in Sinhala
+            // virama-ZWJ-consonant sequences. Merge that boundary back into
+            // the preceding grapheme before counting it.
+            while (isSinhalaConjunctBoundary(text, boundary)) {
+                boundary = iterator.previous();
+                if (boundary == BreakIterator.DONE) {
+                    boundary = 0;
+                    break;
+                }
+            }
+
+            start = boundary;
+            count++;
         }
 
-        return targetOffset == BreakIterator.DONE ? text.length() : (end - targetOffset);
+        return end - start;
+    }
+
+    static boolean isSinhalaConjunctBoundary(CharSequence text, int boundary) {
+        return boundary >= 2
+                && text.charAt(boundary - 1) == '\u200D'
+                && text.charAt(boundary - 2) == '\u0DCA';
     }
 }
