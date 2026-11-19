@@ -1,100 +1,106 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KeyCraft – Sinhala Keyboard for Android with Singlish</title>
-  <meta name="description" content="Type Sinhala in Singlish and get instant Sinhala text with KeyCraft, a free, open-source Android keyboard. No ads, on-device typing. Download the APK today.">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KeyCraft – Sinhala Keyboard for Android | Free App</title>
+  <meta name="description" content="Type Sinhala naturally on Android with Singlish-to-Sinhala transliteration, swipe typing, customizable layouts and themes. Free, open-source and ad-free.">
+  <meta name="theme-color" content="#101827">
   <link rel="canonical" href="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/">
-  <meta name="robots" content="index, follow">
-
+  <link rel="icon" type="image/png" href="/KeyCraft-Sinhala-Keyboard/assets/favicon.png">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="KeyCraft">
-  <meta property="og:title" content="KeyCraft – Sinhala Keyboard for Android">
-  <meta property="og:description" content="Free, open-source Sinhala keyboard for Android with Singlish transliteration, swipe typing and themes. No ads.">
+  <meta property="og:title" content="KeyCraft – Sinhala Keyboard for Android | Free App">
+  <meta property="og:description" content="Type Sinhala naturally on Android with Singlish transliteration, swipe typing, customizable layouts and themes. Free, open-source and ad-free.">
   <meta property="og:url" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/">
-  <meta property="og:image" content="https://raw.githubusercontent.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/main/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png">
-
+  <meta property="og:image" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-keycraft.png">
+  <meta property="og:image:width" content="1024">
+  <meta property="og:image:height" content="500">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="KeyCraft – Sinhala Keyboard for Android">
-  <meta name="twitter:description" content="Free, open-source Sinhala keyboard for Android with Singlish transliteration, swipe typing and themes. No ads.">
-  <meta name="twitter:image" content="https://raw.githubusercontent.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/main/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png">
-
+  <meta name="twitter:title" content="KeyCraft – Sinhala Keyboard for Android | Free App">
+  <meta name="twitter:description" content="Type Sinhala naturally on Android with Singlish transliteration, swipe typing, customizable layouts and themes. Free, open-source and ad-free.">
+  <meta name="twitter:image" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-keycraft.png">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "KeyCraft Sinhala Keyboard",
-    "alternateName": "KeyCraft",
-    "description": "Free, open-source Sinhala keyboard for Android with Singlish to Sinhala transliteration, swipe typing, layouts and themes.",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Android",
+    "description": "A free, open-source Android keyboard with Singlish-to-Sinhala transliteration, swipe typing, customizable layouts and themes.",
+    "url": "https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/",
+    "downloadUrl": "https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.0",
+    "license": "https://www.gnu.org/licenses/gpl-3.0.html",
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD"
-    },
-    "license": "https://www.gnu.org/licenses/gpl-3.0.html",
-    "url": "https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/",
-    "downloadUrl": "https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.0",
-    "image": "https://raw.githubusercontent.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/main/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png",
-    "softwareVersion": "1.1.0"
+    }
   }
   </script>
-
   <style>
-    :root { color-scheme: light dark; }
-    body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; line-height: 1.6; color: #1d1d1f; background: #fafafa; }
-    main { max-width: 760px; margin: 0 auto; padding: 48px 20px; }
-    h1 { font-size: 2.2rem; margin-bottom: .2em; }
-    .sub { color: #555; margin-top: 0; }
-    .cta { display: inline-block; margin: 20px 0; padding: 12px 22px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; }
-    .cta:hover { background: #1d4ed8; }
-    ul { padding-left: 1.2em; }
-    footer { margin-top: 48px; font-size: .9rem; color: #666; }
-    footer a { color: #2563eb; }
-    img.shot { max-width: 240px; width: 100%; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12); }
-    @media (prefers-color-scheme: dark) {
-      body { color: #f5f5f7; background: #111; }
-      .sub, footer { color: #aaa; }
-    }
+    :root { color-scheme: dark; --bg:#101827; --panel:#182438; --text:#edf3fb; --muted:#aab8ca; --accent:#69e0c0; --line:#2a3a51; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:radial-gradient(ellipse at 75% 0%,#203b4b 0,transparent 42%),var(--bg); color:var(--text); font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    a { color:var(--accent); text-underline-offset:4px; }
+    .wrap { width:min(1080px,calc(100% - 40px)); margin:auto; }
+    header { display:flex; align-items:center; justify-content:space-between; padding:24px 0; }
+    .brand { display:flex; align-items:center; gap:12px; color:var(--text); text-decoration:none; font-weight:750; letter-spacing:.2px; }
+    .brand img { width:42px; height:42px; border-radius:12px; }
+    nav { display:flex; gap:22px; flex-wrap:wrap; }
+    nav a { color:var(--muted); text-decoration:none; font-size:.94rem; }
+    .hero { display:grid; grid-template-columns:1.05fr .95fr; align-items:center; gap:48px; padding:68px 0 84px; }
+    .eyebrow { color:var(--accent); font-weight:700; letter-spacing:.12em; text-transform:uppercase; font-size:.78rem; }
+    h1 { font-size:clamp(2.5rem,6vw,4.6rem); line-height:1.06; letter-spacing:-.045em; margin:14px 0 20px; }
+    .lead { color:var(--muted); font-size:1.15rem; max-width:610px; }
+    .actions { display:flex; gap:14px; flex-wrap:wrap; margin-top:30px; }
+    .button { display:inline-block; padding:12px 19px; border-radius:12px; font-weight:750; text-decoration:none; border:1px solid var(--line); }
+    .primary { background:var(--accent); color:#09231f; border-color:var(--accent); }
+    .secondary { color:var(--text); background:#ffffff08; }
+    .preview { width:100%; border:1px solid #ffffff20; border-radius:22px; box-shadow:0 28px 80px #0007; }
+    section { padding:36px 0 58px; }
+    h2 { font-size:1.8rem; letter-spacing:-.025em; margin:0 0 20px; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .tile { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px; }
+    .tile h3 { margin:0 0 8px; font-size:1.05rem; }
+    .tile p { color:var(--muted); margin:0; }
+    .trust { display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+    .pill { border:1px solid var(--line); border-radius:999px; padding:7px 12px; color:var(--muted); font-size:.9rem; }
+    footer { border-top:1px solid var(--line); color:var(--muted); padding:24px 0 38px; font-size:.9rem; }
+    @media(max-width:760px) { header { align-items:flex-start; gap:18px; flex-direction:column; } .hero { grid-template-columns:1fr; gap:28px; padding:44px 0 58px; } .grid { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
-  <main>
-    <h1>KeyCraft – Sinhala Keyboard for Android</h1>
-    <p class="sub">Type Sinhala in Singlish and get instant Sinhala text. Free and open source.</p>
-
-    <a class="cta" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.0">Download KeyCraft v1.1.0 (APK)</a>
-
-    <img class="shot" src="https://raw.githubusercontent.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/main/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="KeyCraft Sinhala keyboard on an Android phone">
-
-    <h2>Features</h2>
-    <ul>
-      <li><strong>Singlish to Sinhala:</strong> type <code>amma</code> and get <code>අම්මා</code>.</li>
-      <li><strong>Swipe typing</strong> with extra characters from key corners.</li>
-      <li><strong>Word suggestions</strong> and spelling help.</li>
-      <li><strong>Customizable layouts</strong>, themes, key shapes and fonts.</li>
-      <li><strong>Productivity tools:</strong> clipboard history, text shortcuts and a quick calculator.</li>
-    </ul>
-
-    <h2>Installation</h2>
-    <ol>
-      <li>Download the APK from the <a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.0">official release page</a>.</li>
-      <li>Allow installation from that source when Android asks.</li>
-      <li>Open KeyCraft and follow the steps to enable it and set it as your default keyboard.</li>
-    </ol>
-    <p>Settings menu names may differ by Android version and phone brand.</p>
-
-    <p>
-      <a href="privacy.html">Privacy &amp; open source</a> ·
-      <a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard">Source code</a> ·
-      <a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues">Report a bug</a>
-    </p>
-
-    <footer>
-      KeyCraft is licensed under GPL-3.0. Built on Unexpected Keyboard by Julow and contributors.
-    </footer>
-  </main>
+  <div class="wrap">
+    <header>
+      <a class="brand" href="/KeyCraft-Sinhala-Keyboard/"><img src="/KeyCraft-Sinhala-Keyboard/assets/favicon.png" alt=""> <span>KeyCraft</span></a>
+      <nav aria-label="Main navigation"><a href="#features">Features</a><a href="privacy.html">Privacy &amp; Open Source</a><a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard">GitHub</a></nav>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <div class="eyebrow">Sinhala typing, made yours</div>
+          <h1 id="hero-title">Type Sinhala beautifully and quickly.</h1>
+          <p class="lead">KeyCraft is a customizable Android keyboard that turns Singlish into Sinhala. Write naturally with swipe typing, flexible layouts, themes and thoughtful productivity tools.</p>
+          <div class="actions"><a class="button primary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.0">Download for Android</a><a class="button secondary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard">Explore source code</a></div>
+          <div class="trust"><span class="pill">Free &amp; open source</span><span class="pill">No ads</span><span class="pill">GPL-3.0</span></div>
+        </div>
+        <img class="preview" src="assets/og-keycraft.png" alt="KeyCraft Sinhala keyboard app preview" width="1024" height="500">
+      </section>
+      <section id="features" aria-labelledby="features-title">
+        <h2 id="features-title">Everything you need to type your way</h2>
+        <div class="grid">
+          <article class="tile"><h3>Singlish to Sinhala</h3><p>Type Sinhala phonetically with on-device transliteration and word suggestions.</p></article>
+          <article class="tile"><h3>Swipe typing</h3><p>Reach extra characters with intuitive corner-swipe gestures.</p></article>
+          <article class="tile"><h3>Your keyboard, your style</h3><p>Choose layouts, themes, key shapes, spacing and useful typing controls.</p></article>
+        </div>
+      </section>
+      <section aria-labelledby="privacy-title">
+        <h2 id="privacy-title">Privacy-friendly by design</h2>
+        <p class="lead">Sinhala transliteration runs on your device. KeyCraft contains no ads; internet access is used when you choose to download optional dictionaries. Read the <a href="privacy.html">privacy and open-source details</a>.</p>
+      </section>
+    </main>
+    <footer>© KeyCraft Sinhala Keyboard · <a href="privacy.html">Privacy &amp; Open Source</a> · <a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/blob/keycraft-branding/LICENSE">GPL-3.0 License</a></footer>
+  </div>
 </body>
 </html>
