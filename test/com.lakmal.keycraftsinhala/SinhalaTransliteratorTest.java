@@ -254,6 +254,17 @@ public class SinhalaTransliteratorTest
   }
 
   @Test
+  public void testSinhalaConjunctsUseExpectedUnicodeJoinerSequences()
+  {
+    assertEquals("\u0D9A\u0DCA\u200D\u0DBB\u0DB8\u0DBA",
+        SinhalaTransliterator.transliterate("kramaya"));
+    assertEquals("\u0DC0\u0DCA\u200D\u0DBA\u0D82\u0DA2\u0DB1",
+        SinhalaTransliterator.transliterate("vyanjana"));
+    assertEquals("\u0DB0\u0DBB\u0DCA\u200D\u0DB8",
+        SinhalaTransliterator.transliterate("dharma"));
+  }
+
+  @Test
   public void testHalKirimaAndPiliCombinations()
   {
     assertEquals("සිංහල", SinhalaTransliterator.transliterate("sinhala"));

@@ -247,7 +247,7 @@ public final class KeyEventHandler
       String rawText = text.trim();
       if (add_space_after)
         text = text + " ";
-      conn.commitText(text, 1);
+      commit_sinhala_text(conn, text);
       _sinhala_buffer.setLength(0);
       _typedword.typed(text);
       _suggestions.clear();
@@ -439,6 +439,24 @@ public final class KeyEventHandler
     }
   }
 
+  /** Commits Sinhala text and closes its composing span atomically. */
+  private static void commit_sinhala_text(InputConnection conn, String text)
+  {
+    if (conn == null) return;
+    conn.beginBatchEdit();
+    try { conn.commitText(text, 1); }
+    finally { conn.endBatchEdit(); }
+  }
+
+  /** Updates the active Sinhala composing region as one atomic editor operation. */
+  private static void update_sinhala_composing_text(InputConnection conn, String text)
+  {
+    if (conn == null) return;
+    conn.beginBatchEdit();
+    try { conn.setComposingText(text, 1); }
+    finally { conn.endBatchEdit(); }
+  }
+
   void send_text(String text)
   {
     InputConnection conn = _recv.getCurrentInputConnection();
@@ -458,7 +476,7 @@ public final class KeyEventHandler
         && QuickCalculator.isFunction(_sinhala_buffer.toString()))
     {
       String function = _sinhala_buffer.toString();
-      conn.commitText(function, 1);
+      commit_sinhala_text(conn, function);
       _sinhala_buffer.setLength(0);
       _typedword.typed(function);
     }
@@ -467,7 +485,7 @@ public final class KeyEventHandler
     {
       _sinhala_buffer.append(text);
       String transliterated = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
-      conn.setComposingText(transliterated, 1);
+      update_sinhala_composing_text(conn, transliterated);
       if (_config.suggestions_enabled)
         _suggestions.currently_typed_word(_sinhala_buffer.toString());
       _next_last_action = LastAction.OTHER;
@@ -802,7 +820,7 @@ public final class KeyEventHandler
       {
         committedSinhala = _suggestions.suggestions[0];
       }
-      conn.commitText(committedSinhala + " ", 1);
+      commit_sinhala_text(conn, committedSinhala + " ");
       _sinhala_buffer.setLength(0);
       _typedword.typed(committedSinhala + " ");
       _suggestions.clear();
@@ -896,13 +914,13 @@ public final class KeyEventHandler
       if (_sinhala_buffer.length() > 0)
       {
         String transliterated = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
-        conn.setComposingText(transliterated, 1);
+        update_sinhala_composing_text(conn, transliterated);
         if (_config.suggestions_enabled)
           _suggestions.currently_typed_word(_sinhala_buffer.toString());
       }
       else
       {
-        conn.setComposingText("", 1);
+        update_sinhala_composing_text(conn, "");
         conn.finishComposingText();
         _suggestions.clear();
         _recv.set_suggestions(_suggestions);

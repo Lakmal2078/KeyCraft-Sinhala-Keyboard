@@ -1,5 +1,6 @@
 package com.lakmal.keycraftsinhala;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Production-grade phonetic transliteration engine for Sinhala.
@@ -24,7 +26,7 @@ public final class SinhalaTransliterator
   private static final Map<String, String> COMMON_WORDS = new HashMap<>();
   private static final Map<String, String> COMMON_PHRASES = new HashMap<>();
   private static final Map<String, List<String>> NEXT_WORD_PREDICTIONS = new HashMap<>();
-  private static final List<Map.Entry<String, String>> COMMON_WORDS_PREFIX_ORDER = new ArrayList<>();
+  private static final PrefixTrieNode COMMON_WORDS_PREFIX_TRIE = new PrefixTrieNode();
 
   static
   {
@@ -1432,11 +1434,10 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
     NEXT_WORD_PREDICTIONS.put("රෑ", Arrays.asList("වෙලා", "කෑම", "නිදාගන්න"));
     NEXT_WORD_PREDICTIONS.put("මොකක්ද", Arrays.asList("ප්‍රශ්නය", "වෙන්නේ", "කරන්නේ"));
 
-    COMMON_WORDS_PREFIX_ORDER.addAll(COMMON_WORDS.entrySet());
-    Collections.sort(COMMON_WORDS_PREFIX_ORDER, (a, b) -> {
-      int lengthComparison = Integer.compare(a.getKey().length(), b.getKey().length());
-      return lengthComparison != 0 ? lengthComparison : a.getKey().compareTo(b.getKey());
-    });
+    for (Map.Entry<String, String> entry : COMMON_WORDS.entrySet())
+    {
+      addPrefixWord(entry.getKey(), entry.getValue());
+    }
   }
   // Standalone vowels (start of word or preceded by vowel)
   private static final String[][] VOWELS_INDEPENDENT = {
@@ -1577,6 +1578,66 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
   private static final String VIRAMA = "\u0DCA"; // ්
   private static final String ZWJ = "\u200D";    // Zero-Width Joiner
   private static final String ANUSVARA = "\u0D82"; // ං
+
+  private static final class PrefixTrieNode
+  {
+    final Map<Character, PrefixTrieNode> children = new TreeMap<>();
+    String key;
+    String value;
+  }
+
+  private static void addPrefixWord(String key, String value)
+  {
+    PrefixTrieNode node = COMMON_WORDS_PREFIX_TRIE;
+    for (int i = 0; i < key.length(); i++)
+    {
+      Character character = key.charAt(i);
+      PrefixTrieNode child = node.children.get(character);
+      if (child == null)
+      {
+        child = new PrefixTrieNode();
+        node.children.put(character, child);
+      }
+      node = child;
+    }
+    node.key = key;
+    node.value = value;
+  }
+
+  /** Finds the prefix node in O(prefix length), then visits only its completions. */
+  private static void addPrefixSuggestions(String prefix, List<String> suggestions)
+  {
+    PrefixTrieNode node = COMMON_WORDS_PREFIX_TRIE;
+    for (int i = 0; i < prefix.length(); i++)
+    {
+      node = node.children.get(prefix.charAt(i));
+      if (node == null)
+        return;
+    }
+
+    // Breadth-first traversal preserves the former shortest-key-first ordering.
+    ArrayDeque<PrefixTrieNode> pending = new ArrayDeque<>();
+    pending.addLast(node);
+    while (!pending.isEmpty())
+    {
+      PrefixTrieNode current = pending.removeFirst();
+      if (current.key != null && current.key.length() > prefix.length())
+      {
+        String candidate = current.value;
+        if (!suggestions.contains(candidate))
+        {
+          if (suggestions.size() == 1 && !COMMON_WORDS.containsKey(prefix))
+            suggestions.add(0, candidate);
+          else
+            suggestions.add(candidate);
+        }
+        if (suggestions.size() >= 4)
+          return;
+      }
+      for (PrefixTrieNode child : current.children.values())
+        pending.addLast(child);
+    }
+  }
 
   private SinhalaTransliterator() {}
 
@@ -1719,27 +1780,9 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
       return list;
     }
 
-    // Prefix completions
+    // Prefix completions use the prebuilt trie instead of scanning the full lexicon.
     if (lower.length() >= 2)
-    {
-      for (Map.Entry<String, String> entry : COMMON_WORDS_PREFIX_ORDER)
-      {
-        String k = entry.getKey();
-        if (k.length() > lower.length() && k.startsWith(lower))
-        {
-          String cand = entry.getValue();
-          if (!list.contains(cand))
-          {
-            if (list.size() == 1 && !COMMON_WORDS.containsKey(lower))
-              list.add(0, cand);
-            else
-              list.add(cand);
-          }
-          if (list.size() >= 4)
-            break;
-        }
-      }
-    }
+      addPrefixSuggestions(lower, list);
 
     // Single "nd" is ambiguous: ඳ (primary) vs ඬ or න්ද alternatives
     if (lower.contains("nd") && !lower.contains("ndh")

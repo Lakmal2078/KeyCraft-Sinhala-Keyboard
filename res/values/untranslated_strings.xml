@@ -6,4 +6,6 @@
   <string translatable="false" name="launcher_anim_g">G</string>
   <string translatable="false" name="launcher_anim_dash">-</string>
   <string translatable="false" name="launcher_repo_url">https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard</string>
+  <string translatable="false" name="launcher_issue_tracker_url">https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues</string>
+  <string translatable="false" name="launcher_license_url">https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/blob/main/LICENSE</string>
 </resources>

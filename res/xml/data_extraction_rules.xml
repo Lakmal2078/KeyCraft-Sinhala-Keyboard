@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Exclude all app data from both cloud backup and device-to-device transfer. -->
+<!-- Only the direct-boot settings store is portable; transient and private app data is excluded. -->
 <data-extraction-rules>
     <cloud-backup>
-        <exclude domain="root" path="."/>
-        <exclude domain="file" path="."/>
-        <exclude domain="database" path="."/>
-        <exclude domain="sharedpref" path="."/>
-        <exclude domain="external" path="."/>
+        <include domain="device_sharedpref" path="com.lakmal.keycraftsinhala_preferences.xml"/>
     </cloud-backup>
     <device-transfer>
-        <exclude domain="root" path="."/>
-        <exclude domain="file" path="."/>
-        <exclude domain="database" path="."/>
-        <exclude domain="sharedpref" path="."/>
-        <exclude domain="external" path="."/>
+        <include domain="device_sharedpref" path="com.lakmal.keycraftsinhala_preferences.xml"/>
     </device-transfer>
 </data-extraction-rules>

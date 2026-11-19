@@ -1,23 +1,49 @@
 package com.lakmal.keycraftsinhala;
 
+import android.view.KeyEvent;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import org.junit.Assert;
 import org.junit.Test;
-import java.io.File;
 
-public class LayoutVerificationTest {
+public class LayoutVerificationTest
+{
+  @Test
+  public void testTermuxLayoutUsesNativeModifierAndNavigationKeys() throws Exception
+  {
+    File layout = new File("srcs/layouts/latn_termux.xml");
+    Assert.assertTrue("Termux layout must exist", layout.isFile());
+    String xml = new String(Files.readAllBytes(layout.toPath()), StandardCharsets.UTF_8);
+    String[] tokens = {
+      "c=\"ctrl\"", "c=\"alt\"", "c=\"esc\"", "c=\"tab\"",
+      "key7=\"up\"", "key6=\"right\"", "key5=\"left\"", "key8=\"down\""
+    };
+    for (String token : tokens)
+      Assert.assertTrue("Termux layout must expose " + token, xml.contains(token));
 
-    @Test
-    public void testSinhalaLayoutKeyDefinitions() {
-        File layoutDir = new File("srcs/layouts");
-        Assert.assertTrue("Layouts directory must exist", layoutDir.exists() && layoutDir.isDirectory());
+    Assert.assertEquals(KeyValue.Kind.Modifier, KeyValue.getSpecialKeyByName("ctrl").getKind());
+    Assert.assertEquals(KeyValue.Modifier.CTRL, KeyValue.getSpecialKeyByName("ctrl").getModifier());
+    Assert.assertEquals(KeyValue.Modifier.ALT, KeyValue.getSpecialKeyByName("alt").getModifier());
+    Assert.assertEquals(KeyEvent.KEYCODE_ESCAPE, KeyValue.getSpecialKeyByName("esc").getKeyevent());
+    Assert.assertEquals(KeyEvent.KEYCODE_TAB, KeyValue.getSpecialKeyByName("tab").getKeyevent());
+    Assert.assertEquals(KeyEvent.KEYCODE_DPAD_LEFT, KeyValue.getSpecialKeyByName("left").getKeyevent());
+    Assert.assertEquals(KeyEvent.KEYCODE_DPAD_DOWN, KeyValue.getSpecialKeyByName("down").getKeyevent());
+    Assert.assertEquals(KeyEvent.KEYCODE_DPAD_UP, KeyValue.getSpecialKeyByName("up").getKeyevent());
+    Assert.assertEquals(KeyEvent.KEYCODE_DPAD_RIGHT, KeyValue.getSpecialKeyByName("right").getKeyevent());
+  }
 
-        File sinhalaLayout = new File(layoutDir, "sinhala_phonetic.xml");
-        Assert.assertTrue("Sinhala phonetic layout XML must exist", sinhalaLayout.exists() && sinhalaLayout.isFile());
+  @Test
+  public void testSinhalaLayoutKeyDefinitions()
+  {
+    File layoutDir = new File("srcs/layouts");
+    Assert.assertTrue("Layouts directory must exist", layoutDir.exists() && layoutDir.isDirectory());
 
-        // Assert all essential Sinhala glyphs are verified
-        String[] essentialGlyphs = {"ක", "ග", "ච", "ට", "ත", "ප", "ය", "ර", "ල", "ව", "ස", "හ"};
-        for (String glyph : essentialGlyphs) {
-            Assert.assertNotNull("Glyph definition must not be null for " + glyph, glyph);
-        }
-    }
+    File sinhalaLayout = new File(layoutDir, "sinhala_phonetic.xml");
+    Assert.assertTrue("Sinhala phonetic layout XML must exist", sinhalaLayout.exists() && sinhalaLayout.isFile());
+
+    String[] essentialGlyphs = {"ක", "ග", "ච", "ට", "ත", "ප", "ය", "ර", "ල", "ව", "ස", "හ"};
+    for (String glyph : essentialGlyphs)
+      Assert.assertNotNull("Glyph definition must not be null for " + glyph, glyph);
+  }
 }
