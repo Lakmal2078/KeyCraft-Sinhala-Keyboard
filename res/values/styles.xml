@@ -21,7 +21,9 @@
     <item name="android:layout_width">0dp</item>
     <item name="android:layout_height">match_parent</item>
     <item name="android:layout_weight">1</item>
-    <item name="android:padding">7dp</item>
+    <item name="android:padding">8dp</item>
+    <item name="android:minWidth">48dp</item>
+    <item name="android:minHeight">48dp</item>
     <item name="android:scaleType">fitCenter</item>
     <item name="android:background">@android:color/transparent</item>
     <item name="android:tint">?attr/colorLabel</item>
@@ -51,7 +53,8 @@
   <style name="emojiTypeButton">
     <item name="android:padding">1px</item>
     <item name="android:gravity">center</item>
-    <item name="android:minHeight">18dp</item>
+    <item name="android:minWidth">48dp</item>
+    <item name="android:minHeight">48dp</item>
     <item name="android:background">?attr/emoji_button_bg</item>
     <item name="android:textColor">?attr/emoji_key_text</item>
     <item name="android:textSize">18sp</item>
@@ -89,13 +92,15 @@
     <item name="android:layout_width">wrap_content</item>
     <item name="android:layout_height">wrap_content</item>
     <item name="android:layout_gravity">center_vertical</item>
-    <item name="android:layout_marginRight">12dp</item>
+    <item name="android:layout_marginEnd">8dp</item>
   </style>
   <style name="clipboardEntryButton">
-    <item name="android:layout_width">24dp</item>
-    <item name="android:layout_height">24dp</item>
-    <item name="android:layout_marginStart">2dp</item>
-    <item name="android:layout_marginEnd">2dp</item>
+    <item name="android:layout_width">48dp</item>
+    <item name="android:layout_height">48dp</item>
+    <item name="android:layout_marginStart">4dp</item>
+    <item name="android:layout_marginEnd">4dp</item>
+    <item name="android:clickable">true</item>
+    <item name="android:focusable">true</item>
     <item name="android:backgroundTint">?attr/colorLabel</item>
     <item name="android:backgroundTintMode">src_in</item>
   </style>
