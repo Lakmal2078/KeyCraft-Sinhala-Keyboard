@@ -71,7 +71,7 @@ Repo: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard.git
 Builds:
   - versionName: 1.2.0
     versionCode: 4
-    commit: REPLACE_WITH_V1_2_0_COMMIT_SHA
+    commit: 419e3d68d29eed6730b18102c1df6e5a5e9b6da4
     gradle:
       - yes
 AutoUpdateMode: Version
