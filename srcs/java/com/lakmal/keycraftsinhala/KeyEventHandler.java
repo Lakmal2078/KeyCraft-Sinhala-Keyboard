@@ -100,6 +100,9 @@ public final class KeyEventHandler
   /** Editing just started. */
   public void started()
   {
+    // This method also runs when preferences are refreshed during active input.
+    // Close any existing composition before resetting its backing state.
+    finish_composing();
     InputConnection ic = _recv.getCurrentInputConnection();
     _autocap.started(_config, ic);
     _suggestions.started();
@@ -297,8 +300,16 @@ public final class KeyEventHandler
 
   private void update_sinhala_predictions(InputConnection conn, String committedWord)
   {
+    if (_config.editor_config.is_sensitive_input)
+    {
+      _last_committed_sinhala = null;
+      _suggestions.clear();
+      _recv.set_suggestions(_suggestions);
+      return;
+    }
+
     String raw = (committedWord != null) ? committedWord.trim() : "";
-    if (_last_committed_sinhala != null && !_config.editor_config.is_sensitive_input)
+    if (_last_committed_sinhala != null)
     {
       if (_sinhala_learner != null)
         _sinhala_learner.recordTransition(_last_committed_sinhala, raw);

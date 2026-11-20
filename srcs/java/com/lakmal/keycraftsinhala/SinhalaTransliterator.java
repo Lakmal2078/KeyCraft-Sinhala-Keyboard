@@ -2,7 +2,6 @@ package com.lakmal.keycraftsinhala;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,6 @@ public final class SinhalaTransliterator
 {
   private static final Map<String, String> COMMON_WORDS = new HashMap<>();
   private static final Map<String, String> COMMON_PHRASES = new HashMap<>();
-  private static final Map<String, List<String>> NEXT_WORD_PREDICTIONS = new HashMap<>();
   private static final PrefixTrieNode COMMON_WORDS_PREFIX_TRIE = new PrefixTrieNode();
 
   static
@@ -1389,51 +1387,6 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("pruthuvi", "පෘථිවි");
     COMMON_WORDS.put("chandra", "චන්ද්‍ර");
 
-NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "දවසක්", "රාත්‍රියක්"));
-    NEXT_WORD_PREDICTIONS.put("ස්තූතියි", Arrays.asList("බොහොම", "ඔබට", "යාලුවා"));
-    NEXT_WORD_PREDICTIONS.put("ආයුබෝවන්", Arrays.asList("ඔබට", "සියලු දෙනාටම", "සුබ"));
-    NEXT_WORD_PREDICTIONS.put("මම", Arrays.asList("යනවා", "කරන්නම්", "දන්නවා"));
-    NEXT_WORD_PREDICTIONS.put("ඔයා", Arrays.asList("කොහොමද", "මොකද", "එනවද"));
-    NEXT_WORD_PREDICTIONS.put("අපි", Arrays.asList("යමු", "කරමු", "බලමු"));
-    NEXT_WORD_PREDICTIONS.put("තෙරුවන්", Arrays.asList("සරණයි", "ආශිර්වාදය"));
-    NEXT_WORD_PREDICTIONS.put("බුදු", Arrays.asList("සරණයි", "දහම්", "ගුණ"));
-    NEXT_WORD_PREDICTIONS.put("ජය", Arrays.asList("වේවා", "නියතයි", "ගමු"));
-    NEXT_WORD_PREDICTIONS.put("ලංකා", Arrays.asList("දීප", "බැංකුව", "මාතාව"));
-    NEXT_WORD_PREDICTIONS.put("ගොඩක්", Arrays.asList("ස්තූතියි", "හොඳයි", "පින්"));
-    NEXT_WORD_PREDICTIONS.put("පරිස්සමෙන්", Arrays.asList("යන්න", "ඉන්න", "එන්න"));
-    NEXT_WORD_PREDICTIONS.put("හරි", Arrays.asList("මචං", "යාලුවා", "එහෙනම්"));
-    NEXT_WORD_PREDICTIONS.put("දැන්", Arrays.asList("මොකද", "යමු", "හරි"));
-    NEXT_WORD_PREDICTIONS.put("හෙට", Arrays.asList("හමුවෙමු", "එන්නම්", "යමු"));
-    NEXT_WORD_PREDICTIONS.put("කොහොමද", Arrays.asList("ඔයාට", "යාලුවා", "විස්තර"));
-    NEXT_WORD_PREDICTIONS.put("මොකද", Arrays.asList("කරන්නේ", "විස්තර", "හිතන්නේ"));
-    NEXT_WORD_PREDICTIONS.put("කාරුණික", Arrays.asList("ඉල්ලීමක්", "දැනුම්දීමක්"));
-    NEXT_WORD_PREDICTIONS.put("කරුණාකර", Arrays.asList("සවන් දෙන්න", "පැමිණෙන්න", "බලන්න"));
-    NEXT_WORD_PREDICTIONS.put("අද", Arrays.asList("දවසේ", "මොකද", "යනවද"));
-    NEXT_WORD_PREDICTIONS.put("ඊයේ", Arrays.asList("රෑ", "හවස", "මොකද"));
-    NEXT_WORD_PREDICTIONS.put("කොහෙද", Arrays.asList("යන්නේ", "ඉන්නේ", "ගියේ"));
-    NEXT_WORD_PREDICTIONS.put("කවද්ද", Arrays.asList("එන්නේ", "යන්නේ", "හමුවෙන්නේ"));
-    NEXT_WORD_PREDICTIONS.put("මොනවද", Arrays.asList("විස්තර", "කරන්නේ", "ඕන"));
-
-    // Additional expanded suggestions
-    NEXT_WORD_PREDICTIONS.put("එන්න", Arrays.asList("පුළුවන්ද", "කෝ", "ගෙදර"));
-    NEXT_WORD_PREDICTIONS.put("යන්න", Arrays.asList("ඕනේ", "කෝ", "එපා"));
-    NEXT_WORD_PREDICTIONS.put("කන්න", Arrays.asList("ඕනේ", "යමු", "මොනවද"));
-    NEXT_WORD_PREDICTIONS.put("බොන්න", Arrays.asList("ඕනේ", "යමු", "මොනවද"));
-    NEXT_WORD_PREDICTIONS.put("බලන්න", Arrays.asList("ඕනේ", "යමු", "මොනවද"));
-    NEXT_WORD_PREDICTIONS.put("කරන්න", Arrays.asList("පුළුවන්ද", "ඕනේ", "එපා"));
-    NEXT_WORD_PREDICTIONS.put("ගන්න", Arrays.asList("ඕනේ", "පුළුවන්ද", "එපා"));
-    NEXT_WORD_PREDICTIONS.put("දෙන්න", Arrays.asList("පුළුවන්ද", "කෝ", "එපා"));
-    NEXT_WORD_PREDICTIONS.put("මගේ", Arrays.asList("අම්මා", "යාලුවා", "රට"));
-    NEXT_WORD_PREDICTIONS.put("ඔයාගේ", Arrays.asList("නම", "ගම", "වැඩ"));
-    NEXT_WORD_PREDICTIONS.put("එයා", Arrays.asList("ආවා", "ගියා", "එනවද"));
-    NEXT_WORD_PREDICTIONS.put("පොඩ්ඩක්", Arrays.asList("ඉන්න", "බලන්න", "අහන්න"));
-    NEXT_WORD_PREDICTIONS.put("කතා", Arrays.asList("කරන්න", "කරමු", "කරලා"));
-    NEXT_WORD_PREDICTIONS.put("වැඩ", Arrays.asList("ඉවරද", "කොහොමද", "කරන්න"));
-    NEXT_WORD_PREDICTIONS.put("ගෙදර", Arrays.asList("යනවා", "ආවා", "ඉන්නේ"));
-    NEXT_WORD_PREDICTIONS.put("උදේ", Arrays.asList("කෑවද", "නැගිට්ටා", "ආවා"));
-    NEXT_WORD_PREDICTIONS.put("රෑ", Arrays.asList("වෙලා", "කෑම", "නිදාගන්න"));
-    NEXT_WORD_PREDICTIONS.put("මොකක්ද", Arrays.asList("ප්‍රශ්නය", "වෙන්නේ", "කරන්නේ"));
-
     for (Map.Entry<String, String> entry : COMMON_WORDS.entrySet())
     {
       addPrefixWord(entry.getKey(), entry.getValue());
@@ -1859,7 +1812,7 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
 
   public static List<String> getNextWordPredictions(String word)
   {
-    if (word == null || word.isEmpty())
+    if (word == null || word.trim().isEmpty())
       return Collections.emptyList();
 
     String trimmed = word.trim();
@@ -1872,20 +1825,8 @@ NEXT_WORD_PREDICTIONS.put("සුබ", Arrays.asList("උදෑසනක්", "�
     if (start == end)
       return Collections.emptyList();
 
-    trimmed = trimmed.substring(start, end);
-    String lower = trimmed.toLowerCase(Locale.ROOT);
-    if (NEXT_WORD_PREDICTIONS.containsKey(trimmed))
-      return NEXT_WORD_PREDICTIONS.get(trimmed);
-    if (NEXT_WORD_PREDICTIONS.containsKey(lower))
-      return NEXT_WORD_PREDICTIONS.get(lower);
-
-    String transliterated = transliterateWord(lower);
-    if (NEXT_WORD_PREDICTIONS.containsKey(transliterated))
-      return NEXT_WORD_PREDICTIONS.get(transliterated);
-
-    List<String> enginePreds = SinhalaPredictionEngine.getPredictions(trimmed, null);
-    if (!enginePreds.isEmpty())
-      return enginePreds;
+    String normalized = trimmed.substring(start, end);
+    String transliterated = transliterateWord(normalized.toLowerCase(Locale.ROOT));
     return SinhalaPredictionEngine.getPredictions(transliterated, null);
   }
 

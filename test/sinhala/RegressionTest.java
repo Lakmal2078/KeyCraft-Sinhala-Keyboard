@@ -31,6 +31,19 @@ public class RegressionTest
   }
 
   @Test
+  public void legacyPredictionFacadeUsesTheCanonicalPredictionEngine()
+  {
+    assertEquals(
+        SinhalaPredictionEngine.getPredictions("සුබ", null),
+        SinhalaTransliterator.getNextWordPredictions("සුබ"));
+    assertEquals(
+        SinhalaPredictionEngine.getPredictions("ස්තූතියි", null),
+        SinhalaTransliterator.getNextWordPredictions("sthuthi"));
+    assertTrue(SinhalaTransliterator.getNextWordPredictions("කාරුණික")
+        .contains("ඉල්ලීමක්"));
+  }
+
+  @Test
   public void nextWordPredictionsHandleNullAndPunctuationOnlyInput()
   {
     assertTrue(SinhalaTransliterator.getNextWordPredictions(null).isEmpty());

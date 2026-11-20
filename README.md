@@ -35,7 +35,7 @@ KeyCraft යනු සිංහල සහ දෛනික ටයිප් කි
 ## 🆕 v1.2.0 නව විශේෂාංග සහ වැඩිදියුණු කිරීම්
 
 - Sinhala transliteration සහ input handling වැඩිදියුණු කිරීම.
-- Sinhala grapheme cluster නිවැරදිව මකා දැමීම සහ typing edge cases නිවැරදි කිරීම.
+- Sinhala input handling සහ typing edge cases වැඩිදියුණු කිරීම.
 - Keyboard touch targets, hit-testing සහ accessibility වැඩිදියුණු කිරීම.
 - Keyboard sizing සහ clipboard pane layout ගැටලු නිවැරදි කිරීම.
 - Contextual toolbar එක ඒකාබද්ධ කර emoji pane ප්‍රමාණය/හැසිරීම වැඩිදියුණු කිරීම.
