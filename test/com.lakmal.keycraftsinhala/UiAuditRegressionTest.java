@@ -157,7 +157,7 @@ public class UiAuditRegressionTest
         Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("tab")));
     assertEquals("Move cursor left",
         Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("cursor_left")));
-    assertEquals("Compose",
+    assertEquals("Compose pending",
         Keyboard2View.accessibilityLabelForKeyValue(KeyValue.COMPOSE));
     assertEquals("Cancel compose",
         Keyboard2View.accessibilityLabelForKeyValue(KeyValue.COMPOSE_CANCEL));

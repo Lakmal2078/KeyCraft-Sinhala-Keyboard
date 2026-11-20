@@ -610,9 +610,10 @@ public class Keyboard2View extends View
       return true;
     }
     KeyValue longPress = KeyModifier.modify_long_press(base);
-    KeyValue resolved = (longPress != null && !longPress.equals(base)) ? longPress : base;
-    onPointerDown(resolved, false);
-    onPointerUp(resolved, mods);
+    if (longPress == null || longPress.equals(base))
+      return false;
+    onPointerDown(longPress, false);
+    onPointerUp(longPress, mods);
     return true;
   }
 
@@ -717,8 +718,9 @@ public class Keyboard2View extends View
           case SWITCH_GREEKMATH: return "Greek and math symbols";
           case CAPS_LOCK: return "Caps lock";
           case SWITCH_VOICE_TYPING:
-          case SWITCH_VOICE_TYPING_CHOOSER:
             return "Voice typing";
+          case SWITCH_VOICE_TYPING_CHOOSER:
+            return "Switch voice typing chooser";
           case CHANGE_DICTIONARY: return "Change language dictionary";
           default: return humanize(value.getEvent().name());
         }
@@ -756,7 +758,7 @@ public class Keyboard2View extends View
           default: return humanize(value.getSlider().name());
         }
       case Compose_pending:
-        return "Compose";
+        return "Compose pending";
       case Placeholder:
         switch (value.getPlaceholder())
         {
@@ -1187,7 +1189,7 @@ public class Keyboard2View extends View
       if (enabled)
       {
         node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
-        if (key.keys[0] != null)
+        if (supportsAccessibilityLongClick(key))
         {
           node.setLongClickable(true);
           node.addAction(AccessibilityNodeInfoCompat.ACTION_LONG_CLICK);
@@ -1208,6 +1210,20 @@ public class Keyboard2View extends View
           }
         }
       }
+    }
+
+    private boolean supportsAccessibilityLongClick(KeyboardData.Key key)
+    {
+      if (key == null || key.keys[0] == null)
+        return false;
+      KeyValue base = _host.modifyKey(key.keys[0], _host._mods);
+      if (base == null)
+        return false;
+      if (base.hasFlagsAny(KeyValue.FLAG_LATCH)
+          && base.hasFlagsAny(KeyValue.FLAG_SPECIAL))
+        return true;
+      KeyValue longPress = KeyModifier.modify_long_press(base);
+      return longPress != null && !longPress.equals(base);
     }
 
     private String getDirectionLabel(Context ctx, int subIndex)

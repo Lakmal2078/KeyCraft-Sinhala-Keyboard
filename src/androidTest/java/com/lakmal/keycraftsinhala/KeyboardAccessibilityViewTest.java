@@ -348,6 +348,8 @@ public class KeyboardAccessibilityViewTest
       assertTrue(active.isFocusable());
       assertTrue(active.isEnabled());
       assertTrue(active.isClickable());
+      assertFalse(active.isLongClickable());
+      assertEquals(0, active.getActions() & AccessibilityNodeInfoCompat.ACTION_LONG_CLICK);
       Rect nodeBounds = new Rect();
       active.getBoundsInParent(nodeBounds);
       assertEquals(bounds(0), nodeBounds);
