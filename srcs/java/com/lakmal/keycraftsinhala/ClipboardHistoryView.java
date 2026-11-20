@@ -108,7 +108,8 @@ public final class ClipboardHistoryView extends NonScrollListView
 
   public void refreshEmptyStates()
   {
-    boolean enabled = Config.globalConfig().clipboard_history_enabled;
+    Config config = Config.globalConfig();
+    boolean enabled = config != null && config.clipboard_history_enabled;
     boolean historyEmpty = (_history == null || _history.isEmpty());
 
     View disabledState = findInPane(R.id.clipboard_disabled_state);

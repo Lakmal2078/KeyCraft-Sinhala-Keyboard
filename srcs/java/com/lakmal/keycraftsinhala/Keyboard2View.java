@@ -277,7 +277,9 @@ public class Keyboard2View extends View
 
     float maxHeight = getMeasuredHeight();
     float tolY = Math.max(TOUCH_MARGIN_TOLERANCE_PX, _tc.vertical_margin * 0.75f);
-    if (ty < -tolY || (maxHeight > 0 && ty >= maxHeight + tolY))
+    // Vertical tolerance is only for gaps between rows, never for taps outside
+    // the measured keyboard surface.
+    if (ty < 0 || (maxHeight > 0 && ty >= maxHeight))
       return null;
 
     float y = _tc.margin_top;
@@ -306,10 +308,7 @@ public class Keyboard2View extends View
     KeyboardData.Row row = getRowAtPosition(ty);
     if (row == null || row.keys.isEmpty() || _tc == null)
       return null;
-    float tolX = Math.max(TOUCH_MARGIN_TOLERANCE_PX, _tc.horizontal_margin * 0.75f);
     float x = _marginLeft + _tc.margin_left;
-    KeyboardData.Key nearestKey = null;
-    float bestDist = Float.MAX_VALUE;
     for (int i = 0; i < row.keys.size(); i++)
     {
       KeyboardData.Key key = row.keys.get(i);
@@ -317,15 +316,11 @@ public class Keyboard2View extends View
       float visualRight = xLeft + key.width * _keyWidth - _tc.horizontal_margin;
       if (tx >= xLeft && tx < visualRight)
         return key;
-      float dist = tx < xLeft ? (xLeft - tx) : (tx - visualRight);
-      if (dist < bestDist)
-      {
-        bestDist = dist;
-        nearestKey = key;
-      }
       x = xLeft + key.width * _keyWidth;
     }
-    return bestDist <= tolX ? nearestKey : null;
+    // Keep touch hit targets identical to the visible key surfaces. In particular,
+    // do not activate a neighbouring key when a pointer lands in an inter-key gap.
+    return null;
   }
 
   private void vibrate()
@@ -711,8 +706,9 @@ public class Keyboard2View extends View
             return "Change keyboard";
           case SWITCH_TEXT:
           case SWITCH_BACK_EMOJI:
-          case SWITCH_BACK_CLIPBOARD:
             return "Switch to text layout";
+          case SWITCH_BACK_CLIPBOARD:
+            return "Switch back clipboard";
           case SWITCH_NUMERIC: return "Switch to numeric layout";
           case SWITCH_EMOJI: return "Open emoji keyboard";
           case SWITCH_CLIPBOARD: return "Open clipboard history";
@@ -762,9 +758,12 @@ public class Keyboard2View extends View
       case Compose_pending:
         return "Compose";
       case Placeholder:
-        return value.getPlaceholder() == KeyValue.Placeholder.COMPOSE_CANCEL
-            ? "Cancel compose"
-            : humanize(value.getPlaceholder().name());
+        switch (value.getPlaceholder())
+        {
+          case COMPOSE_CANCEL: return "Cancel compose";
+          case REMOVED: return "Placeholder";
+          default: return humanize(value.getPlaceholder().name());
+        }
       case Char:
         switch (value.getChar())
         {
@@ -1181,9 +1180,9 @@ public class Keyboard2View extends View
       String primaryLabel = Keyboard2View.accessibilityLabelForKey(key, _host._mods);
       node.setText(primaryLabel);
       node.setContentDescription(primaryLabel);
-      node.setClickable(true);
-      node.setFocusable(true);
       boolean enabled = key != null && !"Empty key".equals(primaryLabel);
+      node.setClickable(enabled);
+      node.setFocusable(enabled);
       node.setEnabled(enabled);
       if (enabled)
       {

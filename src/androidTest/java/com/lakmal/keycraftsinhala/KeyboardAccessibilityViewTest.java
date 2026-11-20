@@ -356,6 +356,8 @@ public class KeyboardAccessibilityViewTest
       AccessibilityNodeInfoCompat empty = AccessibilityNodeInfoCompat.wrap(provider.createAccessibilityNodeInfo(1));
       assertEquals("Empty key", empty.getText().toString());
       assertFalse(empty.isEnabled());
+      assertFalse(empty.isClickable());
+      assertFalse(empty.isFocusable());
       assertEquals(0, empty.getActions() & AccessibilityNodeInfoCompat.ACTION_CLICK);
       assertFalse(provider.performAction(0, AccessibilityNodeInfoCompat.ACTION_LONG_CLICK, null));
       assertFalse(provider.performAction(1, AccessibilityNodeInfoCompat.ACTION_CLICK, null));
