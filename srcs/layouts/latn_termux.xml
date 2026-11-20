@@ -13,8 +13,8 @@
     <key c="o" ne="9" sw="("/>
     <key c="p" ne="0" sw=")"/>
   </row>
-  <row>
-    <key shift="1.0" c="a" nw="loc tab" ne="`" sw="?"/>
+  <row shift="0.5" scale="10.0">
+    <key c="a" nw="loc tab" ne="`" sw="?"/>
     <key c="s" ne="~" sw="&quot;"/>
     <key c="d" ne="-" sw="'"/>
     <key c="f" ne="_" sw=":"/>
