@@ -57,6 +57,13 @@ public class Keyboard2View extends View
   private Theme _theme;
   private Theme.Computed _tc;
   private final KeyboardAccessibilityHelper _accessibilityHelper;
+  private int _accessibilityMeasuredWidth = -1;
+  private int _accessibilityMeasuredHeight = -1;
+  private float _accessibilityKeyWidth = Float.NaN;
+  private float _accessibilityRowHeight = Float.NaN;
+  private float _accessibilityMarginLeft = Float.NaN;
+  private float _accessibilityMarginRight = Float.NaN;
+  private float _accessibilityMarginBottom = Float.NaN;
   private static final int ACCESSIBILITY_POINTER_ID = 0x7ffffffe;
 
   private static RectF _tmpRect = new RectF();
@@ -337,7 +344,25 @@ public class Keyboard2View extends View
       (int)(_tc.row_height * _keyboard.keysHeight
           + _config.marginTop + _marginBottom);
     setMeasuredDimension(resolveSize(width, wSpec), resolveSize(height, hSpec));
-    _accessibilityHelper.invalidateRoot();
+    int measuredWidth = getMeasuredWidth();
+    int measuredHeight = getMeasuredHeight();
+    if (measuredWidth != _accessibilityMeasuredWidth
+        || measuredHeight != _accessibilityMeasuredHeight
+        || Float.compare(_keyWidth, _accessibilityKeyWidth) != 0
+        || Float.compare(_tc.row_height, _accessibilityRowHeight) != 0
+        || Float.compare(_marginLeft, _accessibilityMarginLeft) != 0
+        || Float.compare(_marginRight, _accessibilityMarginRight) != 0
+        || Float.compare(_marginBottom, _accessibilityMarginBottom) != 0)
+    {
+      _accessibilityMeasuredWidth = measuredWidth;
+      _accessibilityMeasuredHeight = measuredHeight;
+      _accessibilityKeyWidth = _keyWidth;
+      _accessibilityRowHeight = _tc.row_height;
+      _accessibilityMarginLeft = _marginLeft;
+      _accessibilityMarginRight = _marginRight;
+      _accessibilityMarginBottom = _marginBottom;
+      _accessibilityHelper.invalidateRoot();
+    }
   }
 
   Rect _cached_exclusion_rect = new Rect();

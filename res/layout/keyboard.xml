@@ -9,7 +9,7 @@
     <ImageButton android:id="@+id/toolbar_btn_theme" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_palette" android:contentDescription="@string/quick_toolbar_theme_desc"/>
   </LinearLayout>
   <com.lakmal.keycraftsinhala.suggestions.CandidatesView android:id="@+id/candidates_view" style="@style/candidates_view">
-    <TextView android:id="@+id/candidates_toolbar_toggle" style="@style/candidates_toolbar_toggle" android:text="‹" android:contentDescription="@string/candidates_show_toolbar_desc"/>
+    <TextView android:id="@+id/candidates_toolbar_toggle" style="@style/candidates_toolbar_toggle" android:text="@string/candidates_toolbar_toggle_text" android:contentDescription="@string/candidates_show_toolbar_desc"/>
     <TextView android:id="@+id/candidates_emoji" style="@style/candidates_emoji"/>
     <TextView android:id="@+id/candidates_left" style="@style/candidates_item"/>
     <TextView android:id="@+id/candidates_middle" style="@style/candidates_item"/>

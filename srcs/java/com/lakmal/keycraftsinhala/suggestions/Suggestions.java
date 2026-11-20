@@ -1,7 +1,6 @@
 package com.lakmal.keycraftsinhala.suggestions;
 
 import android.os.Build.VERSION;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import juloo.cdict.Cdict;
@@ -133,7 +132,7 @@ public final class Suggestions
           suggestions[i] = list.get(i);
         }
         // Keep the literal spelling reachable even for ambiguous prefixes.
-        if (!Arrays.asList(suggestions).contains(word))
+        if (!containsSuggestion(word))
         {
           if (count < MAX_COUNT)
             suggestions[count++] = word;
@@ -154,6 +153,16 @@ public final class Suggestions
     else
       query_suggestions(word);
     _callback.set_suggestions(this);
+  }
+
+  private boolean containsSuggestion(String word)
+  {
+    for (int i = 0; i < count; i++)
+    {
+      if (word.equals(suggestions[i]))
+        return true;
+    }
+    return false;
   }
 
   private static boolean is_ascii_letters(String s)

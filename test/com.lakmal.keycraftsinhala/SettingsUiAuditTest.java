@@ -27,6 +27,24 @@ public class SettingsUiAuditTest
   }
 
   @Test
+  public void keyboardAccessibilityLabelsDescribeEditingActions()
+  {
+    KeyValue[] backspaceValues = new KeyValue[9];
+    backspaceValues[0] = KeyValue.getKeyByName("backspace");
+    KeyboardData.Key backspace = new KeyboardData.Key(backspaceValues, null, 0,
+        1f, 0f, null, KeyboardData.Key.Role.Action);
+
+    KeyValue[] spaceValues = new KeyValue[9];
+    spaceValues[0] = KeyValue.getKeyByName("space");
+    KeyboardData.Key space = new KeyboardData.Key(spaceValues, null, 0,
+        1f, 0f, null, KeyboardData.Key.Role.Space_bar);
+
+    assertEquals("Backspace", Keyboard2View.accessibilityLabelForKey(backspace));
+    assertEquals("Space", Keyboard2View.accessibilityLabelForKey(space));
+    assertEquals("Keyboard key", Keyboard2View.accessibilityLabelForKey(null));
+  }
+
+  @Test
   public void testSoundOnKeypressPreference()
   {
     when(mockPrefs.getBoolean("sound_on_keypress", false)).thenReturn(true);

@@ -812,14 +812,9 @@ public final class KeyEventHandler
     InputConnection conn = _recv.getCurrentInputConnection();
     if (_sinhala_buffer.length() > 0 && conn != null)
     {
+      // Space commits the transliteration, not an unselected suggestion.
+      // Alternative candidates are committed only when the user taps one.
       String committedSinhala = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
-      // Helakuru behaviour: Slot 0 is always committed before the space.
-      if (_suggestions.count > 0
-          && _suggestions.suggestions[0] != null
-          && !_suggestions.suggestions[0].equals(_sinhala_buffer.toString()))
-      {
-        committedSinhala = _suggestions.suggestions[0];
-      }
       commit_sinhala_text(conn, committedSinhala + " ");
       _sinhala_buffer.setLength(0);
       _typedword.typed(committedSinhala + " ");

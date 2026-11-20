@@ -191,6 +191,34 @@ public class KeyEventHandlerTest
   }
 
   @Test
+  public void spaceCommitsSinhalaTransliterationInsteadOfFirstSuggestion()
+  {
+    config.sinhala_transliteration = true;
+    type("ka");
+
+    assertEquals("කළා", suggestions.suggestions[0]);
+    handler.handle_space_bar();
+
+    assertEquals("ක ", document.toString());
+    assertEquals(0, handler._sinhala_buffer.length());
+    assertTrue(suggestions.is_prediction);
+  }
+
+  @Test
+  public void tappingSinhalaSuggestionStillCommitsSelectedCandidate()
+  {
+    config.sinhala_transliteration = true;
+    type("ka");
+
+    assertEquals("කළා", suggestions.suggestions[0]);
+    handler.suggestion_entered(suggestions.suggestions[0]);
+
+    assertEquals("කළා ", document.toString());
+    assertEquals(0, handler._sinhala_buffer.length());
+    assertTrue(suggestions.is_prediction);
+  }
+
+  @Test
   public void incognitoEditorAllowsSinhalaTransliterationWithoutTracking()
   {
     type("old");

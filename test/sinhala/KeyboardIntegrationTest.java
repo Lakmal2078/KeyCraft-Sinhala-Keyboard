@@ -13,6 +13,7 @@ public class KeyboardIntegrationTest
   private Config config;
   private InputConnection connection;
   private KeyEventHandler handler;
+  private Suggestions suggestions;
 
   @Before
   public void setUp()
@@ -28,7 +29,8 @@ public class KeyboardIntegrationTest
     when(receiver.getCurrentInputConnection()).thenReturn(connection);
     when(receiver.getHandler()).thenReturn(mock(Handler.class));
 
-    handler = new KeyEventHandler(config, receiver, new Suggestions(receiver, config));
+    suggestions = new Suggestions(receiver, config);
+    handler = new KeyEventHandler(config, receiver, suggestions);
     handler.started();
   }
 
@@ -60,6 +62,52 @@ public class KeyboardIntegrationTest
     verify(connection).commitText("කොහොමද", 1);
     verify(connection, times(3)).beginBatchEdit();
     verify(connection, times(3)).endBatchEdit();
+    assertEquals(0, handler._sinhala_buffer.length());
+  }
+
+  @Test
+  public void multiCharacterSinhalaWordComposesAndCommitsAsOneWord()
+  {
+    for (char c : "amma".toCharArray())
+      handler.key_up(KeyValue.makeCharKey(c), Pointers.Modifiers.EMPTY);
+
+    verify(connection).setComposingText("අම්මා", 1);
+    handler.key_up(KeyValue.getKeyByName("space"), Pointers.Modifiers.EMPTY);
+
+    verify(connection).commitText("අම්මා ", 1);
+    assertEquals(0, handler._sinhala_buffer.length());
+  }
+
+  @Test
+  public void backspaceUpdatesAndClearsActiveSinhalaComposition()
+  {
+    handler.key_up(KeyValue.makeCharKey('k'), Pointers.Modifiers.EMPTY);
+    handler.key_up(KeyValue.makeCharKey('a'), Pointers.Modifiers.EMPTY);
+    handler.key_up(KeyValue.getKeyByName("backspace"), Pointers.Modifiers.EMPTY);
+
+    verify(connection, times(2)).setComposingText("ක්", 1);
+    assertEquals("k", handler._sinhala_buffer.toString());
+
+    handler.key_up(KeyValue.getKeyByName("backspace"), Pointers.Modifiers.EMPTY);
+    verify(connection).setComposingText("", 1);
+    verify(connection).finishComposingText();
+    assertEquals(0, handler._sinhala_buffer.length());
+  }
+
+  @Test
+  public void SinhalaCandidatesRemainSelectableDuringComposition()
+  {
+    config.suggestions_enabled = true;
+    config.editor_config.should_show_candidates_view = true;
+    handler.started();
+    handler.key_up(KeyValue.makeCharKey('k'), Pointers.Modifiers.EMPTY);
+    handler.key_up(KeyValue.makeCharKey('a'), Pointers.Modifiers.EMPTY);
+
+    assertTrue("Sinhala candidates should be available while composing", suggestions.count > 1);
+    assertEquals("කළා", suggestions.suggestions[0]);
+
+    handler.suggestion_entered(suggestions.suggestions[0], false);
+    verify(connection).commitText("කළා", 1);
     assertEquals(0, handler._sinhala_buffer.length());
   }
 
