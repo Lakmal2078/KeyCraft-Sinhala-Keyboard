@@ -34,6 +34,25 @@ public class LayoutVerificationTest
   }
 
   @Test
+  public void testTermuxLayoutRowsHaveNoVerticalGap() throws Exception
+  {
+    File layout = new File("srcs/layouts/latn_termux.xml");
+    org.w3c.dom.Document doc = javax.xml.parsers.DocumentBuilderFactory
+        .newInstance()
+        .newDocumentBuilder()
+        .parse(layout);
+    org.w3c.dom.NodeList rows = doc.getElementsByTagName("row");
+    Assert.assertEquals(4, rows.getLength());
+    for (int i = 0; i < rows.getLength(); i++)
+    {
+      org.w3c.dom.Element row = (org.w3c.dom.Element) rows.item(i);
+      String rowShift = row.getAttribute("shift");
+      if (!rowShift.isEmpty())
+        Assert.assertEquals(0f, Float.parseFloat(rowShift), 0.0001f);
+    }
+  }
+
+  @Test
   public void testSinhalaLayoutKeyDefinitions()
   {
     File layoutDir = new File("srcs/layouts");
