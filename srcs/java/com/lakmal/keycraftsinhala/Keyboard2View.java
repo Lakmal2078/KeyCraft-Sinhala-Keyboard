@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
@@ -286,16 +287,16 @@ public class Keyboard2View extends View
     {
       KeyboardData.Row row = _keyboard.rows.get(i);
       float top = y + row.shift * _tc.row_height;
-      float bottom = top + row.height * _tc.row_height;
-      if (ty >= top && ty < bottom)
+      float visualBottom = top + row.height * _tc.row_height - _tc.vertical_margin;
+      if (ty >= top && ty < visualBottom)
         return row;
-      float dist = ty < top ? (top - ty) : (ty - bottom);
+      float dist = ty < top ? (top - ty) : (ty - visualBottom);
       if (dist < bestDist)
       {
         bestDist = dist;
         nearestRow = row;
       }
-      y = bottom;
+      y = top + row.height * _tc.row_height;
     }
     return bestDist <= tolY ? nearestRow : null;
   }
@@ -313,16 +314,16 @@ public class Keyboard2View extends View
     {
       KeyboardData.Key key = row.keys.get(i);
       float xLeft = x + key.shift * _keyWidth;
-      float xRight = xLeft + key.width * _keyWidth;
-      if (tx >= xLeft && tx < xRight)
+      float visualRight = xLeft + key.width * _keyWidth - _tc.horizontal_margin;
+      if (tx >= xLeft && tx < visualRight)
         return key;
-      float dist = tx < xLeft ? (xLeft - tx) : (tx - xRight);
+      float dist = tx < xLeft ? (xLeft - tx) : (tx - visualRight);
       if (dist < bestDist)
       {
         bestDist = dist;
         nearestKey = key;
       }
-      x = xRight;
+      x = xLeft + key.width * _keyWidth;
     }
     return bestDist <= tolX ? nearestKey : null;
   }
@@ -606,6 +607,13 @@ public class Keyboard2View extends View
     KeyValue base = modifyKey(key.keys[0], mods);
     if (base == null)
       return false;
+    if (base.hasFlagsAny(KeyValue.FLAG_LATCH) && base.hasFlagsAny(KeyValue.FLAG_SPECIAL))
+    {
+      int currentFlags = _pointers.getKeyFlags(base);
+      boolean currentlyLocked = currentFlags != -1 && (currentFlags & Pointers.FLAG_P_LOCKED) != 0;
+      _pointers.set_fake_pointer_state(key, base, !currentlyLocked, true);
+      return true;
+    }
     KeyValue longPress = KeyModifier.modify_long_press(base);
     KeyValue resolved = (longPress != null && !longPress.equals(base)) ? longPress : base;
     onPointerDown(resolved, false);
@@ -629,6 +637,11 @@ public class Keyboard2View extends View
 
   static String accessibilityLabelForKey(KeyboardData.Key key)
   {
+    return accessibilityLabelForKey(key, null);
+  }
+
+  static String accessibilityLabelForKey(KeyboardData.Key key, Pointers.Modifiers mods)
+  {
     if (key == null)
       return "Keyboard key";
     KeyValue value = key.keys[0];
@@ -645,6 +658,12 @@ public class Keyboard2View extends View
     }
     if (value == null)
       return "Empty key";
+    if (mods != null)
+    {
+      KeyValue modified = KeyModifier.modify(value, mods);
+      if (modified != null)
+        value = modified;
+    }
     return accessibilityLabelForKeyValue(value);
   }
 
@@ -683,15 +702,81 @@ public class Keyboard2View extends View
       case Event:
         switch (value.getEvent())
         {
+          case CONFIG: return "Settings";
+          case ACTION: return value.getString().isEmpty() ? "Action" : value.getString();
           case HIDE_SELF: return "Hide keyboard";
-          case CHANGE_METHOD_PICKER: return "Change keyboard";
-          case SWITCH_TEXT: return "Switch to text layout";
+          case CHANGE_METHOD_PICKER:
+          case CHANGE_METHOD_PREV:
+          case CHANGE_METHOD_NEXT:
+            return "Change keyboard";
+          case SWITCH_TEXT:
+          case SWITCH_BACK_EMOJI:
+          case SWITCH_BACK_CLIPBOARD:
+            return "Switch to text layout";
           case SWITCH_NUMERIC: return "Switch to numeric layout";
           case SWITCH_EMOJI: return "Open emoji keyboard";
           case SWITCH_CLIPBOARD: return "Open clipboard history";
-          case SWITCH_VOICE_TYPING: return "Voice typing";
+          case SWITCH_FORWARD: return "Next layout";
+          case SWITCH_BACKWARD: return "Previous layout";
+          case SWITCH_GREEKMATH: return "Greek and math symbols";
+          case CAPS_LOCK: return "Caps lock";
+          case SWITCH_VOICE_TYPING:
+          case SWITCH_VOICE_TYPING_CHOOSER:
+            return "Voice typing";
+          case CHANGE_DICTIONARY: return "Change language dictionary";
           default: return humanize(value.getEvent().name());
         }
+      case Keyevent:
+        switch (value.getKeyevent())
+        {
+          case KeyEvent.KEYCODE_ENTER: return "Enter";
+          case KeyEvent.KEYCODE_DPAD_UP: return "Arrow up";
+          case KeyEvent.KEYCODE_DPAD_DOWN: return "Arrow down";
+          case KeyEvent.KEYCODE_DPAD_LEFT: return "Arrow left";
+          case KeyEvent.KEYCODE_DPAD_RIGHT: return "Arrow right";
+          case KeyEvent.KEYCODE_PAGE_UP: return "Page up";
+          case KeyEvent.KEYCODE_PAGE_DOWN: return "Page down";
+          case KeyEvent.KEYCODE_MOVE_HOME: return "Home";
+          case KeyEvent.KEYCODE_MOVE_END: return "End";
+          case KeyEvent.KEYCODE_FORWARD_DEL: return "Forward delete";
+          case KeyEvent.KEYCODE_TAB: return "Tab";
+          case KeyEvent.KEYCODE_ESCAPE: return "Escape";
+          case KeyEvent.KEYCODE_INSERT: return "Insert";
+          default:
+            String evLabel = value.getString();
+            if (evLabel != null && !evLabel.isEmpty() && !value.hasFlagsAny(KeyValue.FLAG_KEY_FONT))
+              return evLabel;
+            return humanize(KeyEvent.keyCodeToString(value.getKeyevent()).replace("KEYCODE_", ""));
+        }
+      case Slider:
+        switch (value.getSlider())
+        {
+          case Cursor_left: return "Move cursor left";
+          case Cursor_right: return "Move cursor right";
+          case Cursor_up: return "Move cursor up";
+          case Cursor_down: return "Move cursor down";
+          case Selection_cursor_left: return "Expand selection left";
+          case Selection_cursor_right: return "Expand selection right";
+          default: return humanize(value.getSlider().name());
+        }
+      case Compose_pending:
+        return "Compose";
+      case Placeholder:
+        return value.getPlaceholder() == KeyValue.Placeholder.COMPOSE_CANCEL
+            ? "Cancel compose"
+            : humanize(value.getPlaceholder().name());
+      case Char:
+        switch (value.getChar())
+        {
+          case '\t': return "Tab";
+          case '\n': return "New line";
+          case '\u00A0': return "Non-breaking space";
+          case '\u202F': return "Narrow non-breaking space";
+          case '\u200D': return "Zero width joiner";
+          case '\u200C': return "Zero width non-joiner";
+          default: break;
+        }
+        // fall through
       default:
         String label = value.getString();
         return (label == null || label.length() == 0)
@@ -810,14 +895,14 @@ public class Keyboard2View extends View
       return;
     }
     DisplayMetrics dm = getResources().getDisplayMetrics();
-    int popupW = Math.max((int) (_previewKeyRect.width() * 1.25f), (int) (46 * dm.density));
-    int popupH = Math.max((int) (_previewKeyRect.height() * 1.15f), (int) (54 * dm.density));
+    int hPad = Math.round(10f * dm.density);
     if (_previewPopup == null)
     {
       _previewText = new TextView(getContext());
       _previewText.setGravity(Gravity.CENTER);
       _previewText.setSingleLine(true);
-      _previewPopup = new PopupWindow(_previewText, popupW, popupH, false);
+      _previewText.setPadding(hPad, 0, hPad, 0);
+      _previewPopup = new PopupWindow(_previewText, 1, 1, false);
       _previewPopup.setTouchable(false);
       _previewPopup.setClippingEnabled(false);
     }
@@ -841,6 +926,10 @@ public class Keyboard2View extends View
         ? Theme.getKeyFont(getContext())
         : (_config.custom_font != null ? _config.custom_font : Typeface.DEFAULT_BOLD));
     _previewText.setText(label);
+
+    int measuredTextW = (int) Math.ceil(_previewText.getPaint().measureText(label)) + hPad * 2;
+    int popupW = Math.max(Math.max((int) (_previewKeyRect.width() * 1.25f), (int) (46 * dm.density)), measuredTextW);
+    int popupH = Math.max((int) (_previewKeyRect.height() * 1.15f), (int) (54 * dm.density));
 
     getLocationInWindow(_windowLocation);
     int px = (int) (_windowLocation[0] + _previewKeyRect.centerX() - popupW / 2f);
@@ -1089,12 +1178,12 @@ public class Keyboard2View extends View
       _host.accessibilityBounds(virtualViewId, _bounds);
       node.setBoundsInParent(_bounds);
       node.setClassName("android.widget.Button");
-      node.setText(Keyboard2View.accessibilityLabelForKey(key));
-      node.setContentDescription(Keyboard2View.accessibilityLabelForKey(key));
+      String primaryLabel = Keyboard2View.accessibilityLabelForKey(key, _host._mods);
+      node.setText(primaryLabel);
+      node.setContentDescription(primaryLabel);
       node.setClickable(true);
       node.setFocusable(true);
-      boolean enabled = key != null
-          && !"Empty key".equals(Keyboard2View.accessibilityLabelForKey(key));
+      boolean enabled = key != null && !"Empty key".equals(primaryLabel);
       node.setEnabled(enabled);
       if (enabled)
       {
@@ -1109,7 +1198,10 @@ public class Keyboard2View extends View
         {
           if (key.keys[sub] != null)
           {
-            String subLabel = Keyboard2View.accessibilityLabelForKeyValue(key.keys[sub]);
+            KeyValue subVal = _host.modifyKey(key.keys[sub], _host._mods);
+            if (subVal == null)
+              subVal = key.keys[sub];
+            String subLabel = Keyboard2View.accessibilityLabelForKeyValue(subVal);
             String dirLabel = getDirectionLabel(ctx, sub);
             String actionLabel = ctx.getString(R.string.a11y_swipe_action_fmt, dirLabel, subLabel);
             node.addAction(new AccessibilityNodeInfoCompat.AccessibilityActionCompat(

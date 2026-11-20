@@ -122,7 +122,7 @@ public final class ClipboardHistoryView extends NonScrollListView
     View clearAllBtn = findInPane(R.id.clipboard_clear_all_btn);
     if (clearAllBtn != null)
     {
-      boolean canClear = !historyEmpty;
+      boolean canClear = enabled && !historyEmpty;
       clearAllBtn.setEnabled(canClear);
       clearAllBtn.setAlpha(canClear ? 1.0f : 0.38f);
     }
@@ -257,24 +257,39 @@ public final class ClipboardHistoryView extends NonScrollListView
       if (v == null)
         v = View.inflate(getContext(), R.layout.clipboard_history_entry, null);
       ClipboardHistoryService.HistoryEntry entry = _entries.get(pos);
-      ((TextView)v.findViewById(R.id.clipboard_entry_text))
-        .setText(entry.content);
+      TextView textView = (TextView)v.findViewById(R.id.clipboard_entry_text);
+      if (entry.uri != null)
+      {
+        String subtype = formatMimeSubtype(entry.mime);
+        int fmtRes = "image/gif".equals(entry.mime)
+            ? R.string.clipboard_gif_clip_fmt
+            : R.string.clipboard_image_clip_fmt;
+        textView.setText(getContext().getString(fmtRes, subtype));
+      }
+      else
+      {
+        textView.setText(entry.content);
+      }
 
       ImageView thumb = v.findViewById(R.id.clipboard_entry_thumb);
       if (thumb != null)
       {
         if (entry.uri != null)
         {
+          if (android.os.Build.VERSION.SDK_INT >= 21)
+            thumb.setClipToOutline(true);
           Bitmap bmp = loadThumbnail(entry.uri);
           if (bmp != null)
           {
             thumb.setImageBitmap(bmp);
-            thumb.setVisibility(View.VISIBLE);
+            thumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
           }
           else
           {
-            thumb.setVisibility(View.GONE);
+            thumb.setImageResource(R.drawable.ic_toolbar_grid);
+            thumb.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
           }
+          thumb.setVisibility(View.VISIBLE);
         }
         else
         {
@@ -294,5 +309,18 @@ public final class ClipboardHistoryView extends NonScrollListView
         deleteBtn.setOnClickListener(view -> delete_entry(pos));
       return v;
     }
+  }
+
+  static String formatMimeSubtype(String mime)
+  {
+    if (mime == null || mime.isEmpty())
+      return "IMG";
+    int slash = mime.indexOf('/');
+    String sub = (slash >= 0 && slash + 1 < mime.length())
+        ? mime.substring(slash + 1) : mime;
+    int plus = sub.indexOf('+');
+    if (plus > 0)
+      sub = sub.substring(0, plus);
+    return sub.toUpperCase(java.util.Locale.ROOT);
   }
 }

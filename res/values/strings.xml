@@ -353,6 +353,8 @@
   <string name="clipboard_history_empty">No copied items yet. Copied text or images will appear here.</string>
   <string name="clipboard_pin_empty">No pinned clips. Tap the pin icon on any item to keep it here.</string>
   <string name="clipboard_image_thumb_desc">Copied image preview</string>
+  <string name="clipboard_image_clip_fmt">Copied image (%1$s)</string>
+  <string name="clipboard_gif_clip_fmt">Copied GIF (%1$s)</string>
 
   <!-- Emoji, Stickers & GIFs -->
   <string name="emoji_tab_emoji">Emoji</string>

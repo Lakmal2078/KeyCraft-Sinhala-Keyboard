@@ -105,9 +105,9 @@ public class ColorPickerPreference extends DialogPreference
 
   private static double relativeLuminance(int color)
   {
-    double r = linearizeChannel(Color.red(color) / 255.0);
-    double g = linearizeChannel(Color.green(color) / 255.0);
-    double b = linearizeChannel(Color.blue(color) / 255.0);
+    double r = linearizeChannel(((color >> 16) & 0xFF) / 255.0);
+    double g = linearizeChannel(((color >> 8) & 0xFF) / 255.0);
+    double b = linearizeChannel((color & 0xFF) / 255.0);
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   }
 

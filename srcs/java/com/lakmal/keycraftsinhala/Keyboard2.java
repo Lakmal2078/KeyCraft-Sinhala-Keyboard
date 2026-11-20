@@ -47,6 +47,7 @@ public class Keyboard2 extends InputMethodService
   private Keyboard2View _keyboard_layout_view;
   private CandidatesView _candidates_view;
   private ViewGroup _quick_toolbar;
+  private LinearLayout _top_strip_container;
   private boolean _has_active_suggestions = false;
   private boolean _show_quick_toolbar_override = false;
   private Suggestions _suggestions;
@@ -193,6 +194,7 @@ public class Keyboard2 extends InputMethodService
     _keyboard_layout_view = (Keyboard2View)_keyboard_container_view.findViewById(R.id.keyboard_view);
     _candidates_view = (CandidatesView)_keyboard_container_view.findViewById(R.id.candidates_view);
     _quick_toolbar = (ViewGroup)_keyboard_container_view.findViewById(R.id.quick_toolbar);
+    _top_strip_container = (LinearLayout)_keyboard_container_view.findViewById(R.id.top_strip_container);
     setup_quick_toolbar();
     setup_window_mode_controls();
     apply_window_mode_layout();
@@ -782,36 +784,40 @@ public class Keyboard2 extends InputMethodService
       }
       View backToSuggestions = _quick_toolbar.findViewById(R.id.toolbar_btn_suggestions);
       if (backToSuggestions != null)
-      {
-        backToSuggestions.setVisibility(
-            (can_show_candidates && _has_active_suggestions) ? View.VISIBLE : View.GONE);
-      }
+        backToSuggestions.setVisibility(View.GONE);
     }
-    if (show_toolbar)
+
+    boolean toolbar_visible = show_toolbar && _quick_toolbar != null;
+    boolean candidates_visible = can_show_candidates
+        && (!toolbar_visible || _has_active_suggestions);
+
+    if (_quick_toolbar != null)
+      _quick_toolbar.setVisibility(toolbar_visible ? View.VISIBLE : View.GONE);
+    if (_candidates_view != null)
     {
-      if (_show_quick_toolbar_override && can_show_candidates && _has_active_suggestions)
-      {
-        _quick_toolbar.setVisibility(View.VISIBLE);
-        _candidates_view.setVisibility(View.GONE);
-      }
-      else if (can_show_candidates && _has_active_suggestions)
-      {
-        _candidates_view.setVisibility(View.VISIBLE);
-        if (_quick_toolbar != null)
-          _quick_toolbar.setVisibility(View.GONE);
-      }
-      else
-      {
-        if (_quick_toolbar != null)
-          _quick_toolbar.setVisibility(View.VISIBLE);
-        _candidates_view.setVisibility(View.GONE);
-      }
+      _candidates_view.setVisibility(candidates_visible ? View.VISIBLE : View.GONE);
+      View toggle = _candidates_view.findViewById(R.id.candidates_toolbar_toggle);
+      if (toggle != null)
+        toggle.setVisibility(View.GONE);
     }
-    else
+
+    if (_top_strip_container != null && _quick_toolbar != null && _candidates_view != null)
     {
-      if (_quick_toolbar != null)
-        _quick_toolbar.setVisibility(View.GONE);
-      _candidates_view.setVisibility(can_show_candidates ? View.VISIBLE : View.GONE);
+      boolean sideBySide = toolbar_visible && candidates_visible
+          && (_config.split_layout || _config.wide_screen || _config.orientation_landscape);
+      int barHeight = Math.round(48f * getResources().getDisplayMetrics().density);
+      _top_strip_container.setOrientation(
+          sideBySide ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+
+      LinearLayout.LayoutParams tbLp = new LinearLayout.LayoutParams(
+          sideBySide ? 0 : ViewGroup.LayoutParams.MATCH_PARENT, barHeight);
+      tbLp.weight = sideBySide ? 1f : 0f;
+      _quick_toolbar.setLayoutParams(tbLp);
+
+      LinearLayout.LayoutParams cvLp = new LinearLayout.LayoutParams(
+          sideBySide ? 0 : ViewGroup.LayoutParams.MATCH_PARENT, barHeight);
+      cvLp.weight = sideBySide ? 1f : 0f;
+      _candidates_view.setLayoutParams(cvLp);
     }
   }
 

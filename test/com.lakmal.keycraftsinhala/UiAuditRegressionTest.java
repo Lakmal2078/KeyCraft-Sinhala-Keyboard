@@ -4,11 +4,18 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import com.lakmal.keycraftsinhala.prefs.ColorPickerPreference;
-import com.lakmal.keycraftsinhala.suggestions.Cdict;
+import com.lakmal.keycraftsinhala.suggestions.CandidatesView;
 import com.lakmal.keycraftsinhala.suggestions.Suggestions;
+import juloo.cdict.Cdict;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
@@ -18,8 +25,8 @@ import static org.mockito.Mockito.*;
 
 /**
  * Regression tests for the prioritized UI/UX audit fixes across emoji search,
- * WCAG contrast calculation, suggestion deduplication, key border roles, and
- * keyboard accessibility labels.
+ * WCAG contrast calculation, suggestion deduplication, key border roles,
+ * clipboard image formatting, top-strip/split-mode coexistence, and TalkBack labels.
  */
 public class UiAuditRegressionTest
 {
@@ -127,16 +134,92 @@ public class UiAuditRegressionTest
   }
 
   @Test
-  public void keyboardAccessibilityLabelsAndHitMarginAreConfigured()
+  public void keyboardAccessibilityLabelsCoverPuaKeyeventsSlidersComposeAndJoiners()
   {
     assertTrue(Keyboard2View.TOUCH_MARGIN_TOLERANCE_PX >= 4.0f);
     assertEquals("Backspace",
         Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("backspace")));
     assertEquals("Space",
         Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("space")));
-    assertEquals("Emoji",
+    assertEquals("Open emoji keyboard",
         Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("switch_emoji")));
-    assertEquals("Clipboard",
+    assertEquals("Open clipboard history",
         Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("switch_clipboard")));
+    assertEquals("Enter",
+        Keyboard2View.accessibilityLabelForKeyValue(KeyValue.ENTER));
+    assertEquals("Arrow up",
+        Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("up")));
+    assertEquals("Arrow right",
+        Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("right")));
+    assertEquals("Forward delete",
+        Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("delete")));
+    assertEquals("Tab",
+        Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("tab")));
+    assertEquals("Move cursor left",
+        Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("cursor_left")));
+    assertEquals("Compose",
+        Keyboard2View.accessibilityLabelForKeyValue(KeyValue.COMPOSE));
+    assertEquals("Cancel compose",
+        Keyboard2View.accessibilityLabelForKeyValue(KeyValue.COMPOSE_CANCEL));
+    assertEquals("Zero width joiner",
+        Keyboard2View.accessibilityLabelForKeyValue(KeyValue.getKeyByName("zwj")));
+    assertEquals("Settings",
+        Keyboard2View.accessibilityLabelForKeyValue(KeyValue.CONFIG));
+  }
+
+  @Test
+  public void clipboardMimeSubtypeFormattingAvoidsRawBrackets()
+  {
+    assertEquals("PNG", ClipboardHistoryView.formatMimeSubtype("image/png"));
+    assertEquals("GIF", ClipboardHistoryView.formatMimeSubtype("image/gif"));
+    assertEquals("JPEG", ClipboardHistoryView.formatMimeSubtype("image/jpeg"));
+    assertEquals("SVG", ClipboardHistoryView.formatMimeSubtype("image/svg+xml"));
+    assertEquals("IMG", ClipboardHistoryView.formatMimeSubtype(null));
+  }
+
+  @Test
+  public void topStripKeepsToolbarVisibleWithSuggestionsAndSideBySideInSplitLayout() throws Exception
+  {
+    Keyboard2 keyboard = mock(Keyboard2.class, CALLS_REAL_METHODS);
+    Resources res = mock(Resources.class);
+    DisplayMetrics dm = new DisplayMetrics();
+    dm.density = 2.0f;
+    when(keyboard.getResources()).thenReturn(res);
+    when(res.getDisplayMetrics()).thenReturn(dm);
+
+    Config config = new Config();
+    config.editor_config = new EditorConfig();
+    config.editor_config.should_show_candidates_view = true;
+    config.editor_config.is_sensitive_input = false;
+    config.suggestions_enabled = true;
+    config.sinhala_transliteration = true;
+    config.show_quick_toolbar = true;
+    config.split_layout = true;
+
+    ViewGroup toolbar = mock(ViewGroup.class);
+    CandidatesView candidates = mock(CandidatesView.class);
+    LinearLayout topStrip = mock(LinearLayout.class);
+
+    setField(Keyboard2.class, keyboard, "_config", config);
+    setField(Keyboard2.class, keyboard, "_quick_toolbar", toolbar);
+    setField(Keyboard2.class, keyboard, "_candidates_view", candidates);
+    setField(Keyboard2.class, keyboard, "_top_strip_container", topStrip);
+    setField(Keyboard2.class, keyboard, "_has_active_suggestions", true);
+
+    Method update = Keyboard2.class.getDeclaredMethod("update_top_bar_visibility");
+    update.setAccessible(true);
+    update.invoke(keyboard);
+
+    verify(toolbar).setVisibility(View.VISIBLE);
+    verify(candidates).setVisibility(View.VISIBLE);
+    verify(topStrip).setOrientation(LinearLayout.HORIZONTAL);
+  }
+
+  private static void setField(Class<?> type, Object target, String name, Object value)
+      throws Exception
+  {
+    Field field = type.getDeclaredField(name);
+    field.setAccessible(true);
+    field.set(target, value);
   }
 }
