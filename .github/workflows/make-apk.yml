@@ -109,7 +109,7 @@ jobs:
         run: |
           apk="build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk"
           test -s "$apk"
-          sha256sum "$apk" > "$apk.sha256"
+          (cd "$(dirname "$apk")" && sha256sum "$(basename "$apk")" > "$(basename "$apk").sha256")
           cat "$apk.sha256"
 
       - name: Upload signed release APK and checksum
@@ -147,5 +147,6 @@ jobs:
           files: |
             dist/KeyCraft-Sinhala-Keyboard-release.apk
             dist/KeyCraft-Sinhala-Keyboard-release.apk.sha256
+          body_path: docs/releases/${{ github.ref_name }}.md
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}

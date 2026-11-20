@@ -29,7 +29,7 @@ word-list source and both upstream license notices are retained in
 - Website: <https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/>
 - Source: <https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard>
 - Issue tracker: <https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues>
-- Prepared app version: `1.1.1` (`versionCode` 3)
+- Prepared app version: `1.2.0` (`versionCode` 4)
 
 ## Review notes
 
@@ -45,13 +45,13 @@ word-list source and both upstream license notices are retained in
 - A successful local Gradle build does not guarantee acceptance. Run the
   official `fdroid lint` and `fdroid build` checks and address maintainer review.
 - The first F-Droid metadata build entry must use the full Git commit hash for
-  the release tag, not the tag name. Create/publish `v1.1.1` only after the
+  the release tag, not the tag name. Create/publish `v1.2.0` only after the
   release candidate is approved.
 
 ## Metadata template
 
 Copy the following into `fdroiddata/metadata/com.lakmal.keycraftsinhala.yml`
-after the `v1.1.1` tag is published. A draft is already prepared at
+after the `v1.2.0` tag is published. A draft is already prepared at
 `docs/fdroiddata/com.lakmal.keycraftsinhala.yml`; its `commit` field points to
 the full source commit SHA and must remain a full hash, not a branch or tag name.
 
@@ -64,14 +64,14 @@ WebSite: https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/
 SourceCode: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard
 IssueTracker: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues
 Changelog: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases
-CurrentVersion: 1.1.1
-CurrentVersionCode: 3
+CurrentVersion: 1.2.0
+CurrentVersionCode: 4
 RepoType: git
 Repo: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard.git
 Builds:
-  - versionName: 1.1.1
-    versionCode: 3
-    commit: c3aa8f3d7151982410e3b69a7e28712f2750161f
+  - versionName: 1.2.0
+    versionCode: 4
+    commit: REPLACE_WITH_V1_2_0_COMMIT_SHA
     gradle:
       - yes
 AutoUpdateMode: Version

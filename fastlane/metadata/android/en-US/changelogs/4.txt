@@ -1,0 +1,4 @@
+Improved Sinhala transliteration and grapheme-aware deletion.
+Better keyboard touch targets, accessibility, and performance.
+Fixed keyboard sizing, clipboard layout, emoji pane, and Termux layout issues.
+Updated Sinhala typing, suggestions, and bilingual project documentation.

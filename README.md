@@ -8,13 +8,13 @@ KeyCraft is a free, open-source Sinhala keyboard for Android. Type in Singlish a
 
 KeyCraft යනු සිංහල සහ දෛනික ටයිප් කිරීම පහසු කරවන, Android සඳහා නිර්මාණය කළ අභිරුචිකරණය කළ හැකි Keyboard යෙදුමකි. Singlish → Sinhala පරිවර්තනය, Swipe Typing, විවිධ Keyboard Layouts, Themes සහ Productivity Tools එකම යෙදුමකින් ලබා දෙයි.
 
-[**⬇️ KeyCraft v1.1.1 Download කරන්න**](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.1) · [Source Code](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard) · [Bug එකක් වාර්තා කරන්න](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues)
+[**⬇️ KeyCraft v1.2.0 Download කරන්න**](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0) · [Source Code](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard) · [Bug එකක් වාර්තා කරන්න](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues)
 
 ---
 
 ## 📥 Download සහ Install කිරීම
 
-1. [KeyCraft v1.1.1 Release පිටුවට](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.1.1) යන්න.
+1. [KeyCraft v1.2.0 Release පිටුවට](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0) යන්න.
 2. **KeyCraft-Sinhala-Keyboard-release.apk** ගොනුව Download කරන්න.
 3. Download කළ APK එක විවෘත කර Android ඉල්ලන්නේ නම් එම Source එකෙන් Install කිරීමට අවසර දෙන්න.
 4. KeyCraft විවෘත කර තිරයේ පෙන්වන පියවර අනුගමනය කර Keyboard එක Enable කර Default Keyboard ලෙස තෝරන්න.
@@ -31,6 +31,19 @@ KeyCraft යනු සිංහල සහ දෛනික ටයිප් කි
 - **Productivity Tools** — Quick Calculator, Text Shortcuts සහ Quick-Action Toolbar.
 - **Clipboard Tools** — අවශ්‍ය පරිදි Clipboard History සහ Quick Paste භාවිත කරන්න.
 - **Typing Controls** — Number Row, NumPad, Key Repeat, Auto Capitalization, Vibration ඇතුළු තවත් සැකසුම්.
+
+## 🆕 v1.2.0 නව විශේෂාංග සහ වැඩිදියුණු කිරීම්
+
+- Sinhala transliteration සහ input handling වැඩිදියුණු කිරීම.
+- Sinhala grapheme cluster නිවැරදිව මකා දැමීම සහ typing edge cases නිවැරදි කිරීම.
+- Keyboard touch targets, hit-testing සහ accessibility වැඩිදියුණු කිරීම.
+- Keyboard sizing සහ clipboard pane layout ගැටලු නිවැරදි කිරීම.
+- Contextual toolbar එක ඒකාබද්ධ කර emoji pane ප්‍රමාණය/හැසිරීම වැඩිදියුණු කිරීම.
+- Termux keyboard layout එකේ registration සහ row alignment නිවැරදි කිරීම.
+- Keyboard rendering සහ suggestion handling performance වැඩිදියුණු කිරීම.
+- Bilingual Sinhala/English project website සහ F-Droid metadata යාවත්කාලීන කිරීම.
+
+සම්පූර්ණ විස්තර සඳහා [v1.2.0 Release Notes](docs/releases/v1.2.0.md) බලන්න.
 
 ## 📱 Screenshots
 
