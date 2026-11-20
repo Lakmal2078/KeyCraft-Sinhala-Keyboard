@@ -215,6 +215,19 @@ public class UiAuditRegressionTest
     verify(topStrip).setOrientation(LinearLayout.HORIZONTAL);
   }
 
+  @Test
+  public void vibrantCategoryMapsExpressiveThemes()
+  {
+    String[] vibrantThemes = {
+      "cyberpunk_neon", "sunset_glow", "aurora_flow", "ocean_breeze",
+      "emerald_forest", "midnight_purple", "royal_gold", "rose_quartz", "citrus_pop"
+    };
+    for (String theme : vibrantThemes)
+    {
+      assertEquals(ThemePicker.ThemeCategory.VIBRANT, ThemePicker.categoryOf(theme));
+    }
+  }
+
   private static void setField(Class<?> type, Object target, String name, Object value)
       throws Exception
   {

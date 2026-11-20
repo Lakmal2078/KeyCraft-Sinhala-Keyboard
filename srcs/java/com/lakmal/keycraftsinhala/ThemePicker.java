@@ -81,6 +81,27 @@ final class ThemePicker
       case "tokyo_night":
       case "catppuccin_mocha":
         return ThemeCategory.TERMINAL;
+      case "cyberpunk_neon":
+      case "sunset_glow":
+      case "aurora_flow":
+      case "ocean_breeze":
+      case "emerald_forest":
+      case "midnight_purple":
+      case "royal_gold":
+      case "rose_quartz":
+      case "citrus_pop":
+      case "midnight_ocean":
+      case "quiet_teal":
+      case "arctic_blue":
+      case "soft_lavender":
+      case "berry_noir":
+      case "mint_matcha":
+      case "copper_night":
+      case "cobalt":
+      case "rosepine":
+      case "desert":
+      case "jungle":
+        return ThemeCategory.VIBRANT;
       default:
         return null;
     }
@@ -213,7 +234,8 @@ final class ThemePicker
       ThemeCategory.DARK,
       ThemeCategory.HIGH_CONTRAST,
       ThemeCategory.SRI_LANKA,
-      ThemeCategory.TERMINAL
+      ThemeCategory.TERMINAL,
+      ThemeCategory.VIBRANT
     };
 
     final List<TextView> chipViews = new ArrayList<>();

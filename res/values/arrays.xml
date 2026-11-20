@@ -47,6 +47,15 @@
     <item>@string/pref_theme_e_sinhala_sand</item>
     <item>@string/pref_theme_e_lanka_maroon</item>
     <item>@string/pref_theme_e_high_contrast</item>
+    <item>@string/pref_theme_e_cyberpunk_neon</item>
+    <item>@string/pref_theme_e_sunset_glow</item>
+    <item>@string/pref_theme_e_aurora_flow</item>
+    <item>@string/pref_theme_e_ocean_breeze</item>
+    <item>@string/pref_theme_e_emerald_forest</item>
+    <item>@string/pref_theme_e_midnight_purple</item>
+    <item>@string/pref_theme_e_royal_gold</item>
+    <item>@string/pref_theme_e_rose_quartz</item>
+    <item>@string/pref_theme_e_citrus_pop</item>
   </string-array>
   <string-array name="pref_theme_values">
     <item>system</item>
@@ -67,6 +76,15 @@
     <item>sinhala_sand</item>
     <item>lanka_maroon</item>
     <item>high_contrast</item>
+    <item>cyberpunk_neon</item>
+    <item>sunset_glow</item>
+    <item>aurora_flow</item>
+    <item>ocean_breeze</item>
+    <item>emerald_forest</item>
+    <item>midnight_purple</item>
+    <item>royal_gold</item>
+    <item>rose_quartz</item>
+    <item>citrus_pop</item>
   </string-array>
   <string-array name="pref_keyboard_font_entries">
     <item>@string/pref_font_default</item>
