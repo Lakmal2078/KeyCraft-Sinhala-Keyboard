@@ -2,6 +2,8 @@ package com.lakmal.keycraftsinhala;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewParent;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
@@ -28,5 +30,16 @@ final class ClipboardHistoryCheckBox extends CheckBox
   public void onCheckedChanged(CompoundButton _v, boolean isChecked)
   {
     ClipboardHistoryService.set_history_enabled(isChecked);
+    ViewParent p = getParent();
+    while (p instanceof View)
+    {
+      View hv = ((View)p).findViewById(R.id.clipboard_history_view);
+      if (hv instanceof ClipboardHistoryView)
+      {
+        ((ClipboardHistoryView)hv).refreshEmptyStates();
+        break;
+      }
+      p = p.getParent();
+    }
   }
 }

@@ -4,12 +4,17 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Handler;
 import android.text.InputType;
 import android.text.Layout;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class CustomLayoutEditDialog
 {
@@ -18,10 +23,42 @@ public class CustomLayoutEditDialog
   public static void show(Context ctx, String initial_text,
       boolean allow_remove, final Callback callback)
   {
+    float density = ctx.getResources().getDisplayMetrics().density;
+    int pad = Math.round(12 * density);
+
+    LinearLayout container = new LinearLayout(ctx);
+    container.setOrientation(LinearLayout.VERTICAL);
+
     final LayoutEntryEditText input = new LayoutEntryEditText(ctx);
     input.setText(initial_text);
+    container.addView(input, new LinearLayout.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+
+    final TextView statusBar = new TextView(ctx);
+    statusBar.setPadding(pad, Math.round(8 * density), pad, Math.round(8 * density));
+    statusBar.setTextSize(12);
+    container.addView(statusBar, new LinearLayout.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+    final Runnable updateValidation = () -> {
+      String error = callback.validate(input.getText().toString());
+      if (error == null)
+      {
+        statusBar.setText(R.string.pref_custom_layout_valid);
+        statusBar.setTextColor(0xFF2E7D32);
+        statusBar.setBackgroundColor(0x182E7D32);
+      }
+      else
+      {
+        statusBar.setText(error);
+        statusBar.setTextColor(0xFFC62828);
+        statusBar.setBackgroundColor(0x18C62828);
+      }
+    };
+    updateValidation.run();
+
     AlertDialog.Builder dialog = new AlertDialog.Builder(ctx)
-      .setView(input)
+      .setView(container)
       .setTitle(R.string.pref_custom_layout_title)
       .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener(){
         public void onClick(DialogInterface _dialog, int _which)
@@ -42,8 +79,7 @@ public class CustomLayoutEditDialog
     {
       public void on_change()
       {
-        String error = callback.validate(input.getText().toString());
-        input.setError(error);
+        updateValidation.run();
       }
     });
     dialog.show();
@@ -61,7 +97,7 @@ public class CustomLayoutEditDialog
     public String validate(String text);
   }
 
-  /** An editable text view that shows line numbers. */
+  /** An editable text view that shows 1-based line numbers in monospace font. */
   static class LayoutEntryEditText extends EditText
   {
     /** Used to draw line numbers. */
@@ -83,6 +119,7 @@ public class CustomLayoutEditDialog
     public LayoutEntryEditText(Context ctx)
     {
       super(ctx);
+      setTypeface(Typeface.MONOSPACE);
       _ln_paint = new Paint(getPaint());
       _ln_paint.setTextSize(_ln_paint.getTextSize() * 0.8f);
       setHorizontallyScrolling(true);
@@ -106,7 +143,7 @@ public class CustomLayoutEditDialog
     protected void onDraw(Canvas canvas)
     {
       float digit_width = _ln_paint.measureText("0");
-      int line_count = getLineCount();
+      int line_count = Math.max(1, getLineCount());
       // Extra '+ 1' serves as padding.
       int padding = (int)(((int)Math.log10(line_count) + 1 + 1) * digit_width);
       if (padding != _prev_padding) {
@@ -114,16 +151,18 @@ public class CustomLayoutEditDialog
         _prev_padding = padding;
       }
       super.onDraw(canvas);
-      _ln_paint.setColor(getPaint().getColor());
-      canvas.getClipBounds(_clip_bounds);
       Layout layout = getLayout();
+      if (layout == null)
+        return;
+      _ln_paint.setColor(getPaint().getColor());
+      _ln_paint.setAlpha(160);
+      canvas.getClipBounds(_clip_bounds);
       int offset = (int)(digit_width / 2.f);
-      int line = layout.getLineForVertical(_clip_bounds.top);
-      int skipped = line;
+      int line = Math.max(0, layout.getLineForVertical(_clip_bounds.top));
       while (line < line_count)
       {
         int baseline = getLineBounds(line, null);
-        canvas.drawText(String.valueOf(line), offset, baseline, _ln_paint);
+        canvas.drawText(String.valueOf(line + 1), offset, baseline, _ln_paint);
         line++;
         if (baseline >= _clip_bounds.bottom)
           break;

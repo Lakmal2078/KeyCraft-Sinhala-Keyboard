@@ -30,6 +30,16 @@
     </activity>
 
     <activity android:name="com.lakmal.keycraftsinhala.dict.DictionariesActivity" android:icon="@mipmap/ic_launcher" android:theme="@style/appTheme" android:exported="false" android:directBootAware="true"/>
+
+    <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.fileprovider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+      <meta-data
+          android:name="android.support.FILE_PROVIDER_PATHS"
+          android:resource="@xml/file_paths"/>
+    </provider>
   </application>
 
   <!-- To query enabled input methods for voice IME detection -->

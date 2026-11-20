@@ -174,4 +174,14 @@
   <string-array name="pref_key_shape_values">
     <item>theme</item><item>square</item><item>rounded</item><item>squircle</item><item>pill</item>
   </string-array>
+  <string-array name="pref_one_hand_mode_entries">
+    <item>@string/pref_one_hand_mode_off</item>
+    <item>@string/pref_one_hand_mode_left</item>
+    <item>@string/pref_one_hand_mode_right</item>
+  </string-array>
+  <string-array name="pref_one_hand_mode_values">
+    <item>off</item>
+    <item>left</item>
+    <item>right</item>
+  </string-array>
 </resources>

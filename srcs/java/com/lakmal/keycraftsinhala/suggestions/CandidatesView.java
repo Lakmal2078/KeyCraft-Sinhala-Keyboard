@@ -100,6 +100,13 @@ public class CandidatesView extends LinearLayout
           _item_views[i].setTextColor(textColor);
       }
     }
+    else
+    {
+      TypedValue tv = new TypedValue();
+      if (_item_views[0] != null
+          && getContext().getTheme().resolveAttribute(R.attr.colorLabelActivated, tv, true))
+        _item_views[0].setTextColor(tv.data);
+    }
   }
 
   /** Set the height of the suggestion row and the text size. */
@@ -126,6 +133,11 @@ public class CandidatesView extends LinearLayout
   private void setup_item_view(final int item_index, int item_id)
   {
     TextView v = (TextView)findViewById(item_id);
+    if (item_index == 0)
+    {
+      v.setBackgroundResource(R.drawable.suggestions_pill_background);
+      v.setTypeface(v.getTypeface(), android.graphics.Typeface.BOLD);
+    }
     v.setOnClickListener(new View.OnClickListener()
         {
           @Override

@@ -94,6 +94,10 @@ public class Config
   public boolean smart_snippets_enabled;
   public boolean clipboard_suggestion_enabled;
   public boolean show_quick_toolbar;
+  public String one_hand_mode = "off";
+  public boolean floating_keyboard = false;
+  public int floating_offset_x = 0;
+  public int floating_offset_y = 0;
   public boolean custom_colors_enabled = false;
   public int custom_bg_color = 0xFF1E1E2E;
   public int custom_accent_color = 0xFF3D5AFE;
@@ -248,6 +252,10 @@ public class Config
     smart_snippets_enabled = _prefs.getBoolean("smart_snippets_enabled", true);
     clipboard_suggestion_enabled = _prefs.getBoolean("clipboard_suggestion_enabled", false);
     show_quick_toolbar = _prefs.getBoolean("show_quick_toolbar", true);
+    one_hand_mode = _prefs.getString("one_hand_mode", "off");
+    floating_keyboard = _prefs.getBoolean("floating_keyboard", false);
+    floating_offset_x = _prefs.getInt("floating_offset_x", 0);
+    floating_offset_y = _prefs.getInt("floating_offset_y", 0);
     custom_colors_enabled = _prefs.getBoolean("custom_colors_enabled", false);
     custom_bg_color = _prefs.getInt("custom_bg_color", 0xFF1E1E2E);
     custom_accent_color = _prefs.getInt("custom_accent_color", 0xFF3D5AFE);

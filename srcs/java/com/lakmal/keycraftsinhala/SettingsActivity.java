@@ -26,12 +26,42 @@ public class SettingsActivity extends PreferenceActivity
     addPreferencesFromResource(R.xml.settings);
 
     boolean foldableDevice = FoldStateTracker.isFoldableDevice(this);
-    findPreference("margin_bottom_portrait_unfolded").setEnabled(foldableDevice);
-    findPreference("margin_bottom_landscape_unfolded").setEnabled(foldableDevice);
-    findPreference("horizontal_margin_portrait_unfolded").setEnabled(foldableDevice);
-    findPreference("horizontal_margin_landscape_unfolded").setEnabled(foldableDevice);
-    findPreference("keyboard_height_unfolded").setEnabled(foldableDevice);
-    findPreference("keyboard_height_landscape_unfolded").setEnabled(foldableDevice);
+    String[] foldableKeys = new String[] {
+      "margin_bottom_portrait_unfolded",
+      "margin_bottom_landscape_unfolded",
+      "horizontal_margin_portrait_unfolded",
+      "horizontal_margin_landscape_unfolded",
+      "keyboard_height_unfolded",
+      "keyboard_height_landscape_unfolded"
+    };
+    for (String key : foldableKeys)
+    {
+      Preference p = findPreference(key);
+      if (p != null)
+      {
+        p.setEnabled(foldableDevice);
+        if (!foldableDevice)
+          p.setSummary(R.string.pref_foldable_disabled_summary);
+      }
+    }
+
+    Preference themePref = findPreference("theme");
+    if (themePref != null)
+    {
+      themePref.setOnPreferenceClickListener(preference -> {
+        SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
+        AlertDialog d = ThemePicker.create(new AlertDialog.Builder(this), getResources(), prefs);
+        d.setOnDismissListener(dialog -> {
+          if (preference instanceof android.preference.ListPreference)
+          {
+            String updated = prefs.getString("theme", Config.DEFAULT_THEME);
+            ((android.preference.ListPreference)preference).setValue(updated);
+          }
+        });
+        d.show();
+        return true;
+      });
+    }
 
     Preference resetSettings = findPreference("reset_keyboard_settings");
     if (resetSettings != null)

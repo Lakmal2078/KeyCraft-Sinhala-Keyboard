@@ -78,11 +78,8 @@ public final class Suggestions
       return;
     clear();
     is_prediction = true;
-    count = Math.min(list.size(), MAX_COUNT);
-    for (int i = 0; i < count; i++)
-    {
-      suggestions[i] = list.get(i);
-    }
+    for (int i = 0; i < list.size() && count < MAX_COUNT; i++)
+      addUniqueSuggestion(list.get(i));
     _callback.set_suggestions(this);
   }
 
@@ -126,11 +123,8 @@ public final class Suggestions
       if (!list.isEmpty())
       {
         clear();
-        count = Math.min(list.size(), MAX_COUNT);
-        for (int i = 0; i < count; i++)
-        {
-          suggestions[i] = list.get(i);
-        }
+        for (int i = 0; i < list.size() && count < MAX_COUNT; i++)
+          addUniqueSuggestion(list.get(i));
         // Keep the literal spelling reachable even for ambiguous prefixes.
         if (!containsSuggestion(word))
         {
@@ -155,11 +149,26 @@ public final class Suggestions
     _callback.set_suggestions(this);
   }
 
+  private void addUniqueSuggestion(String candidate)
+  {
+    if (candidate == null || candidate.isEmpty() || count >= MAX_COUNT)
+      return;
+    if (!containsSuggestion(candidate))
+      suggestions[count++] = candidate;
+  }
+
   private boolean containsSuggestion(String word)
   {
-    for (int i = 0; i < count; i++)
+    return containsSuggestion(suggestions, count, word);
+  }
+
+  private static boolean containsSuggestion(String[] arr, int len, String word)
+  {
+    if (word == null)
+      return false;
+    for (int i = 0; i < len; i++)
     {
-      if (word.equals(suggestions[i]))
+      if (word.equals(arr[i]))
         return true;
     }
     return false;
@@ -209,29 +218,41 @@ public final class Suggestions
 
   int query_suggestions(String word)
   {
+    clear();
     Cdict dict = _config.current_dictionary;
     boolean first_char_upper = Character.isUpperCase(word.charAt(0));
     word = apply_substitutions(word);
     Cdict.Result r = dict.find(word);
-    int i = 0;
     if (r.found)
-      suggestions[i++] = dict.word(r.index);
-    int[] suffixes = dict.suffixes(r, MAX_COUNT);
+      addUniqueSuggestion(dict.word(r.index));
+    int[] suffixes = dict.suffixes(r, MAX_COUNT * 2);
     // Disable distance search for small words
-    int[] dist = (word.length() < 3 || i + 1 >= MAX_COUNT) ? NO_RESULTS :
-      dict.distance(word, 1, MAX_COUNT);
-    for (int j = 0; j < MAX_COUNT && i < MAX_COUNT; j++)
+    int[] dist = (word.length() < 3 || count + 1 >= MAX_COUNT) ? NO_RESULTS :
+      dict.distance(word, 1, MAX_COUNT * 2);
+    int limit = Math.max(suffixes.length, dist.length);
+    for (int j = 0; j < limit && count < MAX_COUNT; j++)
     {
       if (suffixes.length > j)
-        suggestions[i++] = dict.word(suffixes[j]);
-      if (dist.length > j && i < MAX_COUNT)
-        suggestions[i++] = dict.word(dist[j]);
+        addUniqueSuggestion(dict.word(suffixes[j]));
+      if (dist.length > j)
+        addUniqueSuggestion(dict.word(dist[j]));
     }
-    if (first_char_upper)
-      capitalize_results(suggestions, i);
+    if (first_char_upper && count > 0)
+    {
+      capitalize_results(suggestions, count);
+      int uniqueCount = 0;
+      for (int i = 0; i < count; i++)
+      {
+        String s = suggestions[i];
+        if (s != null && !containsSuggestion(suggestions, uniqueCount, s))
+          suggestions[uniqueCount++] = s;
+      }
+      for (int i = uniqueCount; i < count; i++)
+        suggestions[i] = null;
+      count = uniqueCount;
+    }
     emoji_suggestion = query_emoji(word); // word with substitutions applied
-    count = i;
-    return i;
+    return count;
   }
 
   static void capitalize_results(String[] s, int count)

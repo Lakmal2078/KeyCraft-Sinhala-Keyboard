@@ -147,6 +147,15 @@ public abstract class ListGroupPreference<E> extends PreferenceGroup
     set_values(_values, true);
   }
 
+  void move_item(int i, int delta)
+  {
+    int target = i + delta;
+    if (i < 0 || i >= _values.size() || target < 0 || target >= _values.size() || i == target)
+      return;
+    java.util.Collections.swap(_values, i, target);
+    set_values(_values, true);
+  }
+
   /** Internal */
 
   @Override
@@ -199,7 +208,7 @@ public abstract class ListGroupPreference<E> extends PreferenceGroup
       _index = index;
       setPersistent(false);
       setTitle(label_of_value(value, index));
-      if (should_allow_remove_item(value))
+      if (should_allow_remove_item(value) || _values.size() > 1)
         setWidgetLayoutResource(R.layout.pref_listgroup_item_widget);
     }
 
@@ -207,8 +216,32 @@ public abstract class ListGroupPreference<E> extends PreferenceGroup
     protected View onCreateView(ViewGroup parent)
     {
       View v = super.onCreateView(parent);
+      View upBtn = v.findViewById(R.id.pref_listgroup_up_btn);
+      if (upBtn != null)
+      {
+        boolean canUp = _values.size() > 1 && _index > 0;
+        upBtn.setFocusable(false);
+        upBtn.setVisibility(_values.size() > 1 ? View.VISIBLE : View.GONE);
+        upBtn.setEnabled(canUp);
+        upBtn.setAlpha(canUp ? 1.0f : 0.3f);
+        upBtn.setOnClickListener(_v -> move_item(_index, -1));
+      }
+      View downBtn = v.findViewById(R.id.pref_listgroup_down_btn);
+      if (downBtn != null)
+      {
+        boolean canDown = _values.size() > 1 && _index < _values.size() - 1;
+        downBtn.setFocusable(false);
+        downBtn.setVisibility(_values.size() > 1 ? View.VISIBLE : View.GONE);
+        downBtn.setEnabled(canDown);
+        downBtn.setAlpha(canDown ? 1.0f : 0.3f);
+        downBtn.setOnClickListener(_v -> move_item(_index, 1));
+      }
       View remove_btn = v.findViewById(R.id.pref_listgroup_remove_btn);
       if (remove_btn != null)
+      {
+        boolean allowRemove = should_allow_remove_item(_value);
+        remove_btn.setFocusable(false);
+        remove_btn.setVisibility(allowRemove ? View.VISIBLE : View.GONE);
         remove_btn.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View _v)
@@ -216,6 +249,7 @@ public abstract class ListGroupPreference<E> extends PreferenceGroup
             remove_item(_index);
           }
         });
+      }
       v.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View _v)

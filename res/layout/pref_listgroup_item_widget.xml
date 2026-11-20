@@ -1,4 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="fill_parent" android:orientation="horizontal">
-  <Button android:id="@+id/pref_listgroup_remove_btn" android:layout_width="@dimen/pref_button_size" android:layout_height="@dimen/pref_button_size" android:layout_gravity="center" android:background="@android:drawable/ic_menu_close_clear_cancel"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+  <ImageButton
+      android:id="@+id/pref_listgroup_up_btn"
+      android:layout_width="@dimen/pref_button_size"
+      android:layout_height="@dimen/pref_button_size"
+      android:background="?android:attr/selectableItemBackgroundBorderless"
+      android:src="@drawable/ic_arrow_up"
+      android:tint="?android:attr/textColorSecondary"
+      android:contentDescription="@string/pref_layouts_move_up"/>
+  <ImageButton
+      android:id="@+id/pref_listgroup_down_btn"
+      android:layout_width="@dimen/pref_button_size"
+      android:layout_height="@dimen/pref_button_size"
+      android:background="?android:attr/selectableItemBackgroundBorderless"
+      android:src="@drawable/ic_arrow_down"
+      android:tint="?android:attr/textColorSecondary"
+      android:contentDescription="@string/pref_layouts_move_down"/>
+  <Button
+      android:id="@+id/pref_listgroup_remove_btn"
+      android:layout_width="@dimen/pref_button_size"
+      android:layout_height="@dimen/pref_button_size"
+      android:layout_gravity="center"
+      android:background="@android:drawable/ic_menu_close_clear_cancel"
+      android:contentDescription="@string/pref_layouts_remove_custom"/>
 </LinearLayout>

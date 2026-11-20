@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content">
-  <TextView android:id="@+id/clipboard_entry_text" style="@style/clipboardEntry"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="52dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="4dp">
+
+  <ImageView
+      android:id="@+id/clipboard_entry_thumb"
+      android:layout_width="40dp"
+      android:layout_height="40dp"
+      android:layout_marginStart="6dp"
+      android:layout_marginEnd="6dp"
+      android:scaleType="centerCrop"
+      android:visibility="gone"
+      android:contentDescription="@string/clipboard_image_thumb_desc"/>
+
+  <TextView
+      android:id="@+id/clipboard_entry_text"
+      style="@style/clipboardEntry"
+      android:maxLines="3"
+      android:ellipsize="end"/>
+
   <LinearLayout style="@style/clipboardEntryButtons">
     <ImageButton android:id="@+id/clipboard_entry_paste" style="@style/clipboardEntryButton" android:src="@drawable/ic_clipboard_paste" android:contentDescription="@string/clipboard_action_paste"/>
     <ImageButton android:id="@+id/clipboard_entry_addpin" style="@style/clipboardEntryButton" android:src="@drawable/ic_clipboard_save" android:contentDescription="@string/clipboard_action_pin"/>
+    <ImageButton android:id="@+id/clipboard_entry_delete" style="@style/clipboardEntryButton" android:src="@drawable/ic_delete" android:contentDescription="@string/clipboard_action_delete"/>
   </LinearLayout>
 </LinearLayout>

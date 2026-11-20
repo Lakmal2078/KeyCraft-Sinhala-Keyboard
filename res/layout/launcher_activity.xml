@@ -1,34 +1,218 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:fitsSystemWindows="true">
-  <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingBottom="24dp">
-    <TextView style="@style/paragraph" android:text="@string/launcher_description" android:textSize="16sp"/>
-    <TextView style="@style/paragraph" android:text="@string/launcher_setup_heading" android:textStyle="bold" android:textSize="20sp"/>
-    <TextView android:id="@+id/launcher_enabled_status" style="@style/paragraph" android:accessibilityLiveRegion="polite" android:text="@string/launcher_status_enabled_initial" android:textSize="16sp"/>
-    <Button style="@style/paragraph" android:minHeight="48dp" android:text="@string/launcher_button_imesettings" android:onClick="launch_imesettings"/>
-    <TextView android:id="@+id/launcher_selected_status" style="@style/paragraph" android:accessibilityLiveRegion="polite" android:text="@string/launcher_status_selected_initial" android:textSize="16sp"/>
-    <Button android:id="@+id/launcher_button_imepicker" style="@style/paragraph" android:minHeight="48dp" android:text="@string/launcher_button_imepicker" android:onClick="launch_imepicker"/>
-    <TextView style="@style/paragraph" android:text="@string/launcher_test_heading" android:textStyle="bold" android:textSize="20sp"/>
-    <TextView android:id="@+id/launcher_typing_status" style="@style/paragraph" android:accessibilityLiveRegion="polite" android:text="@string/launcher_status_typing_initial" android:textSize="16sp"/>
-    <com.lakmal.keycraftsinhala.TypingTestEditText android:id="@+id/launcher_tryhere_area" style="@style/paragraph" android:layout_width="match_parent" android:minHeight="96dp" android:gravity="top|start" android:inputType="textCapSentences|textMultiLine" android:hint="@string/launcher_tryhere_hint" android:importantForAutofill="no" android:saveEnabled="false"/>
-    <TextView android:id="@+id/launcher_tryhere_text" style="@style/paragraph" android:text="@string/launcher_tryhere"/>
-    <Button style="@style/paragraph" android:minHeight="48dp" android:text="@string/launcher_button_clear_test" android:onClick="clear_typing_test"/>
-    <Button style="@style/paragraph" android:minHeight="48dp" android:text="@string/launcher_button_dictionaries" android:onClick="launch_dictionaries_activity"/>
-    <TextView style="@style/paragraph" android:text="@string/launcher_howto_heading" android:textStyle="bold" android:textSize="20sp"/>
-    <LinearLayout style="@style/anim_box">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:paddingStart="16dp"
+      android:paddingEnd="16dp"
+      android:paddingTop="16dp"
+      android:paddingBottom="28dp">
+
+    <!-- Hero Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_card_surface"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/app_name"
+          android:textSize="22sp"
+          android:textStyle="bold"/>
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="4dp"
+          android:text="@string/brand_tagline"
+          android:textSize="14sp"
+          android:alpha="0.8"/>
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="8dp"
+          android:text="@string/launcher_description"
+          android:textSize="14sp"/>
+    </LinearLayout>
+
+    <!-- Step-by-Step Setup Card -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/launcher_setup_heading"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_card_surface"
+        android:padding="14dp"
+        android:layout_marginBottom="12dp">
+      <TextView
+          android:id="@+id/launcher_enabled_status"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:accessibilityLiveRegion="polite"
+          android:text="@string/launcher_status_enabled_initial"
+          android:textSize="15sp"
+          android:textStyle="bold"/>
+      <Button
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:minHeight="48dp"
+          android:layout_marginTop="8dp"
+          android:text="@string/launcher_button_imesettings"
+          android:onClick="launch_imesettings"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_card_surface"
+        android:padding="14dp"
+        android:layout_marginBottom="16dp">
+      <TextView
+          android:id="@+id/launcher_selected_status"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:accessibilityLiveRegion="polite"
+          android:text="@string/launcher_status_selected_initial"
+          android:textSize="15sp"
+          android:textStyle="bold"/>
+      <Button
+          android:id="@+id/launcher_button_imepicker"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:minHeight="48dp"
+          android:layout_marginTop="8dp"
+          android:text="@string/launcher_button_imepicker"
+          android:onClick="launch_imepicker"/>
+    </LinearLayout>
+
+    <!-- Typing Test Card -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/launcher_test_heading"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_card_surface"
+        android:padding="14dp"
+        android:layout_marginBottom="16dp">
+      <TextView
+          android:id="@+id/launcher_typing_status"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:accessibilityLiveRegion="polite"
+          android:text="@string/launcher_status_typing_initial"
+          android:textSize="15sp"
+          android:textStyle="bold"/>
+      <TextView
+          android:id="@+id/launcher_tryhere_text"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="4dp"
+          android:text="@string/launcher_tryhere"
+          android:textSize="13sp"/>
+      <com.lakmal.keycraftsinhala.TypingTestEditText
+          android:id="@+id/launcher_tryhere_area"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:minHeight="96dp"
+          android:layout_marginTop="8dp"
+          android:gravity="top|start"
+          android:inputType="textCapSentences|textMultiLine"
+          android:hint="@string/launcher_tryhere_hint"
+          android:importantForAutofill="no"
+          android:saveEnabled="false"/>
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:layout_marginTop="8dp">
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:text="@string/launcher_button_clear_test"
+            android:onClick="clear_typing_test"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:layout_marginStart="8dp"
+            android:text="@string/launcher_button_theme"
+            android:onClick="launch_theme_picker"/>
+      </LinearLayout>
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:layout_marginTop="6dp">
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:text="@string/launcher_button_dictionaries"
+            android:onClick="launch_dictionaries_activity"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:layout_marginStart="8dp"
+            android:text="@string/launcher_button_settings"
+            android:onClick="launch_settings_activity"/>
+      </LinearLayout>
+    </LinearLayout>
+
+    <!-- How-to Gestures -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/launcher_howto_heading"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout style="@style/anim_box" android:layout_width="match_parent" android:background="@drawable/bg_card_surface" android:padding="12dp">
       <ImageView style="@style/anim" android:id="@+id/launcher_anim_swipe" android:background="@drawable/doc_key_u" android:src="@drawable/doc_anim_swipe" android:contentDescription="@string/launcher_anim_swipe_description"/>
       <TextView style="@style/anim_text" android:text="@string/launcher_anim_7"/>
     </LinearLayout>
-    <LinearLayout style="@style/anim_box">
+
+    <LinearLayout style="@style/anim_box" android:layout_width="match_parent" android:background="@drawable/bg_card_surface" android:padding="12dp">
       <ImageView style="@style/anim" android:id="@+id/launcher_anim_circle" android:background="@drawable/doc_key_g" android:src="@drawable/doc_anim_circle" android:contentDescription="@string/launcher_anim_circle_description"/>
       <TextView style="@style/anim_text" android:text="@string/launcher_anim_g"/>
     </LinearLayout>
-    <LinearLayout style="@style/anim_box">
+
+    <LinearLayout style="@style/anim_box" android:layout_width="match_parent" android:background="@drawable/bg_card_surface" android:padding="12dp">
       <ImageView style="@style/anim" android:id="@+id/launcher_anim_round_trip" android:background="@drawable/doc_key_g" android:src="@drawable/doc_anim_round_trip" android:contentDescription="@string/launcher_anim_round_trip_description"/>
       <TextView style="@style/anim_text" android:text="@string/launcher_anim_dash"/>
     </LinearLayout>
-    <TextView style="@style/paragraph" android:text="@string/launcher_sourcecode"/>
-    <TextView style="@style/paragraph" android:text="@string/launcher_repo_url" android:autoLink="web" android:linksClickable="true"/>
-    <TextView style="@style/paragraph" android:text="@string/launcher_issue_tracker_url" android:autoLink="web" android:linksClickable="true"/>
-    <TextView style="@style/paragraph" android:text="@string/launcher_license_url" android:autoLink="web" android:linksClickable="true"/>
+
+    <TextView style="@style/paragraph" android:layout_marginStart="0dp" android:layout_marginEnd="0dp" android:text="@string/launcher_sourcecode"/>
+    <TextView style="@style/paragraph" android:layout_marginStart="0dp" android:layout_marginEnd="0dp" android:text="@string/launcher_repo_url" android:autoLink="web" android:linksClickable="true"/>
+    <TextView style="@style/paragraph" android:layout_marginStart="0dp" android:layout_marginEnd="0dp" android:text="@string/launcher_issue_tracker_url" android:autoLink="web" android:linksClickable="true"/>
+    <TextView style="@style/paragraph" android:layout_marginStart="0dp" android:layout_marginEnd="0dp" android:text="@string/launcher_license_url" android:autoLink="web" android:linksClickable="true"/>
   </LinearLayout>
 </ScrollView>

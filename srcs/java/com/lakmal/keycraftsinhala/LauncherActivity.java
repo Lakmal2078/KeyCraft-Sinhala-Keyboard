@@ -209,6 +209,18 @@ public class LauncherActivity extends Activity implements Handler.Callback
     startActivity(new Intent(this, DictionariesActivity.class));
   }
 
+  public void launch_theme_picker(View v)
+  {
+    android.content.SharedPreferences prefs =
+        DirectBootAwarePreferences.get_shared_preferences(this);
+    ThemePicker.create(new android.app.AlertDialog.Builder(this), getResources(), prefs).show();
+  }
+
+  public void launch_settings_activity(View v)
+  {
+    startActivity(new Intent(this, SettingsActivity.class));
+  }
+
   Animatable find_anim(int id)
   {
     ImageView img = (ImageView)findViewById(id);

@@ -7,14 +7,20 @@ import android.graphics.Insets;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.inputmethodservice.InputMethodService;
 import android.os.Build.VERSION;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.os.Bundle;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import androidx.customview.widget.ExploreByTouchHelper;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
@@ -65,6 +71,12 @@ public class Keyboard2View extends View
   private float _accessibilityMarginRight = Float.NaN;
   private float _accessibilityMarginBottom = Float.NaN;
   private static final int ACCESSIBILITY_POINTER_ID = 0x7ffffffe;
+  private static final int ACCESSIBILITY_SWIPE_ACTION_BASE = 0x7f0a1000;
+
+  private PopupWindow _previewPopup;
+  private TextView _previewText;
+  private final int[] _windowLocation = new int[2];
+  private final RectF _previewKeyRect = new RectF();
 
   private static RectF _tmpRect = new RectF();
 
@@ -138,6 +150,7 @@ public class Keyboard2View extends View
   {
     _mods = Pointers.Modifiers.EMPTY;
     _pointers.clear();
+    hidePreviewPopup();
     requestLayout();
     invalidate();
   }
@@ -179,6 +192,7 @@ public class Keyboard2View extends View
   {
     updateFlags();
     _config.handler.key_down(k, isSwipe);
+    updatePreviewPopup();
     invalidate();
     vibrate();
     playKeySound();
@@ -198,6 +212,7 @@ public class Keyboard2View extends View
     // flags.
     _config.handler.key_up(k, mods);
     updateFlags();
+    updatePreviewPopup();
     invalidate();
   }
 
@@ -210,6 +225,7 @@ public class Keyboard2View extends View
   public void onPointerFlagsChanged(boolean shouldVibrate)
   {
     updateFlags();
+    updatePreviewPopup();
     invalidate();
     if (shouldVibrate)
       vibrate();
@@ -255,11 +271,17 @@ public class Keyboard2View extends View
 
   private KeyboardData.Row getRowAtPosition(float ty)
   {
-    if (_keyboard == null || _keyboard.rows.isEmpty() || _tc == null
-        || ty < 0 || ty >= getMeasuredHeight())
+    if (_keyboard == null || _keyboard.rows.isEmpty() || _tc == null)
+      return null;
+
+    float maxHeight = getMeasuredHeight();
+    float tolY = Math.max(TOUCH_MARGIN_TOLERANCE_PX, _tc.vertical_margin * 0.75f);
+    if (ty < -tolY || (maxHeight > 0 && ty >= maxHeight + tolY))
       return null;
 
     float y = _tc.margin_top;
+    KeyboardData.Row nearestRow = null;
+    float bestDist = Float.MAX_VALUE;
     for (int i = 0; i < _keyboard.rows.size(); i++)
     {
       KeyboardData.Row row = _keyboard.rows.get(i);
@@ -267,19 +289,26 @@ public class Keyboard2View extends View
       float bottom = top + row.height * _tc.row_height;
       if (ty >= top && ty < bottom)
         return row;
+      float dist = ty < top ? (top - ty) : (ty - bottom);
+      if (dist < bestDist)
+      {
+        bestDist = dist;
+        nearestRow = row;
+      }
       y = bottom;
     }
-    return null;
+    return bestDist <= tolY ? nearestRow : null;
   }
 
-  private KeyboardData.Key getKeyAtPosition(float tx, float ty)
+  KeyboardData.Key getKeyAtPosition(float tx, float ty)
   {
     KeyboardData.Row row = getRowAtPosition(ty);
-    if (row == null || row.keys.isEmpty())
+    if (row == null || row.keys.isEmpty() || _tc == null)
       return null;
+    float tolX = Math.max(TOUCH_MARGIN_TOLERANCE_PX, _tc.horizontal_margin * 0.75f);
     float x = _marginLeft + _tc.margin_left;
-    if (tx < x)
-      return null;
+    KeyboardData.Key nearestKey = null;
+    float bestDist = Float.MAX_VALUE;
     for (int i = 0; i < row.keys.size(); i++)
     {
       KeyboardData.Key key = row.keys.get(i);
@@ -287,11 +316,15 @@ public class Keyboard2View extends View
       float xRight = xLeft + key.width * _keyWidth;
       if (tx >= xLeft && tx < xRight)
         return key;
-      if (tx < xLeft)
-        return null;
+      float dist = tx < xLeft ? (xLeft - tx) : (tx - xRight);
+      if (dist < bestDist)
+      {
+        bestDist = dist;
+        nearestKey = key;
+      }
       x = xRight;
     }
-    return null;
+    return bestDist <= tolX ? nearestKey : null;
   }
 
   private void vibrate()
@@ -441,6 +474,7 @@ public class Keyboard2View extends View
         x += k.shift * _keyWidth;
         float keyW = _keyWidth * k.width - _tc.horizontal_margin;
         boolean isKeyDown = _pointers.isKeyDown(k);
+        int activeSwipeSub = isKeyDown ? _pointers.getActiveSwipeSubIndex(k) : 0;
         Theme.Computed.Key tc_key;
         if (isKeyDown)
           tc_key = _tc.key_activated;
@@ -459,7 +493,7 @@ public class Keyboard2View extends View
         for (int i = 1; i < 9; i++)
         {
           if (k.keys[i] != null)
-            drawSubLabel(canvas, k.keys[i], x, y, keyW, keyH, i, isKeyDown, tc_key);
+            drawSubLabel(canvas, k.keys[i], x, y, keyW, keyH, i, isKeyDown, i == activeSwipeSub, tc_key);
         }
         drawIndication(canvas, k, x, y, keyW, keyH, _tc);
         x += _keyWidth * k.width;
@@ -563,6 +597,36 @@ public class Keyboard2View extends View
     return false;
   }
 
+  boolean performAccessibilityLongClick(int keyIndex)
+  {
+    KeyboardData.Key key = accessibilityKeyAt(keyIndex);
+    if (key == null || key.keys[0] == null)
+      return false;
+    Pointers.Modifiers mods = _mods;
+    KeyValue base = modifyKey(key.keys[0], mods);
+    if (base == null)
+      return false;
+    KeyValue longPress = KeyModifier.modify_long_press(base);
+    KeyValue resolved = (longPress != null && !longPress.equals(base)) ? longPress : base;
+    onPointerDown(resolved, false);
+    onPointerUp(resolved, mods);
+    return true;
+  }
+
+  boolean performAccessibilitySwipe(int keyIndex, int subIndex)
+  {
+    KeyboardData.Key key = accessibilityKeyAt(keyIndex);
+    if (key == null || subIndex <= 0 || subIndex >= key.keys.length || key.keys[subIndex] == null)
+      return false;
+    Pointers.Modifiers mods = _mods;
+    KeyValue value = modifyKey(key.keys[subIndex], mods);
+    if (value == null)
+      return false;
+    onPointerDown(value, true);
+    onPointerUp(value, mods);
+    return true;
+  }
+
   static String accessibilityLabelForKey(KeyboardData.Key key)
   {
     if (key == null)
@@ -581,7 +645,13 @@ public class Keyboard2View extends View
     }
     if (value == null)
       return "Empty key";
+    return accessibilityLabelForKeyValue(value);
+  }
 
+  static String accessibilityLabelForKeyValue(KeyValue value)
+  {
+    if (value == null)
+      return "Empty key";
     switch (value.getKind())
     {
       case Editing:
@@ -654,7 +724,143 @@ public class Keyboard2View extends View
   @Override
   public void onDetachedFromWindow()
   {
+    hidePreviewPopup();
     super.onDetachedFromWindow();
+  }
+
+  @Override
+  protected void onVisibilityChanged(View changedView, int visibility)
+  {
+    super.onVisibilityChanged(changedView, visibility);
+    if (visibility != View.VISIBLE)
+      hidePreviewPopup();
+  }
+
+  private void hidePreviewPopup()
+  {
+    if (_previewPopup != null && _previewPopup.isShowing())
+    {
+      try {
+        _previewPopup.dismiss();
+      } catch (Exception ignored) {}
+    }
+  }
+
+  private boolean shouldShowKeyPreview(KeyValue value)
+  {
+    if (value == null)
+      return false;
+    if (value.getKind() == KeyValue.Kind.Slider)
+      return false;
+    if (value.getKind() == KeyValue.Kind.Editing)
+      return false;
+    if (value.getKind() == KeyValue.Kind.Event || value.getKind() == KeyValue.Kind.Modifier)
+      return false;
+    String s = value.getString();
+    return s != null && !s.trim().isEmpty();
+  }
+
+  private boolean findKeyRect(KeyboardData.Key target, RectF out)
+  {
+    if (_keyboard == null || _tc == null || target == null)
+      return false;
+    float y = _tc.margin_top;
+    for (int rowIndex = 0; rowIndex < _keyboard.rows.size(); rowIndex++)
+    {
+      KeyboardData.Row row = _keyboard.rows.get(rowIndex);
+      y += row.shift * _tc.row_height;
+      float x = _marginLeft + _tc.margin_left;
+      float keyH = row.height * _tc.row_height - _tc.vertical_margin;
+      for (int keyIndex = 0; keyIndex < row.keys.size(); keyIndex++)
+      {
+        KeyboardData.Key k = row.keys.get(keyIndex);
+        x += k.shift * _keyWidth;
+        float keyW = _keyWidth * k.width - _tc.horizontal_margin;
+        if (k == target)
+        {
+          out.set(x, y, x + keyW, y + keyH);
+          return true;
+        }
+        x += _keyWidth * k.width;
+      }
+      y += row.height * _tc.row_height;
+    }
+    return false;
+  }
+
+  private void updatePreviewPopup()
+  {
+    if (!isAttachedToWindow() || getWindowToken() == null || getVisibility() != VISIBLE
+        || _keyboard == null || _tc == null || getWidth() <= 0 || getHeight() <= 0)
+    {
+      hidePreviewPopup();
+      return;
+    }
+    Pointers.ActivePreview preview = _pointers.getActivePreview();
+    if (preview == null || !shouldShowKeyPreview(preview.value)
+        || !findKeyRect(preview.key, _previewKeyRect))
+    {
+      hidePreviewPopup();
+      return;
+    }
+    String label = preview.value.getString();
+    if (label == null || label.isEmpty())
+    {
+      hidePreviewPopup();
+      return;
+    }
+    DisplayMetrics dm = getResources().getDisplayMetrics();
+    int popupW = Math.max((int) (_previewKeyRect.width() * 1.25f), (int) (46 * dm.density));
+    int popupH = Math.max((int) (_previewKeyRect.height() * 1.15f), (int) (54 * dm.density));
+    if (_previewPopup == null)
+    {
+      _previewText = new TextView(getContext());
+      _previewText.setGravity(Gravity.CENTER);
+      _previewText.setSingleLine(true);
+      _previewPopup = new PopupWindow(_previewText, popupW, popupH, false);
+      _previewPopup.setTouchable(false);
+      _previewPopup.setClippingEnabled(false);
+    }
+
+    int bgColor = _config.custom_colors_enabled ? _config.custom_accent_color : _theme.colorKeyActivated;
+    int fgColor = _config.custom_colors_enabled
+        ? Theme.getContrastColor(bgColor)
+        : (_theme.activatedColor != 0 ? _theme.activatedColor : Theme.getContrastColor(bgColor));
+    int borderColor = Theme.blend(bgColor, fgColor, 0.25f);
+
+    GradientDrawable bg = new GradientDrawable();
+    bg.setColor(bgColor);
+    bg.setCornerRadius(Math.max(10f * dm.density, _tc.key.border_radius * 1.2f));
+    bg.setStroke(Math.max(1, (int) (1.5f * dm.density)), borderColor);
+    _previewText.setBackground(bg);
+    if (VERSION.SDK_INT >= 21)
+      _previewText.setElevation(6f * dm.density);
+    _previewText.setTextColor(fgColor);
+    _previewText.setTextSize(TypedValue.COMPLEX_UNIT_PX, Math.max(_mainLabelSize * 1.35f, 22f * dm.density));
+    _previewText.setTypeface(preview.value.hasFlagsAny(KeyValue.FLAG_KEY_FONT)
+        ? Theme.getKeyFont(getContext())
+        : (_config.custom_font != null ? _config.custom_font : Typeface.DEFAULT_BOLD));
+    _previewText.setText(label);
+
+    getLocationInWindow(_windowLocation);
+    int px = (int) (_windowLocation[0] + _previewKeyRect.centerX() - popupW / 2f);
+    int py = (int) (_windowLocation[1] + _previewKeyRect.top - popupH - 6 * dm.density);
+    px = Math.max(4, Math.min(px, dm.widthPixels - popupW - 4));
+    if (py < 4)
+      py = (int) (_windowLocation[1] + _previewKeyRect.top);
+
+    try {
+      if (_previewPopup.isShowing())
+        _previewPopup.update(px, py, popupW, popupH);
+      else
+      {
+        _previewPopup.setWidth(popupW);
+        _previewPopup.setHeight(popupH);
+        _previewPopup.showAtLocation(this, Gravity.NO_GRAVITY, px, py);
+      }
+    } catch (Exception ignored) {
+      hidePreviewPopup();
+    }
   }
 
   /** Draw borders and background of the key. */
@@ -668,7 +874,22 @@ public class Keyboard2View extends View
     canvas.drawRoundRect(_tmpRect, r, r, tc.bg_paint);
     if (w > 0.f && tc.border_left_paint != null)
     {
-      canvas.drawRoundRect(_tmpRect, r, r, tc.border_left_paint);
+      if (!tc.has_distinct_borders)
+      {
+        canvas.drawRoundRect(_tmpRect, r, r, tc.border_left_paint);
+      }
+      else
+      {
+        float inset = w + r * 0.5f;
+        drawBorder(canvas, _tmpRect.left - w, _tmpRect.top,
+            _tmpRect.left + inset, _tmpRect.bottom, tc.border_left_paint, tc);
+        drawBorder(canvas, _tmpRect.left, _tmpRect.top - w,
+            _tmpRect.right, _tmpRect.top + inset, tc.border_top_paint, tc);
+        drawBorder(canvas, _tmpRect.right - inset, _tmpRect.top,
+            _tmpRect.right + w, _tmpRect.bottom, tc.border_right_paint, tc);
+        drawBorder(canvas, _tmpRect.left, _tmpRect.bottom - inset,
+            _tmpRect.right, _tmpRect.bottom + w, tc.border_bottom_paint, tc);
+      }
     }
   }
 
@@ -759,7 +980,7 @@ public class Keyboard2View extends View
 
   private void drawSubLabel(Canvas canvas, KeyValue kv, float x, float y,
       float keyW, float keyH, int sub_index, boolean isKeyDown,
-      Theme.Computed.Key tc)
+      boolean isActiveSwipeCorner, Theme.Computed.Key tc)
   {
     Paint.Align a = LABEL_POSITION_H[sub_index];
     Vertical v = LABEL_POSITION_V[sub_index];
@@ -770,7 +991,15 @@ public class Keyboard2View extends View
     if (label == null || label.isEmpty())
       return;
     float textSize = scaleTextSize(kv, false);
-    Paint p = tc.sublabel_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), labelColor(kv, isKeyDown, true, tc), textSize, a);
+    if (isActiveSwipeCorner)
+      textSize *= 1.18f;
+    int color = isActiveSwipeCorner
+        ? (_config.custom_colors_enabled ? Theme.getContrastColor(_config.custom_accent_color) : _theme.activatedColor)
+        : labelColor(kv, isKeyDown, true, tc);
+    Paint p = tc.sublabel_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), color, textSize, a);
+    boolean prevBold = p.isFakeBoldText();
+    if (isActiveSwipeCorner)
+      p.setFakeBoldText(true);
     float subPadding = _config.keyPadding;
     if (v == Vertical.CENTER)
       y += (keyH - p.ascent() - p.descent()) / 2f;
@@ -790,10 +1019,15 @@ public class Keyboard2View extends View
     float maxSubW = keyW * 0.46f;
     if (textW > maxSubW && maxSubW > 0)
     {
-      textSize = Math.max(6f, textSize * (maxSubW / textW));
-      p = tc.sublabel_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), labelColor(kv, isKeyDown, true, tc), textSize, a);
+      float minSubPx = Math.max(9f * getResources().getDisplayMetrics().density, 10f);
+      textSize = Math.max(minSubPx, textSize * (maxSubW / textW));
+      p = tc.sublabel_paint(kv.hasFlagsAny(KeyValue.FLAG_KEY_FONT), color, textSize, a);
+      if (isActiveSwipeCorner)
+        p.setFakeBoldText(true);
     }
     canvas.drawText(label, 0, label_len, x, y, p);
+    if (isActiveSwipeCorner)
+      p.setFakeBoldText(prevBold);
   }
 
   private void drawIndication(Canvas canvas, KeyboardData.Key k, float x,
@@ -859,11 +1093,46 @@ public class Keyboard2View extends View
       node.setContentDescription(Keyboard2View.accessibilityLabelForKey(key));
       node.setClickable(true);
       node.setFocusable(true);
-      node.setEnabled(key != null
-          && !"Empty key".equals(Keyboard2View.accessibilityLabelForKey(key)));
-      if (key != null
-          && !"Empty key".equals(Keyboard2View.accessibilityLabelForKey(key)))
+      boolean enabled = key != null
+          && !"Empty key".equals(Keyboard2View.accessibilityLabelForKey(key));
+      node.setEnabled(enabled);
+      if (enabled)
+      {
         node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
+        if (key.keys[0] != null)
+        {
+          node.setLongClickable(true);
+          node.addAction(AccessibilityNodeInfoCompat.ACTION_LONG_CLICK);
+        }
+        Context ctx = _host.getContext();
+        for (int sub = 1; sub <= 8; sub++)
+        {
+          if (key.keys[sub] != null)
+          {
+            String subLabel = Keyboard2View.accessibilityLabelForKeyValue(key.keys[sub]);
+            String dirLabel = getDirectionLabel(ctx, sub);
+            String actionLabel = ctx.getString(R.string.a11y_swipe_action_fmt, dirLabel, subLabel);
+            node.addAction(new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+                ACCESSIBILITY_SWIPE_ACTION_BASE + sub, actionLabel));
+          }
+        }
+      }
+    }
+
+    private String getDirectionLabel(Context ctx, int subIndex)
+    {
+      switch (subIndex)
+      {
+        case 1: return ctx.getString(R.string.a11y_swipe_dir_nw);
+        case 2: return ctx.getString(R.string.a11y_swipe_dir_ne);
+        case 3: return ctx.getString(R.string.a11y_swipe_dir_sw);
+        case 4: return ctx.getString(R.string.a11y_swipe_dir_se);
+        case 5: return ctx.getString(R.string.a11y_swipe_dir_w);
+        case 6: return ctx.getString(R.string.a11y_swipe_dir_e);
+        case 7: return ctx.getString(R.string.a11y_swipe_dir_n);
+        case 8: return ctx.getString(R.string.a11y_swipe_dir_s);
+        default: return "";
+      }
     }
 
     @Override
@@ -875,6 +1144,22 @@ public class Keyboard2View extends View
       {
         sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED);
         return true;
+      }
+      if (action == AccessibilityNodeInfoCompat.ACTION_LONG_CLICK
+          && _host.performAccessibilityLongClick(virtualViewId))
+      {
+        sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_LONG_CLICKED);
+        return true;
+      }
+      if (action > ACCESSIBILITY_SWIPE_ACTION_BASE
+          && action <= ACCESSIBILITY_SWIPE_ACTION_BASE + 8)
+      {
+        int subIndex = action - ACCESSIBILITY_SWIPE_ACTION_BASE;
+        if (_host.performAccessibilitySwipe(virtualViewId, subIndex))
+        {
+          sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED);
+          return true;
+        }
       }
       return false;
     }

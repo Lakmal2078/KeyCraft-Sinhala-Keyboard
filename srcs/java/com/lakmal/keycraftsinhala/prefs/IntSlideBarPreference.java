@@ -37,10 +37,14 @@ public class IntSlideBarPreference extends DialogPreference
   {
     super(context, attrs);
     _initialSummary = getSummary().toString();
+    float density = context.getResources().getDisplayMetrics().density;
+    int hPad = Math.round(20 * density);
+    int vPad = Math.round(14 * density);
     _textView = new TextView(context);
-    _textView.setPadding(48, 40, 48, 40);
+    _textView.setPadding(hPad, vPad, hPad, Math.round(8 * density));
     _seekBar = new SeekBar(context);
     _seekBar.setOnSeekBarChangeListener(this);
+    _seekBar.setPadding(hPad, Math.round(8 * density), hPad, vPad);
     _min = attrs.getAttributeIntValue(null, "min", 0);
     int max = attrs.getAttributeIntValue(null, "max", 0);
     _seekBar.setMax(max - _min);

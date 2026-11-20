@@ -290,6 +290,7 @@ final class ThemePicker
     Switch borderSwitch = new Switch(context);
     borderSwitch.setText(getStringSafe(context, R.string.pref_theme_key_borders, "Key borders"));
     borderSwitch.setTextSize(15);
+    borderSwitch.setMinHeight(dp(context, 48));
     borderSwitch.setChecked(borders[0]);
     borderSwitch.setPadding(dp(context, 4), dp(context, 8), dp(context, 4), dp(context, 8));
     borderSwitch.setOnCheckedChangeListener((button, checked) -> {
@@ -344,6 +345,11 @@ final class ThemePicker
       int keyColor = colors[1];
       int textColor = colors[2];
       int activeColor = colors[3];
+      int actionKeyColor = colors[4];
+      int spaceKeyColor = colors[5];
+      boolean hasGradient = colors[6] != 0;
+      int gradStart = colors[7];
+      int gradEnd = colors[8];
 
       LinearLayout card = new LinearLayout(context);
       card.setOrientation(LinearLayout.VERTICAL);
@@ -412,12 +418,22 @@ final class ThemePicker
       LinearLayout keyboard = new LinearLayout(context);
       keyboard.setOrientation(LinearLayout.VERTICAL);
       keyboard.setPadding(dp(context, 5), dp(context, 6), dp(context, 5), dp(context, 6));
-      keyboard.setBackground(rounded(keyboardColor, dp(context, 8)));
+      if (hasGradient)
+      {
+        GradientDrawable gradBg = new GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM, new int[] { gradStart, gradEnd });
+        gradBg.setCornerRadius(dp(context, 8));
+        keyboard.setBackground(gradBg);
+      }
+      else
+      {
+        keyboard.setBackground(rounded(keyboardColor, dp(context, 8)));
+      }
       String[][] rows = {
         { "q", "w", "e", "r", "t", "y", "u", "i", "o", "p" },
         { "a", "s", "d", "f", "g", "h", "j", "k", "l" },
         { "⇧", "z", "x", "c", "v", "b", "n", "m", "⌫" },
-        { "?123", ",", "☻", "English", ".", "↵" }
+        { "?123", ",", "☻", "සිං / EN", ".", "↵" }
       };
 
       CardHolder holder = new CardHolder(value, entryName, cat, card, cardBg, title, star, check);
@@ -430,15 +446,22 @@ final class ThemePicker
         rowLp.bottomMargin = dp(context, 3);
         for (int ki = 0; ki < rows[ri].length; ki++)
         {
-          boolean special = (ri == 2 && (ki == 0 || ki == rows[ri].length - 1)) ||
-              (ri == 3 && (ki == 0 || ki == rows[ri].length - 1));
+          boolean isEnter = (ri == 3 && ki == rows[ri].length - 1);
+          boolean isAction = (ri == 2 && (ki == 0 || ki == rows[ri].length - 1)) || (ri == 3 && ki == 0);
+          boolean isSpace = (ri == 3 && ki == 3);
+          int capColor = isEnter ? activeColor
+              : isAction ? actionKeyColor
+              : isSpace ? spaceKeyColor
+              : keyColor;
+          int capTextColor = isEnter ? Theme.getContrastColor(activeColor) : textColor;
+
           TextView cap = new TextView(context);
           cap.setText(rows[ri][ki]);
-          cap.setTextSize(ri == 3 && ki == 3 ? 9 : 11);
+          cap.setTextSize(isSpace ? 9 : 11);
           cap.setSingleLine(true);
           cap.setGravity(Gravity.CENTER);
-          cap.setTextColor(special ? Theme.getContrastColor(activeColor) : textColor);
-          GradientDrawable keyBg = rounded(special ? activeColor : keyColor, dp(context, 4));
+          cap.setTextColor(capTextColor);
+          GradientDrawable keyBg = rounded(capColor, dp(context, 4));
           if (borders)
           {
             keyBg.setStroke(dp(context, 1), 0x66808080);
@@ -446,7 +469,8 @@ final class ThemePicker
           cap.setBackground(keyBg);
           holder.keyBackgrounds.add(keyBg);
           cap.setPadding(dp(context, 1), 0, dp(context, 1), 0);
-          LinearLayout.LayoutParams keyLp = new LinearLayout.LayoutParams(0, dp(context, ri == 3 ? 25 : 27), 1);
+          float weight = isSpace ? 3.2f : (isEnter || isAction ? 1.3f : 1.0f);
+          LinearLayout.LayoutParams keyLp = new LinearLayout.LayoutParams(0, dp(context, ri == 3 ? 25 : 27), weight);
           keyLp.setMargins(dp(context, 1), 0, dp(context, 1), 0);
           row.addView(cap, keyLp);
         }
@@ -610,15 +634,32 @@ final class ThemePicker
     int keyColor = 0xFF444444;
     int textColor = Color.WHITE;
     int activeColor = keyColor;
+    int actionColor = keyColor;
+    int spaceColor = keyColor;
+    int hasGradient = 0;
+    int gradStart = keyboardColor;
+    int gradEnd = keyboardColor;
     if (colors != null)
     {
       keyboardColor = colors.getColor(R.styleable.keyboard_colorKeyboard, 0xFF202020);
       keyColor = colors.getColor(R.styleable.keyboard_colorKey, 0xFF444444);
       textColor = colors.getColor(R.styleable.keyboard_colorLabel, Color.WHITE);
       activeColor = colors.getColor(R.styleable.keyboard_colorKeyActivated, keyColor);
+      actionColor = colors.getColor(R.styleable.keyboard_colorKeyAction, keyColor);
+      spaceColor = colors.getColor(R.styleable.keyboard_colorKeySpaceBar, keyColor);
+      if (colors.hasValue(R.styleable.keyboard_keyboardGradientStart)
+          && colors.hasValue(R.styleable.keyboard_keyboardGradientEnd))
+      {
+        hasGradient = 1;
+        gradStart = colors.getColor(R.styleable.keyboard_keyboardGradientStart, keyboardColor);
+        gradEnd = colors.getColor(R.styleable.keyboard_keyboardGradientEnd, keyboardColor);
+      }
       colors.recycle();
     }
-    return new int[] { keyboardColor, keyColor, textColor, activeColor };
+    return new int[] {
+      keyboardColor, keyColor, textColor, activeColor, actionColor, spaceColor,
+      hasGradient, gradStart, gradEnd
+    };
   }
 
   private static int dp(Context context, float value)

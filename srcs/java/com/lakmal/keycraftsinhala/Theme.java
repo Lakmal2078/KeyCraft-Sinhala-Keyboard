@@ -247,6 +247,7 @@ public class Theme
       public final Paint border_top_paint;
       public final Paint border_right_paint;
       public final Paint border_bottom_paint;
+      public final boolean has_distinct_borders;
       public final float border_width;
       public final float border_radius;
       final Paint _label_paint;
@@ -274,12 +275,14 @@ public class Theme
             case Action:
               int actionColor = config.custom_colors_enabled ? config.custom_accent_color : theme.colorKeyAction;
               bg_paint.setColor(actionColor);
-              border_width = theme.keyBorderWidthAction;
+              border_width = (config.borderConfig && config.customBorderLineWidth > 0)
+                  ? config.customBorderLineWidth : theme.keyBorderWidthAction;
               break;
             case Space_bar:
               int spaceColor = config.custom_colors_enabled ? computeKeyColor(config.custom_bg_color, theme.colorKeySpaceBar) : theme.colorKeySpaceBar;
               bg_paint.setColor(spaceColor);
-              border_width = theme.keyBorderWidthSpaceBar;
+              border_width = (config.borderConfig && config.customBorderLineWidth > 0)
+                  ? config.customBorderLineWidth : theme.keyBorderWidthSpaceBar;
               break;
             case Suggestion:
               bg_paint.setColor(0);
@@ -294,31 +297,36 @@ public class Theme
           }
           bg_paint.setAlpha(config.keyOpacity);
         }
-        int bColor;
-        if (config.custom_colors_enabled)
-        {
-          int bg = config.custom_bg_color;
-          boolean isDark = ((0.299 * ((bg >> 16) & 0xFF) + 0.587 * ((bg >> 8) & 0xFF) + 0.114 * (bg & 0xFF)) / 255.0) < 0.5;
-          bColor = blend(config.custom_bg_color, isDark ? 0xFFFFFFFF : 0xFF000000, 0.18f);
-        }
-        else
-        {
-          bColor = theme.keyBorderColorLeft;
-          if (bColor == 0 || (bColor & 0xFF000000) == 0)
-          {
-            boolean isDark = getContrastColor(theme.colorKey) == 0xFFFFFFFF;
-            bColor = isDark ? 0x33FFFFFF : 0x22000000;
-          }
-        }
-        border_left_paint = init_border_paint(config, border_width, bColor);
-        border_top_paint = init_border_paint(config, border_width, bColor);
-        border_right_paint = init_border_paint(config, border_width, bColor);
-        border_bottom_paint = init_border_paint(config, border_width, bColor);
+        int bLeft = resolveBorderEdgeColor(theme, config, theme.keyBorderColorLeft);
+        int bTop = resolveBorderEdgeColor(theme, config, theme.keyBorderColorTop);
+        int bRight = resolveBorderEdgeColor(theme, config, theme.keyBorderColorRight);
+        int bBottom = resolveBorderEdgeColor(theme, config, theme.keyBorderColorBottom);
+        has_distinct_borders = (bLeft != bTop || bTop != bRight || bRight != bBottom);
+        border_left_paint = init_border_paint(config, border_width, bLeft);
+        border_top_paint = init_border_paint(config, border_width, bTop);
+        border_right_paint = init_border_paint(config, border_width, bRight);
+        border_bottom_paint = init_border_paint(config, border_width, bBottom);
         _label_paint = init_label_paint(config, null);
         _special_label_paint = init_label_paint(config, _key_font);
         _sublabel_paint = init_label_paint(config, null);
         _special_sublabel_paint = init_label_paint(config, _key_font);
         _label_alpha_bits = (config.labelBrightness & 0xFF) << 24;
+      }
+
+      static int resolveBorderEdgeColor(Theme theme, Config config, int edgeColor)
+      {
+        if (config.custom_colors_enabled)
+        {
+          int bg = config.custom_bg_color;
+          boolean isDark = ((0.299 * ((bg >> 16) & 0xFF) + 0.587 * ((bg >> 8) & 0xFF) + 0.114 * (bg & 0xFF)) / 255.0) < 0.5;
+          return blend(config.custom_bg_color, isDark ? 0xFFFFFFFF : 0xFF000000, 0.18f);
+        }
+        if (edgeColor == 0 || (edgeColor & 0xFF000000) == 0)
+        {
+          boolean isDark = getContrastColor(theme.colorKey) == 0xFFFFFFFF;
+          return isDark ? 0x33FFFFFF : 0x22000000;
+        }
+        return edgeColor;
       }
 
       public Paint label_paint(boolean special_font, int color, float text_size)

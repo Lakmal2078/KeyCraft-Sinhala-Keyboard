@@ -2,9 +2,9 @@ package com.lakmal.keycraftsinhala.prefs;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.preference.DialogPreference;
 import android.text.Editable;
@@ -24,6 +24,7 @@ import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import com.lakmal.keycraftsinhala.R;
+import com.lakmal.keycraftsinhala.Theme;
 
 public class ColorPickerPreference extends DialogPreference
     implements SeekBar.OnSeekBarChangeListener
@@ -32,7 +33,9 @@ public class ColorPickerPreference extends DialogPreference
   private int _selectedColor;
   private int _defaultColor = 0xFF1E1E2E;
 
-  private View _previewSwatch;
+  private LinearLayout _previewBanner;
+  private TextView _previewSample;
+  private TextView _contrastReadout;
   private EditText _hexInput;
   private SeekBar _seekR;
   private SeekBar _seekG;
@@ -88,6 +91,29 @@ public class ColorPickerPreference extends DialogPreference
     }
     _currentColor = _defaultColor;
     _selectedColor = _defaultColor;
+  }
+
+  /** Compute WCAG 2.1 contrast ratio between two opaque colors (1.0 .. 21.0). */
+  public static double calculateContrastRatio(int colorA, int colorB)
+  {
+    double l1 = relativeLuminance(colorA);
+    double l2 = relativeLuminance(colorB);
+    double lighter = Math.max(l1, l2);
+    double darker = Math.min(l1, l2);
+    return (lighter + 0.05) / (darker + 0.05);
+  }
+
+  private static double relativeLuminance(int color)
+  {
+    double r = linearizeChannel(Color.red(color) / 255.0);
+    double g = linearizeChannel(Color.green(color) / 255.0);
+    double b = linearizeChannel(Color.blue(color) / 255.0);
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+
+  private static double linearizeChannel(double c)
+  {
+    return (c <= 0.03928) ? (c / 12.92) : Math.pow((c + 0.055) / 1.055, 2.4);
   }
 
   @Override
@@ -159,14 +185,31 @@ public class ColorPickerPreference extends DialogPreference
     root.setOrientation(LinearLayout.VERTICAL);
     root.setPadding(dp16, dp16, dp16, dp16);
 
-    // 1. Color Preview Swatch
-    _previewSwatch = new View(ctx);
+    // 1. Live Keycap Preview & Contrast Ratio Readout
+    _previewBanner = new LinearLayout(ctx);
+    _previewBanner.setOrientation(LinearLayout.HORIZONTAL);
+    _previewBanner.setGravity(Gravity.CENTER_VERTICAL);
+    _previewBanner.setPadding(dp16, dp8, dp16, dp8);
     LinearLayout.LayoutParams swatchParams = new LinearLayout.LayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(ctx, 50));
+        ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(ctx, 64));
     swatchParams.bottomMargin = dp16;
-    _previewSwatch.setLayoutParams(swatchParams);
+    _previewBanner.setLayoutParams(swatchParams);
+
+    _previewSample = new TextView(ctx);
+    _previewSample.setText(R.string.pref_color_preview_sample);
+    _previewSample.setTextSize(18);
+    _previewSample.setTypeface(Typeface.DEFAULT_BOLD);
+    _previewBanner.addView(_previewSample, new LinearLayout.LayoutParams(
+        0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+
+    _contrastReadout = new TextView(ctx);
+    _contrastReadout.setTextSize(12);
+    _contrastReadout.setGravity(Gravity.END);
+    _previewBanner.addView(_contrastReadout, new LinearLayout.LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
     updatePreviewSwatch(_selectedColor);
-    root.addView(_previewSwatch);
+    root.addView(_previewBanner);
 
     // 2. Hex input row
     LinearLayout hexRow = new LinearLayout(ctx);
@@ -176,13 +219,14 @@ public class ColorPickerPreference extends DialogPreference
         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
     TextView hexLabel = new TextView(ctx);
-    hexLabel.setText("HEX: ");
+    hexLabel.setText(R.string.pref_color_hex_label);
     hexLabel.setTextSize(16);
     hexLabel.setPadding(0, 0, dp8, 0);
     hexRow.addView(hexLabel);
 
     _hexInput = new EditText(ctx);
     _hexInput.setSingleLine(true);
+    _hexInput.setMinHeight(dpToPx(ctx, 48));
     _hexInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
     _hexInput.setFilters(new InputFilter[] { new InputFilter.LengthFilter(7) });
     _hexInput.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -216,15 +260,16 @@ public class ColorPickerPreference extends DialogPreference
     hexRow.addView(_hexInput);
 
     Button btnReset = new Button(ctx, null, android.R.attr.borderlessButtonStyle);
-    btnReset.setText("Reset");
+    btnReset.setText(R.string.pref_color_reset);
+    btnReset.setMinHeight(dpToPx(ctx, 48));
     btnReset.setOnClickListener(v -> setColorInternal(_defaultColor, true));
     hexRow.addView(btnReset);
 
     root.addView(hexRow);
 
-    // 3. Quick Presets
+    // 3. Quick Presets (48dp touch targets with accessible labels)
     TextView presetsTitle = new TextView(ctx);
-    presetsTitle.setText("Presets");
+    presetsTitle.setText(R.string.pref_color_presets);
     presetsTitle.setTextSize(14);
     presetsTitle.setPadding(0, dp8, 0, dp8);
     root.addView(presetsTitle);
@@ -233,18 +278,27 @@ public class ColorPickerPreference extends DialogPreference
     presetScroll.setHorizontalScrollBarEnabled(false);
     LinearLayout presetContainer = new LinearLayout(ctx);
     presetContainer.setOrientation(LinearLayout.HORIZONTAL);
-    int swatchSize = dpToPx(ctx, 36);
-    int swatchMargin = dpToPx(ctx, 4);
+    int targetSize = dpToPx(ctx, 48);
+    int circlePadding = dpToPx(ctx, 4);
 
     for (int preset : PRESETS)
     {
+      LinearLayout touchTarget = new LinearLayout(ctx);
+      touchTarget.setGravity(Gravity.CENTER);
+      touchTarget.setPadding(circlePadding, circlePadding, circlePadding, circlePadding);
+      touchTarget.setMinimumWidth(targetSize);
+      touchTarget.setMinimumHeight(targetSize);
+      touchTarget.setClickable(true);
+      touchTarget.setFocusable(true);
+      touchTarget.setContentDescription(ctx.getString(
+          R.string.pref_color_preset_desc, String.format("#%06X", (0xFFFFFF & preset))));
+
       View pView = new View(ctx);
-      LinearLayout.LayoutParams pParams = new LinearLayout.LayoutParams(swatchSize, swatchSize);
-      pParams.setMargins(swatchMargin, swatchMargin, swatchMargin, swatchMargin);
-      pView.setLayoutParams(pParams);
       pView.setBackground(createColorCircleDrawable(preset));
-      pView.setOnClickListener(v -> setColorInternal(preset, true));
-      presetContainer.addView(pView);
+      touchTarget.addView(pView, new LinearLayout.LayoutParams(
+          dpToPx(ctx, 38), dpToPx(ctx, 38)));
+      touchTarget.setOnClickListener(v -> setColorInternal(preset, true));
+      presetContainer.addView(touchTarget, new LinearLayout.LayoutParams(targetSize, targetSize));
     }
     presetScroll.addView(presetContainer);
     root.addView(presetScroll);
@@ -310,24 +364,37 @@ public class ColorPickerPreference extends DialogPreference
 
   private void updatePreviewSwatch(int color)
   {
-    if (_previewSwatch != null)
+    Context ctx = getContext();
+    if (_previewBanner != null)
     {
       GradientDrawable gd = new GradientDrawable();
-      gd.setCornerRadius(dpToPx(getContext(), 8));
+      gd.setCornerRadius(dpToPx(ctx, 10));
       gd.setColor(color);
-      gd.setStroke(dpToPx(getContext(), 2), 0x55888888);
-      _previewSwatch.setBackground(gd);
+      gd.setStroke(dpToPx(ctx, 2), 0x55888888);
+      _previewBanner.setBackground(gd);
+    }
+    int fgColor = Theme.getContrastColor(color);
+    if (_previewSample != null)
+      _previewSample.setTextColor(fgColor);
+    if (_contrastReadout != null)
+    {
+      double ratio = calculateContrastRatio(fgColor, color);
+      String grade = ctx.getString(ratio >= 4.5
+          ? R.string.pref_color_contrast_pass : R.string.pref_color_contrast_low);
+      _contrastReadout.setText(ctx.getString(R.string.pref_color_contrast_fmt, ratio, grade));
+      _contrastReadout.setTextColor(fgColor);
     }
   }
 
   private void updateRgbLabels()
   {
+    Context ctx = getContext();
     if (_textR != null && _seekR != null)
-      _textR.setText("Red: " + _seekR.getProgress());
+      _textR.setText(ctx.getString(R.string.pref_color_red_fmt, _seekR.getProgress()));
     if (_textG != null && _seekG != null)
-      _textG.setText("Green: " + _seekG.getProgress());
+      _textG.setText(ctx.getString(R.string.pref_color_green_fmt, _seekG.getProgress()));
     if (_textB != null && _seekB != null)
-      _textB.setText("Blue: " + _seekB.getProgress());
+      _textB.setText(ctx.getString(R.string.pref_color_blue_fmt, _seekB.getProgress()));
   }
 
   @Override

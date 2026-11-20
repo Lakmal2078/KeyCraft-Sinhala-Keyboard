@@ -1,19 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:background="?attr/colorKeyboard">
-  <LinearLayout android:id="@+id/quick_toolbar" style="@style/quick_toolbar">
-    <ImageButton android:id="@+id/toolbar_btn_apps" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_grid" android:contentDescription="@string/quick_toolbar_apps_desc"/>
-    <ImageButton android:id="@+id/toolbar_btn_keyboard" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_keyboard" android:contentDescription="@string/quick_toolbar_keyboard_desc"/>
-    <ImageButton android:id="@+id/toolbar_btn_translate" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_translate" android:contentDescription="@string/quick_toolbar_translate_desc"/>
-    <ImageButton android:id="@+id/toolbar_btn_settings" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_settings" android:contentDescription="@string/quick_toolbar_settings_desc"/>
-    <ImageButton android:id="@+id/toolbar_btn_clipboard" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_clipboard" android:contentDescription="@string/quick_toolbar_clipboard_desc"/>
-    <ImageButton android:id="@+id/toolbar_btn_theme" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_palette" android:contentDescription="@string/quick_toolbar_theme_desc"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/keyboard_root_frame"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
+
+  <LinearLayout
+      android:id="@+id/keyboard_window_container"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:background="?attr/colorKeyboard">
+
+    <!-- Floating Mode Drag Handle (visible only when floating_keyboard=true) -->
+    <LinearLayout
+        android:id="@+id/keyboard_floating_handle"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp"
+        android:background="?attr/colorKey"
+        android:visibility="gone">
+      <TextView
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="@string/keyboard_floating_drag_hint"
+          android:textColor="?attr/colorSubLabel"
+          android:textSize="12sp"
+          android:gravity="center_vertical"
+          android:singleLine="true"/>
+      <Button
+          android:id="@+id/keyboard_floating_dock_btn"
+          android:layout_width="wrap_content"
+          android:layout_height="36dp"
+          android:minWidth="48dp"
+          android:paddingStart="10dp"
+          android:paddingEnd="10dp"
+          android:background="@drawable/bg_toolbar_button"
+          android:text="@string/keyboard_floating_dock"
+          android:textAllCaps="false"
+          android:textColor="?attr/colorLabel"
+          android:textSize="12sp"/>
+    </LinearLayout>
+
+    <!-- Quick Action Toolbar -->
+    <LinearLayout android:id="@+id/quick_toolbar" style="@style/quick_toolbar">
+      <ImageButton android:id="@+id/toolbar_btn_suggestions" style="@style/quick_toolbar_button" android:src="@drawable/ic_arrow_up" android:contentDescription="@string/quick_toolbar_suggestions_desc" android:visibility="gone"/>
+      <ImageButton android:id="@+id/toolbar_btn_apps" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_grid" android:contentDescription="@string/quick_toolbar_apps_desc"/>
+      <ImageButton android:id="@+id/toolbar_btn_edit" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_edit" android:contentDescription="@string/quick_toolbar_edit_desc"/>
+      <ImageButton android:id="@+id/toolbar_btn_one_hand" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_one_hand" android:contentDescription="@string/quick_toolbar_one_hand_desc"/>
+      <ImageButton android:id="@+id/toolbar_btn_translate" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_translate" android:contentDescription="@string/quick_toolbar_translate_desc"/>
+      <ImageButton android:id="@+id/toolbar_btn_clipboard" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_clipboard" android:contentDescription="@string/quick_toolbar_clipboard_desc"/>
+      <ImageButton android:id="@+id/toolbar_btn_theme" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_palette" android:contentDescription="@string/quick_toolbar_theme_desc"/>
+      <ImageButton android:id="@+id/toolbar_btn_keyboard" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_keyboard" android:contentDescription="@string/quick_toolbar_keyboard_desc"/>
+      <ImageButton android:id="@+id/toolbar_btn_settings" style="@style/quick_toolbar_button" android:src="@drawable/ic_toolbar_settings" android:contentDescription="@string/quick_toolbar_settings_desc"/>
+    </LinearLayout>
+
+    <!-- Candidates Bar -->
+    <com.lakmal.keycraftsinhala.suggestions.CandidatesView android:id="@+id/candidates_view" style="@style/candidates_view">
+      <TextView android:id="@+id/candidates_toolbar_toggle" style="@style/candidates_toolbar_toggle" android:text="@string/candidates_toolbar_toggle_text" android:contentDescription="@string/candidates_show_toolbar_desc"/>
+      <TextView android:id="@+id/candidates_emoji" style="@style/candidates_emoji"/>
+      <TextView android:id="@+id/candidates_left" style="@style/candidates_item"/>
+      <TextView android:id="@+id/candidates_middle" style="@style/candidates_item"/>
+      <TextView android:id="@+id/candidates_right" style="@style/candidates_item"/>
+    </com.lakmal.keycraftsinhala.suggestions.CandidatesView>
+
+    <!-- One-Handed / Standard Keyboard Body Row -->
+    <LinearLayout
+        android:id="@+id/keyboard_body_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="bottom">
+
+      <!-- One-Handed Mode Side Rail (dynamically positioned left or right in code) -->
+      <LinearLayout
+          android:id="@+id/one_hand_side_rail"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_weight="0.18"
+          android:orientation="vertical"
+          android:gravity="center"
+          android:paddingTop="6dp"
+          android:paddingBottom="6dp"
+          android:visibility="gone">
+        <ImageButton
+            android:id="@+id/one_hand_expand_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_toolbar_button"
+            android:src="@drawable/ic_close"
+            android:tint="?attr/colorLabel"
+            android:contentDescription="@string/one_hand_expand_desc"/>
+        <ImageButton
+            android:id="@+id/one_hand_flip_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_toolbar_button"
+            android:src="@drawable/ic_toolbar_one_hand"
+            android:tint="?attr/colorLabel"
+            android:contentDescription="@string/one_hand_flip_desc"/>
+        <ImageButton
+            android:id="@+id/one_hand_float_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_toolbar_button"
+            android:src="@drawable/ic_toolbar_grid"
+            android:tint="?attr/colorLabel"
+            android:contentDescription="@string/one_hand_float_desc"/>
+      </LinearLayout>
+
+      <com.lakmal.keycraftsinhala.Keyboard2View
+          android:id="@+id/keyboard_view"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"/>
+    </LinearLayout>
   </LinearLayout>
-  <com.lakmal.keycraftsinhala.suggestions.CandidatesView android:id="@+id/candidates_view" style="@style/candidates_view">
-    <TextView android:id="@+id/candidates_toolbar_toggle" style="@style/candidates_toolbar_toggle" android:text="@string/candidates_toolbar_toggle_text" android:contentDescription="@string/candidates_show_toolbar_desc"/>
-    <TextView android:id="@+id/candidates_emoji" style="@style/candidates_emoji"/>
-    <TextView android:id="@+id/candidates_left" style="@style/candidates_item"/>
-    <TextView android:id="@+id/candidates_middle" style="@style/candidates_item"/>
-    <TextView android:id="@+id/candidates_right" style="@style/candidates_item"/>
-  </com.lakmal.keycraftsinhala.suggestions.CandidatesView>
-  <com.lakmal.keycraftsinhala.Keyboard2View android:id="@+id/keyboard_view" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-</LinearLayout>
+</FrameLayout>

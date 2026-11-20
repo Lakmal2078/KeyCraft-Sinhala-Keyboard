@@ -245,7 +245,8 @@ public final class Pointers implements Handler.Callback
       int d = (direction + i + 16) % 16;
       // Don't make the difference between a key that doesn't exist and a key
       // that is removed by [_handler]. Triggers side effects.
-      k = _handler.modifyKey(getKeyAtDirection(ptr.key, d), ptr.modifiers);
+      int subIdx = DIRECTION_TO_INDEX[d];
+      k = _handler.modifyKey(ptr.key.keys[subIdx], ptr.modifiers);
       if (k != null)
       {
         // When the nearest key is a slider, it is only selected if it's placed
@@ -254,6 +255,7 @@ public final class Pointers implements Handler.Callback
         // gestures without being interrupted by the slider.
         if (k.getKind() == KeyValue.Kind.Slider && Math.abs(i) >= 2)
           continue;
+        ptr.activeSubIndex = subIdx;
         return k;
       }
     }
@@ -287,6 +289,8 @@ public final class Pointers implements Handler.Callback
       ptr.gesture.moved_to_center();
       ptr.value = apply_gesture(ptr, ptr.gesture.get_gesture());
       ptr.flags = 0;
+      ptr.activeSubIndex = 0;
+      _handler.onPointerFlagsChanged(false);
 
     }
     else
@@ -318,17 +322,60 @@ public final class Pointers implements Handler.Callback
       { // Gesture changed state
         if (!ptr.gesture.is_in_progress())
         { // Gesture ended
+          ptr.activeSubIndex = 0;
           _handler.onPointerFlagsChanged(true);
         }
         else
         {
           ptr.value = apply_gesture(ptr, ptr.gesture.get_gesture());
+          ptr.activeSubIndex = 0;
           restartLongPress(ptr);
           ptr.flags = 0; // Special behaviors are ignored during a gesture.
           _handler.onPointerFlagsChanged(true); // Vibrate
         }
       }
     }
+  }
+
+  /** Snapshot of the currently active touch pointer for floating key preview popup. */
+  public static final class ActivePreview
+  {
+    public final KeyboardData.Key key;
+    public final KeyValue value;
+    public final int subIndex;
+
+    public ActivePreview(KeyboardData.Key key, KeyValue value, int subIndex)
+    {
+      this.key = key;
+      this.value = value;
+      this.subIndex = subIndex;
+    }
+  }
+
+  /** Returns the most recently pressed active non-latched pointer preview, or null. */
+  public ActivePreview getActivePreview()
+  {
+    for (int i = _ptrs.size() - 1; i >= 0; i--)
+    {
+      Pointer p = _ptrs.get(i);
+      if (!p.hasFlagsAny(FLAG_P_LATCHED) && !p.hasFlagsAny(FLAG_P_SLIDING) && p.value != null)
+        return new ActivePreview(p.key, p.value, p.activeSubIndex);
+    }
+    return null;
+  }
+
+  /** Returns the active swipe sub-index (1..8) for key [k], or 0 if not actively swiping a corner. */
+  public int getActiveSwipeSubIndex(KeyboardData.Key k)
+  {
+    if (k == null)
+      return 0;
+    for (int i = _ptrs.size() - 1; i >= 0; i--)
+    {
+      Pointer p = _ptrs.get(i);
+      if (p.key == k && !p.hasFlagsAny(FLAG_P_LATCHED) && p.activeSubIndex > 0)
+        return p.activeSubIndex;
+    }
+    return 0;
   }
 
   // Pointers management
@@ -556,6 +603,8 @@ public final class Pointers implements Handler.Callback
     public int timeoutWhat;
     /** [null] when not in sliding mode. */
     public Sliding sliding;
+    /** Active key slot index (0 center, 1..8 swipe corners). */
+    public int activeSubIndex;
 
     public Pointer(int p, KeyboardData.Key k, KeyValue v, float x, float y, Modifiers m, int f)
     {
@@ -569,6 +618,7 @@ public final class Pointers implements Handler.Callback
       flags = f;
       timeoutWhat = -1;
       sliding = null;
+      activeSubIndex = 0;
     }
 
     public boolean hasFlagsAny(int has)

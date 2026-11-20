@@ -1,12 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:background="?attr/colorKeyboard">
-  <ScrollView android:id="@+id/clipboard_scroll_view" android:layout_width="fill_parent" android:layout_height="@dimen/clipboard_view_height">
-    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
-      <com.lakmal.keycraftsinhala.ClipboardHistoryCheckBox android:id="@+id/clipboard_history_checkbox" android:text="@string/clipboard_history_heading" style="@style/clipboardHeading" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
-      <com.lakmal.keycraftsinhala.ClipboardHistoryView android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:divider="?attr/clipboard_divider_color" android:dividerHeight="?attr/clipboard_divider_height"/>
-      <TextView android:text="@string/clipboard_pin_heading" style="@style/clipboardHeading" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
-      <com.lakmal.keycraftsinhala.ClipboardPinView android:id="@+id/clipboard_pin_view" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:divider="?attr/clipboard_divider_color" android:dividerHeight="?attr/clipboard_divider_height"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?attr/colorKeyboard">
+
+  <!-- Header: Privacy note + Clear All button -->
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:gravity="center_vertical"
+      android:paddingStart="12dp"
+      android:paddingEnd="8dp"
+      android:paddingTop="6dp"
+      android:paddingBottom="2dp">
+
+    <TextView
+        android:id="@+id/clipboard_privacy_note"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/clipboard_privacy_note"
+        android:textSize="11sp"
+        android:textColor="?attr/colorSubLabel"
+        android:maxLines="2"
+        android:ellipsize="end"/>
+
+    <Button
+        android:id="@+id/clipboard_clear_all_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:minWidth="48dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="@drawable/bg_toolbar_button"
+        android:text="@string/clipboard_clear_all"
+        android:textAllCaps="false"
+        android:textSize="12sp"
+        android:textColor="?attr/colorLabel"/>
+  </LinearLayout>
+
+  <ScrollView
+      android:id="@+id/clipboard_scroll_view"
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/clipboard_view_height">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp">
+
+      <com.lakmal.keycraftsinhala.ClipboardHistoryCheckBox
+          android:id="@+id/clipboard_history_checkbox"
+          android:text="@string/clipboard_history_heading"
+          style="@style/clipboardHeading"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"/>
+
+      <!-- Disabled history state -->
+      <LinearLayout
+          android:id="@+id/clipboard_disabled_state"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:gravity="center_vertical"
+          android:paddingStart="14dp"
+          android:paddingEnd="14dp"
+          android:paddingTop="8dp"
+          android:paddingBottom="8dp"
+          android:visibility="gone">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/clipboard_disabled_empty"
+            android:textSize="13sp"
+            android:textColor="?attr/colorSubLabel"/>
+        <Button
+            android:id="@+id/clipboard_enable_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:minWidth="48dp"
+            android:background="@drawable/suggestions_item_background"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="@string/clipboard_enable_action"
+            android:textAllCaps="false"
+            android:textSize="13sp"
+            android:textColor="?attr/colorLabel"/>
+      </LinearLayout>
+
+      <!-- Empty history state -->
+      <TextView
+          android:id="@+id/clipboard_history_empty"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="14dp"
+          android:paddingEnd="14dp"
+          android:paddingTop="8dp"
+          android:paddingBottom="8dp"
+          android:text="@string/clipboard_history_empty"
+          android:textSize="13sp"
+          android:textColor="?attr/colorSubLabel"
+          android:visibility="gone"/>
+
+      <com.lakmal.keycraftsinhala.ClipboardHistoryView
+          android:id="@+id/clipboard_history_view"
+          android:orientation="vertical"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:divider="?attr/clipboard_divider_color"
+          android:dividerHeight="?attr/clipboard_divider_height"/>
+
+      <TextView
+          android:text="@string/clipboard_pin_heading"
+          style="@style/clipboardHeading"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"/>
+
+      <!-- Empty pinned state -->
+      <TextView
+          android:id="@+id/clipboard_pin_empty"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="14dp"
+          android:paddingEnd="14dp"
+          android:paddingTop="8dp"
+          android:paddingBottom="8dp"
+          android:text="@string/clipboard_pin_empty"
+          android:textSize="13sp"
+          android:textColor="?attr/colorSubLabel"
+          android:visibility="gone"/>
+
+      <com.lakmal.keycraftsinhala.ClipboardPinView
+          android:id="@+id/clipboard_pin_view"
+          android:orientation="vertical"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:divider="?attr/clipboard_divider_color"
+          android:dividerHeight="?attr/clipboard_divider_height"/>
     </LinearLayout>
   </ScrollView>
-  <com.lakmal.keycraftsinhala.Keyboard2View android:id="@+id/clipboard_bottom_row" layout="@xml/clipboard_bottom_row" android:layout_width="fill_parent" android:layout_height="wrap_content" android:background="?attr/colorKeyboard"/>
+
+  <com.lakmal.keycraftsinhala.Keyboard2View
+      android:id="@+id/clipboard_bottom_row"
+      layout="@xml/clipboard_bottom_row"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="?attr/colorKeyboard"/>
 </LinearLayout>

@@ -147,28 +147,145 @@ public class LayoutsPreference extends ListGroupPreference<LayoutsPreference.Lay
 
   void select_dialog(final SelectionCallback callback)
   {
-    ArrayAdapter layouts = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, _layout_display_names);
-    new AlertDialog.Builder(getContext())
-      .setView(View.inflate(getContext(), R.layout.dialog_edit_text, null))
-      .setAdapter(layouts, new DialogInterface.OnClickListener(){
-        public void onClick(DialogInterface _dialog, int which)
+    final Context ctx = getContext();
+    final List<String> names = get_layout_names(ctx.getResources());
+    final int count = Math.min(names.size(), _layout_display_names.length);
+
+    final List<Integer> filteredIndices = new ArrayList<>();
+    final List<String> filteredLabels = new ArrayList<>();
+    final ArrayAdapter<String> adapter = new ArrayAdapter<>(
+        ctx, android.R.layout.simple_list_item_1, filteredLabels);
+
+    final int[] activeFilter = new int[] { 0 }; // 0=All, 1=Sinhala, 2=Latin, 3=Dev
+    final String[] queryHolder = new String[] { "" };
+
+    final Runnable rebuildFilter = () -> {
+      filteredIndices.clear();
+      filteredLabels.clear();
+      String q = queryHolder[0].toLowerCase(java.util.Locale.ROOT).trim();
+      for (int i = 0; i < count; i++)
+      {
+        String internalName = names.get(i);
+        String label = _layout_display_names[i];
+        boolean matchesCat = true;
+        switch (activeFilter[0])
         {
-          String name = get_layout_names(getContext().getResources()).get(which);
-          switch (name)
-          {
-            case "system":
-              callback.select(new SystemLayout());
-              break;
-            case "custom":
-              select_custom(callback, read_initial_custom_layout());
-              break;
-            default:
-              callback.select(new NamedLayout(name));
-              break;
-          }
+          case 1:
+            matchesCat = internalName.contains("sinhala") || internalName.contains("tamil")
+                || label.contains("සිංහල") || label.contains("தமிழ்");
+            break;
+          case 2:
+            matchesCat = internalName.startsWith("latn_") || internalName.startsWith("latin_")
+                || "system".equals(internalName);
+            break;
+          case 3:
+            matchesCat = internalName.contains("termux") || internalName.contains("apl")
+                || internalName.contains("bqn") || "custom".equals(internalName)
+                || internalName.contains("dvorak") || internalName.contains("colemak")
+                || internalName.contains("workman");
+            break;
         }
-      })
-      .show();
+        boolean matchesQuery = q.isEmpty()
+            || label.toLowerCase(java.util.Locale.ROOT).contains(q)
+            || internalName.toLowerCase(java.util.Locale.ROOT).contains(q);
+        if (matchesCat && matchesQuery)
+        {
+          filteredIndices.add(i);
+          filteredLabels.add(label);
+        }
+      }
+      adapter.notifyDataSetChanged();
+    };
+
+    float density = ctx.getResources().getDisplayMetrics().density;
+    int dp8 = Math.round(8 * density);
+    int dp12 = Math.round(12 * density);
+
+    android.widget.LinearLayout root = new android.widget.LinearLayout(ctx);
+    root.setOrientation(android.widget.LinearLayout.VERTICAL);
+    root.setPadding(dp12, dp8, dp12, dp8);
+
+    android.widget.EditText searchInput = new android.widget.EditText(ctx);
+    searchInput.setHint(R.string.pref_layouts_search_hint);
+    searchInput.setSingleLine(true);
+    searchInput.setMinHeight(Math.round(48 * density));
+    searchInput.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+    searchInput.addTextChangedListener(new android.text.TextWatcher()
+    {
+      @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+      @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+      @Override
+      public void afterTextChanged(android.text.Editable s)
+      {
+        queryHolder[0] = s == null ? "" : s.toString();
+        rebuildFilter.run();
+      }
+    });
+    root.addView(searchInput, new android.widget.LinearLayout.LayoutParams(-1, -2));
+
+    android.widget.HorizontalScrollView chipScroll = new android.widget.HorizontalScrollView(ctx);
+    chipScroll.setHorizontalScrollBarEnabled(false);
+    android.widget.LinearLayout chipRow = new android.widget.LinearLayout(ctx);
+    chipRow.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+    chipRow.setPadding(0, dp8, 0, dp8);
+    int[] filterLabels = new int[] {
+      R.string.pref_layouts_filter_all,
+      R.string.pref_layouts_filter_sinhala,
+      R.string.pref_layouts_filter_latin,
+      R.string.pref_layouts_filter_dev
+    };
+    final List<android.widget.Button> filterBtns = new ArrayList<>();
+    for (int f = 0; f < filterLabels.length; f++)
+    {
+      final int idx = f;
+      android.widget.Button b = new android.widget.Button(ctx);
+      b.setText(filterLabels[f]);
+      b.setAllCaps(false);
+      b.setMinHeight(Math.round(48 * density));
+      b.setMinWidth(Math.round(48 * density));
+      b.setAlpha(f == 0 ? 1.0f : 0.65f);
+      b.setOnClickListener(v -> {
+        activeFilter[0] = idx;
+        for (int j = 0; j < filterBtns.size(); j++)
+          filterBtns.get(j).setAlpha(j == idx ? 1.0f : 0.65f);
+        rebuildFilter.run();
+      });
+      filterBtns.add(b);
+      chipRow.addView(b);
+    }
+    chipScroll.addView(chipRow);
+    root.addView(chipScroll, new android.widget.LinearLayout.LayoutParams(-1, -2));
+
+    android.widget.ListView listView = new android.widget.ListView(ctx);
+    listView.setAdapter(adapter);
+    root.addView(listView, new android.widget.LinearLayout.LayoutParams(-1, 0, 1f));
+
+    rebuildFilter.run();
+
+    final AlertDialog dialog = new AlertDialog.Builder(ctx)
+      .setView(root)
+      .setNegativeButton(android.R.string.cancel, null)
+      .create();
+    listView.setOnItemClickListener((parent, view, pos, id) -> {
+      if (pos < 0 || pos >= filteredIndices.size())
+        return;
+      int origIdx = filteredIndices.get(pos);
+      String name = names.get(origIdx);
+      dialog.dismiss();
+      switch (name)
+      {
+        case "system":
+          callback.select(new SystemLayout());
+          break;
+        case "custom":
+          select_custom(callback, read_initial_custom_layout());
+          break;
+        default:
+          callback.select(new NamedLayout(name));
+          break;
+      }
+    });
+    dialog.show();
   }
 
   /** Dialog for specifying a custom layout. [initial_text] is the layout

@@ -48,6 +48,7 @@ public final class ClipboardPinView extends NonScrollListView
     _entries.add(0,text);
     _adapter.notifyDataSetChanged();
     persist();
+    notifySiblingEmptyStates();
     invalidate();
   }
 
@@ -59,7 +60,18 @@ public final class ClipboardPinView extends NonScrollListView
     _entries.remove(pos);
     _adapter.notifyDataSetChanged();
     persist();
+    notifySiblingEmptyStates();
     invalidate();
+  }
+
+  private void notifySiblingEmptyStates()
+  {
+    if (getParent() instanceof View)
+    {
+      View hv = ((View)getParent()).findViewById(R.id.clipboard_history_view);
+      if (hv instanceof ClipboardHistoryView)
+        ((ClipboardHistoryView)hv).refreshEmptyStates();
+    }
   }
 
   /** Send the specified entry to the editor. */

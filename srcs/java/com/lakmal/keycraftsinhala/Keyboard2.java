@@ -40,6 +40,10 @@ public class Keyboard2 extends InputMethodService
 {
   /** The view containing the keyboard and candidates view. */
   private ViewGroup _keyboard_container_view;
+  private ViewGroup _keyboard_window_container;
+  private ViewGroup _keyboard_body_row;
+  private View _one_hand_side_rail;
+  private View _floating_handle;
   private Keyboard2View _keyboard_layout_view;
   private CandidatesView _candidates_view;
   private ViewGroup _quick_toolbar;
@@ -55,7 +59,13 @@ public class Keyboard2 extends InputMethodService
   private Dictionaries _dictionaries;
   private ViewGroup _emojiPane = null;
   private ViewGroup _clipboard_pane = null;
+  private ViewGroup _text_edit_pane = null;
+  private boolean _text_edit_select_active = false;
   private Handler _handler;
+  private float _dragStartRawX;
+  private float _dragStartRawY;
+  private float _dragBaseTransX;
+  private float _dragBaseTransY;
 
   private Config _config;
   /** Last configuration used to derive orientation- and window-dependent keyboard metrics. */
@@ -176,10 +186,16 @@ public class Keyboard2 extends InputMethodService
   private void create_keyboard_view()
   {
     _keyboard_container_view = (ViewGroup)inflate_view(R.layout.keyboard);
+    _keyboard_window_container = (ViewGroup)_keyboard_container_view.findViewById(R.id.keyboard_window_container);
+    _keyboard_body_row = (ViewGroup)_keyboard_container_view.findViewById(R.id.keyboard_body_row);
+    _one_hand_side_rail = _keyboard_container_view.findViewById(R.id.one_hand_side_rail);
+    _floating_handle = _keyboard_container_view.findViewById(R.id.keyboard_floating_handle);
     _keyboard_layout_view = (Keyboard2View)_keyboard_container_view.findViewById(R.id.keyboard_view);
     _candidates_view = (CandidatesView)_keyboard_container_view.findViewById(R.id.candidates_view);
     _quick_toolbar = (ViewGroup)_keyboard_container_view.findViewById(R.id.quick_toolbar);
     setup_quick_toolbar();
+    setup_window_mode_controls();
+    apply_window_mode_layout();
     View candidatesToolbarToggle = _keyboard_container_view.findViewById(R.id.candidates_toolbar_toggle);
     if (candidatesToolbarToggle != null)
       candidatesToolbarToggle.setOnClickListener(new View.OnClickListener()
@@ -193,172 +209,378 @@ public class Keyboard2 extends InputMethodService
       });
   }
 
+  private void setup_window_mode_controls()
+  {
+    if (_one_hand_side_rail != null)
+    {
+      View expandBtn = _one_hand_side_rail.findViewById(R.id.one_hand_expand_btn);
+      if (expandBtn != null)
+        expandBtn.setOnClickListener(v -> updatePrefString("one_hand_mode", "off"));
+
+      View flipBtn = _one_hand_side_rail.findViewById(R.id.one_hand_flip_btn);
+      if (flipBtn != null)
+        flipBtn.setOnClickListener(v -> {
+          String next = "left".equals(_config.one_hand_mode) ? "right" : "left";
+          updatePrefString("one_hand_mode", next);
+        });
+
+      View floatBtn = _one_hand_side_rail.findViewById(R.id.one_hand_float_btn);
+      if (floatBtn != null)
+        floatBtn.setOnClickListener(v -> {
+          SharedPreferences prefs = DirectBootAwarePreferences.get_shared_preferences(Keyboard2.this);
+          prefs.edit()
+              .putString("one_hand_mode", "off")
+              .putBoolean("floating_keyboard", true)
+              .apply();
+        });
+    }
+
+    if (_floating_handle != null)
+    {
+      View dockBtn = _floating_handle.findViewById(R.id.keyboard_floating_dock_btn);
+      if (dockBtn != null)
+        dockBtn.setOnClickListener(v -> {
+          SharedPreferences prefs = DirectBootAwarePreferences.get_shared_preferences(Keyboard2.this);
+          prefs.edit().putBoolean("floating_keyboard", false).apply();
+        });
+
+      _floating_handle.setOnTouchListener((v, event) -> {
+        if (_keyboard_window_container == null)
+          return false;
+        switch (event.getActionMasked())
+        {
+          case MotionEvent.ACTION_DOWN:
+            _dragStartRawX = event.getRawX();
+            _dragStartRawY = event.getRawY();
+            _dragBaseTransX = _keyboard_window_container.getTranslationX();
+            _dragBaseTransY = _keyboard_window_container.getTranslationY();
+            return true;
+          case MotionEvent.ACTION_MOVE:
+            float dx = event.getRawX() - _dragStartRawX;
+            float dy = event.getRawY() - _dragStartRawY;
+            int screenW = getResources().getDisplayMetrics().widthPixels;
+            int maxX = Math.max(0, (screenW - _keyboard_window_container.getWidth()) / 2);
+            float clampedX = Math.max(-maxX, Math.min(maxX, _dragBaseTransX + dx));
+            float clampedY = Math.max(-600f, Math.min(0f, _dragBaseTransY + dy));
+            _keyboard_window_container.setTranslationX(clampedX);
+            _keyboard_window_container.setTranslationY(clampedY);
+            return true;
+          case MotionEvent.ACTION_UP:
+          case MotionEvent.ACTION_CANCEL:
+            SharedPreferences prefs = DirectBootAwarePreferences.get_shared_preferences(Keyboard2.this);
+            prefs.edit()
+                .putInt("floating_offset_x", Math.round(_keyboard_window_container.getTranslationX()))
+                .putInt("floating_offset_y", Math.round(_keyboard_window_container.getTranslationY()))
+                .apply();
+            return true;
+        }
+        return false;
+      });
+    }
+  }
+
+  private void updatePrefString(String key, String value)
+  {
+    SharedPreferences prefs = DirectBootAwarePreferences.get_shared_preferences(this);
+    prefs.edit().putString(key, value).apply();
+  }
+
+  private void apply_window_mode_layout()
+  {
+    if (_keyboard_window_container == null || _keyboard_body_row == null || _keyboard_layout_view == null)
+      return;
+    android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+    boolean floating = _config.floating_keyboard;
+    boolean oneHandLeft = !floating && "left".equals(_config.one_hand_mode);
+    boolean oneHandRight = !floating && "right".equals(_config.one_hand_mode);
+    boolean oneHandActive = oneHandLeft || oneHandRight;
+
+    ViewGroup.LayoutParams winLp = _keyboard_window_container.getLayoutParams();
+    if (winLp instanceof FrameLayout.LayoutParams)
+    {
+      FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) winLp;
+      if (floating)
+      {
+        int targetW = Math.min(Math.round(dm.widthPixels * 0.86f), Math.round(440f * dm.density));
+        flp.width = Math.max(Math.round(280f * dm.density), targetW);
+        flp.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+      }
+      else
+      {
+        flp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        flp.gravity = Gravity.BOTTOM;
+      }
+      _keyboard_window_container.setLayoutParams(flp);
+    }
+
+    if (VERSION.SDK_INT >= 21)
+      _keyboard_window_container.setElevation(floating ? 10f * dm.density : 0f);
+
+    if (floating)
+    {
+      int maxX = Math.max(0, (dm.widthPixels - Math.round(dm.widthPixels * 0.86f)) / 2);
+      _keyboard_window_container.setTranslationX(
+          Math.max(-maxX, Math.min(maxX, _config.floating_offset_x)));
+      _keyboard_window_container.setTranslationY(
+          Math.max(-600f, Math.min(0f, _config.floating_offset_y)));
+    }
+    else
+    {
+      _keyboard_window_container.setTranslationX(0f);
+      _keyboard_window_container.setTranslationY(0f);
+    }
+
+    if (_floating_handle != null)
+      _floating_handle.setVisibility(floating ? View.VISIBLE : View.GONE);
+
+    if (_one_hand_side_rail != null)
+    {
+      _one_hand_side_rail.setVisibility(oneHandActive ? View.VISIBLE : View.GONE);
+      _keyboard_body_row.removeAllViews();
+      LinearLayout.LayoutParams kbdLp = new LinearLayout.LayoutParams(
+          oneHandActive ? 0 : ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT);
+      kbdLp.weight = oneHandActive ? 0.82f : 0f;
+      LinearLayout.LayoutParams railLp = new LinearLayout.LayoutParams(
+          0, ViewGroup.LayoutParams.MATCH_PARENT);
+      railLp.weight = 0.18f;
+      if (oneHandRight)
+      {
+        _keyboard_body_row.addView(_one_hand_side_rail, railLp);
+        _keyboard_body_row.addView(_keyboard_layout_view, kbdLp);
+      }
+      else
+      {
+        _keyboard_body_row.addView(_keyboard_layout_view, kbdLp);
+        _keyboard_body_row.addView(_one_hand_side_rail, railLp);
+      }
+    }
+  }
+
   private void setup_quick_toolbar()
   {
     if (_quick_toolbar == null)
       return;
+
+    View btnSuggestions = _quick_toolbar.findViewById(R.id.toolbar_btn_suggestions);
+    if (btnSuggestions != null)
+    {
+      btnSuggestions.setOnClickListener(v -> {
+        _show_quick_toolbar_override = false;
+        update_top_bar_visibility();
+      });
+    }
+
     View btnApps = _quick_toolbar.findViewById(R.id.toolbar_btn_apps);
     if (btnApps != null)
     {
-      btnApps.setOnClickListener(new View.OnClickListener()
-      {
-        @Override
-        public void onClick(View v)
+      btnApps.setOnClickListener(v -> {
+        ensure_emoji_pane();
+        setInputView(_emojiPane);
+      });
+      btnApps.setOnLongClickListener(v -> {
+        incrTextLayout(1);
+        return true;
+      });
+    }
+
+    View btnEdit = _quick_toolbar.findViewById(R.id.toolbar_btn_edit);
+    if (btnEdit != null)
+    {
+      btnEdit.setOnClickListener(v -> showTextEditPane());
+    }
+
+    View btnOneHand = _quick_toolbar.findViewById(R.id.toolbar_btn_one_hand);
+    if (btnOneHand != null)
+    {
+      btnOneHand.setOnClickListener(v -> {
+        SharedPreferences prefs = DirectBootAwarePreferences.get_shared_preferences(Keyboard2.this);
+        if (_config.floating_keyboard)
         {
-          ensure_emoji_pane();
-          setInputView(_emojiPane);
+          prefs.edit()
+              .putBoolean("floating_keyboard", false)
+              .putString("one_hand_mode", "right")
+              .apply();
+        }
+        else
+        {
+          String next = "off".equals(_config.one_hand_mode) ? "right" : "off";
+          prefs.edit().putString("one_hand_mode", next).apply();
         }
       });
-      btnApps.setOnLongClickListener(new View.OnLongClickListener()
-      {
-        @Override
-        public boolean onLongClick(View v)
-        {
-          incrTextLayout(1);
-          return true;
-        }
+      btnOneHand.setOnLongClickListener(v -> {
+        SharedPreferences prefs = DirectBootAwarePreferences.get_shared_preferences(Keyboard2.this);
+        prefs.edit()
+            .putString("one_hand_mode", "off")
+            .putBoolean("floating_keyboard", !_config.floating_keyboard)
+            .apply();
+        return true;
       });
     }
 
     View btnKeyboard = _quick_toolbar.findViewById(R.id.toolbar_btn_keyboard);
     if (btnKeyboard != null)
     {
-      btnKeyboard.setOnClickListener(new View.OnClickListener()
-      {
-        @Override
-        public void onClick(View v)
-        {
-          get_imm().showInputMethodPicker();
-        }
-      });
-      btnKeyboard.setOnLongClickListener(new View.OnLongClickListener()
-      {
-        @Override
-        public boolean onLongClick(View v)
-        {
-          incrTextLayout(1);
-          return true;
-        }
+      btnKeyboard.setOnClickListener(v -> get_imm().showInputMethodPicker());
+      btnKeyboard.setOnLongClickListener(v -> {
+        incrTextLayout(1);
+        return true;
       });
     }
 
     View btnTranslate = _quick_toolbar.findViewById(R.id.toolbar_btn_translate);
     if (btnTranslate != null)
     {
-      btnTranslate.setOnClickListener(new View.OnClickListener()
-      {
-        @Override
-        public void onClick(View v)
+      btnTranslate.setOnClickListener(v -> launch_translate());
+      btnTranslate.setOnLongClickListener(v -> {
+        try
         {
-          launch_translate();
+          SharedPreferences prefs = DirectBootAwarePreferences.get_shared_preferences(Keyboard2.this);
+          boolean nextState = !_config.sinhala_transliteration;
+          prefs.edit().putBoolean("sinhala_transliteration", nextState).apply();
         }
-      });
-      btnTranslate.setOnLongClickListener(new View.OnLongClickListener()
-      {
-        @Override
-        public boolean onLongClick(View v)
-        {
-          try
-          {
-            SharedPreferences prefs = DirectBootAwarePreferences.get_shared_preferences(Keyboard2.this);
-            boolean nextState = !_config.sinhala_transliteration;
-            prefs.edit().putBoolean("sinhala_transliteration", nextState).apply();
-          }
-          catch (Exception e) {}
-          return true;
-        }
+        catch (Exception e) {}
+        return true;
       });
     }
 
     View btnSettings = _quick_toolbar.findViewById(R.id.toolbar_btn_settings);
     if (btnSettings != null)
     {
-      btnSettings.setOnClickListener(new View.OnClickListener()
-      {
-        @Override
-        public void onClick(View v)
-        {
-          Intent intent = new Intent(Keyboard2.this, SettingsActivity.class);
-          intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-          startActivity(intent);
-        }
+      btnSettings.setOnClickListener(v -> {
+        Intent intent = new Intent(Keyboard2.this, SettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
       });
     }
 
     View btnClipboard = _quick_toolbar.findViewById(R.id.toolbar_btn_clipboard);
     if (btnClipboard != null)
     {
-      btnClipboard.setOnClickListener(new View.OnClickListener()
-      {
-        @Override
-        public void onClick(View v)
-        {
-          showClipboardPane();
-        }
-      });
+      btnClipboard.setOnClickListener(v -> showClipboardPane());
     }
 
     View btnTheme = _quick_toolbar.findViewById(R.id.toolbar_btn_theme);
     if (btnTheme != null)
     {
-      btnTheme.setOnClickListener(new View.OnClickListener()
-      {
-        @Override
-        public void onClick(View v)
-        {
-          show_theme_picker();
-        }
-      });
-      btnTheme.setOnLongClickListener(new View.OnLongClickListener()
-      {
-        @Override
-        public boolean onLongClick(View v)
-        {
-          Intent intent = new Intent(Keyboard2.this, SettingsActivity.class);
-          intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-          startActivity(intent);
-          return true;
-        }
+      btnTheme.setOnClickListener(v -> show_theme_picker());
+      btnTheme.setOnLongClickListener(v -> {
+        Intent intent = new Intent(Keyboard2.this, SettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        return true;
       });
     }
 
-    if (_quick_toolbar != null)
+    int[] btnIds = new int[] {
+      R.id.toolbar_btn_suggestions, R.id.toolbar_btn_apps, R.id.toolbar_btn_edit,
+      R.id.toolbar_btn_one_hand, R.id.toolbar_btn_translate, R.id.toolbar_btn_clipboard,
+      R.id.toolbar_btn_theme, R.id.toolbar_btn_keyboard, R.id.toolbar_btn_settings
+    };
+    if (_config.custom_colors_enabled)
     {
-      int[] btnIds = new int[] {
-        R.id.toolbar_btn_apps, R.id.toolbar_btn_keyboard, R.id.toolbar_btn_translate,
-        R.id.toolbar_btn_settings, R.id.toolbar_btn_clipboard, R.id.toolbar_btn_theme
-      };
-      if (_config.custom_colors_enabled)
+      int iconTint = Theme.getContrastColor(_config.custom_bg_color);
+      for (int id : btnIds)
       {
-        int iconTint = Theme.getContrastColor(_config.custom_bg_color);
-        for (int id : btnIds)
-        {
-          android.widget.ImageButton btn = _quick_toolbar.findViewById(id);
-          if (btn != null)
-            btn.setColorFilter(iconTint);
-        }
-      }
-      else
-      {
-        for (int id : btnIds)
-        {
-          android.widget.ImageButton btn = _quick_toolbar.findViewById(id);
-          if (btn != null)
-            btn.clearColorFilter();
-        }
+        android.widget.ImageButton btn = _quick_toolbar.findViewById(id);
+        if (btn != null)
+          btn.setColorFilter(iconTint);
       }
     }
+    else
+    {
+      for (int id : btnIds)
+      {
+        android.widget.ImageButton btn = _quick_toolbar.findViewById(id);
+        if (btn != null)
+          btn.clearColorFilter();
+      }
+    }
+  }
+
+  private void showTextEditPane()
+  {
+    if (_text_edit_pane == null)
+    {
+      _text_edit_pane = (ViewGroup)inflate_view(R.layout.text_edit_pane);
+      wire_text_edit_pane(_text_edit_pane);
+    }
+    int targetHeight = _keyboard_container_view != null ? _keyboard_container_view.getHeight() : 0;
+    if (targetHeight <= 0 && _keyboard_container_view != null)
+      targetHeight = _keyboard_container_view.getMeasuredHeight();
+    if (targetHeight > 0)
+      _text_edit_pane.setMinimumHeight(targetHeight);
+    setInputView(_text_edit_pane);
+  }
+
+  private void wire_text_edit_pane(ViewGroup pane)
+  {
+    android.widget.Button selectToggle = pane.findViewById(R.id.text_edit_select_toggle);
+    if (selectToggle != null)
+    {
+      selectToggle.setOnClickListener(v -> {
+        _text_edit_select_active = !_text_edit_select_active;
+        selectToggle.setBackgroundResource(_text_edit_select_active
+            ? R.drawable.suggestions_pill_background
+            : R.drawable.suggestions_item_background);
+      });
+    }
+    View backBtn = pane.findViewById(R.id.text_edit_back);
+    if (backBtn != null)
+      backBtn.setOnClickListener(v -> setInputView(_keyboard_container_view));
+
+    bindEditKey(pane, R.id.text_edit_left, "left", true);
+    bindEditKey(pane, R.id.text_edit_right, "right", true);
+    bindEditKey(pane, R.id.text_edit_up, "up", true);
+    bindEditKey(pane, R.id.text_edit_down, "down", true);
+    bindEditKey(pane, R.id.text_edit_home, "home", true);
+    bindEditKey(pane, R.id.text_edit_end, "end", true);
+    bindEditKey(pane, R.id.text_edit_select_all, "selectAll", false);
+    bindEditKey(pane, R.id.text_edit_copy, "copy", false);
+    bindEditKey(pane, R.id.text_edit_cut, "cut", false);
+    bindEditKey(pane, R.id.text_edit_paste, "paste", false);
+    bindEditKey(pane, R.id.text_edit_undo, "undo", false);
+    bindEditKey(pane, R.id.text_edit_redo, "redo", false);
+    bindEditKey(pane, R.id.text_edit_backspace, "backspace", false);
+    bindEditKey(pane, R.id.text_edit_del_word, "delete_word", false);
+  }
+
+  private void bindEditKey(ViewGroup pane, int viewId, final String keyName,
+      final boolean respectSelectToggle)
+  {
+    View view = pane.findViewById(viewId);
+    if (view == null)
+      return;
+    view.setOnClickListener(v -> {
+      KeyValue kv = KeyValue.getKeyByName(keyName);
+      if (kv == null || _keyeventhandler == null)
+        return;
+      Pointers.Modifiers mods = (respectSelectToggle && _text_edit_select_active)
+          ? Pointers.Modifiers.EMPTY.with_extra_mod(KeyValue.SHIFT)
+          : Pointers.Modifiers.EMPTY;
+      _keyeventhandler.key_down(kv, false);
+      _keyeventhandler.key_up(kv, mods);
+    });
+  }
+
+  /** Commit image/sticker/GIF content to the active editor if accepted. */
+  public boolean commitMediaContent(android.net.Uri uri, String mime)
+  {
+    return ContentCommitter.commit(getCurrentInputConnection(),
+        getCurrentInputEditorInfo(), uri, mime);
   }
 
   /** Inflate the emoji pane and size its grid to the active keyboard viewport. */
   private void ensure_emoji_pane()
   {
     if (_emojiPane == null)
+    {
       _emojiPane = (ViewGroup)inflate_view(R.layout.emoji_pane);
+      StickerGifHelper.bindEmojiPane(_emojiPane, this);
+    }
 
-    View grid = _emojiPane.findViewById(R.id.emoji_grid);
-    View groupBar = _emojiPane.findViewById(R.id.emoji_group_bar);
-    View bottomRow = _emojiPane.findViewById(R.id.emoji_bottom_row);
+    View contentFrame = _emojiPane.findViewById(R.id.emoji_content_frame);
+    View grid = contentFrame != null ? contentFrame : _emojiPane.findViewById(R.id.emoji_grid);
     if (grid == null)
       return;
 
@@ -372,10 +594,14 @@ public class Keyboard2 extends InputMethodService
       width = getResources().getDisplayMetrics().widthPixels;
 
     int fixedHeight = 0;
-    View[] fixedViews = new View[] { groupBar, bottomRow };
-    for (View fixedView : fixedViews)
+    int[] fixedIds = new int[] {
+      R.id.emoji_mode_bar, R.id.emoji_search_strip,
+      R.id.emoji_search_input_row, R.id.emoji_group_bar, R.id.emoji_bottom_row
+    };
+    for (int id : fixedIds)
     {
-      if (fixedView == null)
+      View fixedView = _emojiPane.findViewById(id);
+      if (fixedView == null || fixedView.getVisibility() == View.GONE)
         continue;
       fixedView.measure(
           View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
@@ -429,6 +655,9 @@ public class Keyboard2 extends InputMethodService
         clipboardScroll.setLayoutParams(scrollParams);
       }
     }
+    ClipboardHistoryView historyView = _clipboard_pane.findViewById(R.id.clipboard_history_view);
+    if (historyView != null)
+      historyView.refreshEmptyStates();
     setInputView(_clipboard_pane);
   }
 
@@ -535,20 +764,29 @@ public class Keyboard2 extends InputMethodService
     return _config.suggestions_enabled
       && !_config.editor_config.is_sensitive_input
       && (has_dict || has_sinhala || has_productivity)
-      && _config.editor_config.should_show_candidates_view
-      && !_config.split_layout;
+      && _config.editor_config.should_show_candidates_view;
   }
 
   private void update_top_bar_visibility()
   {
+    boolean can_show_candidates = should_show_candidates();
+    boolean show_toolbar = _config.show_quick_toolbar;
     if (_quick_toolbar != null)
     {
       View translate = _quick_toolbar.findViewById(R.id.toolbar_btn_translate);
       if (translate != null)
-        translate.setEnabled(!_config.editor_config.is_sensitive_input);
+      {
+        boolean enabled = !_config.editor_config.is_sensitive_input;
+        translate.setEnabled(enabled);
+        translate.setAlpha(enabled ? 1.0f : 0.38f);
+      }
+      View backToSuggestions = _quick_toolbar.findViewById(R.id.toolbar_btn_suggestions);
+      if (backToSuggestions != null)
+      {
+        backToSuggestions.setVisibility(
+            (can_show_candidates && _has_active_suggestions) ? View.VISIBLE : View.GONE);
+      }
     }
-    boolean can_show_candidates = should_show_candidates();
-    boolean show_toolbar = _config.show_quick_toolbar && !_config.split_layout;
     if (show_toolbar)
     {
       if (_show_quick_toolbar_override && can_show_candidates && _has_active_suggestions)
@@ -646,24 +884,29 @@ public class Keyboard2 extends InputMethodService
       create_keyboard_view();
       _emojiPane = null;
       _clipboard_pane = null;
+      _text_edit_pane = null;
       setInputView(_keyboard_container_view);
     }
-    // Set keyboard background
+    else
+    {
+      apply_window_mode_layout();
+    }
+    View bgTarget = _keyboard_window_container != null ? _keyboard_window_container : _keyboard_container_view;
     if (_config.custom_colors_enabled)
     {
-      _keyboard_container_view.setBackgroundColor(_config.custom_bg_color);
-      if (_keyboard_container_view.getBackground() != null)
+      bgTarget.setBackgroundColor(_config.custom_bg_color);
+      if (bgTarget.getBackground() != null)
       {
-        Drawable bg = _keyboard_container_view.getBackground().mutate();
+        Drawable bg = bgTarget.getBackground().mutate();
         bg.setAlpha(_config.keyboardOpacity);
-        _keyboard_container_view.setBackground(bg);
+        bgTarget.setBackground(bg);
       }
     }
-    else if (_keyboard_container_view.getBackground() != null)
+    else if (bgTarget.getBackground() != null)
     {
-      Drawable bg = _keyboard_container_view.getBackground().mutate();
+      Drawable bg = bgTarget.getBackground().mutate();
       bg.setAlpha(_config.keyboardOpacity);
-      _keyboard_container_view.setBackground(bg);
+      bgTarget.setBackground(bg);
     }
     if (clipboardHistoryChanged && _clipboard_pane != null)
     {
@@ -671,6 +914,10 @@ public class Keyboard2 extends InputMethodService
           _clipboard_pane.findViewById(R.id.clipboard_history_checkbox);
       if (checkbox != null)
         checkbox.refreshFromConfig();
+      ClipboardHistoryView historyView =
+          _clipboard_pane.findViewById(R.id.clipboard_history_view);
+      if (historyView != null)
+        historyView.refreshEmptyStates();
     }
     _keyboard_layout_view.reset();
     refresh_candidates_view();

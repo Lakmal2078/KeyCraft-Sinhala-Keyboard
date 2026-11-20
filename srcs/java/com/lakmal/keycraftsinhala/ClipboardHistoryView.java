@@ -3,11 +3,17 @@ package com.lakmal.keycraftsinhala;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +48,19 @@ public final class ClipboardHistoryView extends NonScrollListView
     _history = labels;
   }
 
+  private View findInPane(int viewId)
+  {
+    ViewParent parent = getParent();
+    while (parent instanceof View)
+    {
+      View found = ((View)parent).findViewById(viewId);
+      if (found != null)
+        return found;
+      parent = parent.getParent();
+    }
+    return null;
+  }
+
   /** The history entry at index [pos] is removed from the history and added to
       the list of pinned clipboards. Image entries cannot be pinned. */
   public void pin_entry(int pos)
@@ -55,13 +74,13 @@ public final class ClipboardHistoryView extends NonScrollListView
       update_data();
       return;
     }
-    ClipboardPinView v = (ClipboardPinView)((ViewGroup)getParent().getParent()).findViewById(R.id.clipboard_pin_view);
-    v.add_entry(clip);
+    View pinObj = findInPane(R.id.clipboard_pin_view);
+    if (pinObj instanceof ClipboardPinView)
+      ((ClipboardPinView)pinObj).add_entry(clip);
     _service.remove_history_entry(clip);
   }
 
-  /** Paste the specified entry, then remove it from clipboard history. An
-      image is removed only when the focused app accepts it. */
+  /** Paste the specified entry while retaining it in history until cleared or expired. */
   public void paste_entry(int pos)
   {
     if (_service == null || pos < 0 || pos >= _entries.size())
@@ -69,18 +88,91 @@ public final class ClipboardHistoryView extends NonScrollListView
     ClipboardHistoryService.HistoryEntry entry = _entries.get(pos);
     if (entry.uri != null)
     {
-      if (ClipboardHistoryService.paste_image(entry.uri, entry.mime))
-        _service.remove_entry(entry);
+      ClipboardHistoryService.paste_image(entry.uri, entry.mime);
       return;
     }
     String clip = entry.content;
     if (_service.contains_history_entry(clip))
-    {
       ClipboardHistoryService.paste(clip);
-      _service.remove_history_entry(clip);
-    }
     else
       update_data();
+  }
+
+  /** Delete a single entry from clipboard history. */
+  public void delete_entry(int pos)
+  {
+    if (_service == null || pos < 0 || pos >= _entries.size())
+      return;
+    _service.remove_entry(_entries.get(pos));
+  }
+
+  public void refreshEmptyStates()
+  {
+    boolean enabled = Config.globalConfig().clipboard_history_enabled;
+    boolean historyEmpty = (_history == null || _history.isEmpty());
+
+    View disabledState = findInPane(R.id.clipboard_disabled_state);
+    View emptyHistoryView = findInPane(R.id.clipboard_history_empty);
+    if (disabledState != null)
+      disabledState.setVisibility(enabled ? View.GONE : View.VISIBLE);
+    if (emptyHistoryView != null)
+      emptyHistoryView.setVisibility((enabled && historyEmpty) ? View.VISIBLE : View.GONE);
+    setVisibility((enabled && !historyEmpty) ? View.VISIBLE : View.GONE);
+
+    View clearAllBtn = findInPane(R.id.clipboard_clear_all_btn);
+    if (clearAllBtn != null)
+    {
+      boolean canClear = !historyEmpty;
+      clearAllBtn.setEnabled(canClear);
+      clearAllBtn.setAlpha(canClear ? 1.0f : 0.38f);
+    }
+
+    View pinObj = findInPane(R.id.clipboard_pin_view);
+    View emptyPinView = findInPane(R.id.clipboard_pin_empty);
+    if (pinObj instanceof ClipboardPinView && emptyPinView != null)
+    {
+      boolean pinEmpty = ((ClipboardPinView)pinObj).getCount() == 0;
+      emptyPinView.setVisibility(pinEmpty ? View.VISIBLE : View.GONE);
+      pinObj.setVisibility(pinEmpty ? View.GONE : View.VISIBLE);
+    }
+  }
+
+  private void bindPaneActions()
+  {
+    View clearAllBtn = findInPane(R.id.clipboard_clear_all_btn);
+    if (clearAllBtn != null)
+    {
+      clearAllBtn.setOnClickListener(v -> {
+        if (_service == null || _history.isEmpty())
+          return;
+        AlertDialog d = new AlertDialog.Builder(getContext())
+          .setTitle(R.string.clipboard_clear_all_confirm)
+          .setPositiveButton(R.string.clipboard_clear_all,
+              new DialogInterface.OnClickListener()
+              {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                  _service.clear_history();
+                }
+              })
+          .setNegativeButton(android.R.string.cancel, null)
+          .create();
+        Utils.show_dialog_on_ime(d, v.getWindowToken());
+      });
+    }
+
+    View enableBtn = findInPane(R.id.clipboard_enable_btn);
+    if (enableBtn != null)
+    {
+      enableBtn.setOnClickListener(v -> {
+        ClipboardHistoryService.set_history_enabled(true);
+        View cb = findInPane(R.id.clipboard_history_checkbox);
+        if (cb instanceof ClipboardHistoryCheckBox)
+          ((ClipboardHistoryCheckBox)cb).refreshFromConfig();
+        update_data();
+      });
+    }
   }
 
   @Override
@@ -102,6 +194,7 @@ public final class ClipboardHistoryView extends NonScrollListView
       return;
     refresh_entries();
     _adapter.notifyDataSetChanged();
+    refreshEmptyStates();
     invalidate();
   }
 
@@ -109,10 +202,15 @@ public final class ClipboardHistoryView extends NonScrollListView
   protected void onAttachedToWindow()
   {
     super.onAttachedToWindow();
+    bindPaneActions();
     if (_service != null)
     {
       _service.set_on_clipboard_history_change(this);
       update_data();
+    }
+    else
+    {
+      refreshEmptyStates();
     }
   }
 
@@ -122,6 +220,24 @@ public final class ClipboardHistoryView extends NonScrollListView
     super.onDetachedFromWindow();
     if (_service != null)
       _service.remove_on_clipboard_history_change(this);
+  }
+
+  private Bitmap loadThumbnail(Uri uri)
+  {
+    try (InputStream is = getContext().getContentResolver().openInputStream(uri))
+    {
+      if (is == null) return null;
+      BitmapFactory.Options opts = new BitmapFactory.Options();
+      opts.inSampleSize = 4;
+      Bitmap bmp = BitmapFactory.decodeStream(is, null, opts);
+      if (bmp == null) return null;
+      int px = Math.round(40 * getResources().getDisplayMetrics().density);
+      return Bitmap.createScaledBitmap(bmp, Math.max(1, px), Math.max(1, px), true);
+    }
+    catch (Exception | OutOfMemoryError _e)
+    {
+      return null;
+    }
   }
 
   class ClipboardEntriesAdapter extends BaseAdapter
@@ -140,20 +256,42 @@ public final class ClipboardHistoryView extends NonScrollListView
     {
       if (v == null)
         v = View.inflate(getContext(), R.layout.clipboard_history_entry, null);
+      ClipboardHistoryService.HistoryEntry entry = _entries.get(pos);
       ((TextView)v.findViewById(R.id.clipboard_entry_text))
-        .setText(_history.get(pos));
-      v.findViewById(R.id.clipboard_entry_addpin).setOnClickListener(
-          new View.OnClickListener()
+        .setText(entry.content);
+
+      ImageView thumb = v.findViewById(R.id.clipboard_entry_thumb);
+      if (thumb != null)
+      {
+        if (entry.uri != null)
+        {
+          Bitmap bmp = loadThumbnail(entry.uri);
+          if (bmp != null)
           {
-            @Override
-            public void onClick(View v) { pin_entry(pos); }
-          });
-      v.findViewById(R.id.clipboard_entry_paste).setOnClickListener(
-          new View.OnClickListener()
+            thumb.setImageBitmap(bmp);
+            thumb.setVisibility(View.VISIBLE);
+          }
+          else
           {
-            @Override
-            public void onClick(View v) { paste_entry(pos); }
-          });
+            thumb.setVisibility(View.GONE);
+          }
+        }
+        else
+        {
+          thumb.setVisibility(View.GONE);
+        }
+      }
+
+      View pinBtn = v.findViewById(R.id.clipboard_entry_addpin);
+      if (pinBtn != null)
+      {
+        pinBtn.setVisibility(entry.uri == null ? View.VISIBLE : View.GONE);
+        pinBtn.setOnClickListener(view -> pin_entry(pos));
+      }
+      v.findViewById(R.id.clipboard_entry_paste).setOnClickListener(view -> paste_entry(pos));
+      View deleteBtn = v.findViewById(R.id.clipboard_entry_delete);
+      if (deleteBtn != null)
+        deleteBtn.setOnClickListener(view -> delete_entry(pos));
       return v;
     }
   }

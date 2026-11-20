@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
@@ -18,6 +19,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import juloo.cdict.Cdict;
@@ -79,6 +81,23 @@ public class DictionaryListView extends LinearLayout
     addView(v);
   }
 
+  /** Filter dictionary items by display name or locale code. Returns count of visible items. */
+  public int filter(String query)
+  {
+    String q = (query == null) ? "" : query.trim().toLowerCase(Locale.ROOT);
+    int visible = 0;
+    for (DictView d : _dict_views)
+    {
+      boolean show = q.isEmpty()
+          || d.display_name.toLowerCase(Locale.ROOT).contains(q)
+          || d.dict_name.toLowerCase(Locale.ROOT).contains(q);
+      d.root_view.setVisibility(show ? View.VISIBLE : View.GONE);
+      if (show)
+        visible++;
+    }
+    return visible;
+  }
+
   /** Update the "installed" status of item views. Meaning whether the
       "download" or "delete" button is shown. */
   void refresh()
@@ -137,34 +156,47 @@ public class DictionaryListView extends LinearLayout
 
   final class DictView implements View.OnClickListener
   {
+    public final View root_view;
     public final String dict_name;
+    public final String display_name;
     public final ImageView download_button;
+    public final ProgressBar download_progress;
 
     public DictView(View view, SupportedDictionaries ds, int dict_index)
     {
+      root_view = view;
       dict_name = ds.dict_name(dict_index);
+      display_name = ds.display_name(dict_index);
       float size_mb = ds.size(dict_index) / 1048576.f;
       ((TextView)view.findViewById(R.id.dictionary_download_locale))
-        .setText(ds.display_name(dict_index));
+        .setText(display_name);
       ((TextView)view.findViewById(R.id.dictionary_download_size))
         .setText(getContext().getString(R.string.dictionary_download_size_format,
             NumberFormat.getInstance().format(size_mb)));
       download_button =
         (ImageView)view.findViewById(R.id.dictionary_download_button);
+      download_progress =
+        (ProgressBar)view.findViewById(R.id.dictionary_download_progress);
+      if (download_progress != null)
+        download_progress.setContentDescription(
+            getContext().getString(R.string.dictionaries_downloading_desc));
       download_button.setOnClickListener(this);
     }
 
     public void refresh(Set<String> installed)
     {
+      boolean pending = _pending.contains(dict_name);
       boolean is_installed = installed.contains(dict_name);
-      int res =
-        _pending.contains(dict_name) ? 0 :
-        is_installed ? R.drawable.ic_delete :
-        R.drawable.ic_download;
-      download_button.setImageResource(res);
-      download_button.setContentDescription(
-          download_button.getContext().getString(
-              is_installed ? R.string.dictionaries_delete_button : R.string.dictionaries_download_button));
+      if (download_progress != null)
+        download_progress.setVisibility(pending ? View.VISIBLE : View.GONE);
+      download_button.setVisibility(pending ? View.GONE : View.VISIBLE);
+      if (!pending)
+      {
+        download_button.setImageResource(is_installed ? R.drawable.ic_delete : R.drawable.ic_download);
+        download_button.setContentDescription(
+            download_button.getContext().getString(
+                is_installed ? R.string.dictionaries_delete_button : R.string.dictionaries_download_button));
+      }
     }
 
     @Override

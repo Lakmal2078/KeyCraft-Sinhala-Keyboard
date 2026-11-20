@@ -41,11 +41,15 @@ public class SlideBarPreference extends DialogPreference
   {
     super(context, attrs);
     _initialSummary = getSummary().toString();
+    float density = context.getResources().getDisplayMetrics().density;
+    int hPad = Math.round(20 * density);
+    int vPad = Math.round(14 * density);
     _textView = new TextView(context);
-    _textView.setPadding(48, 40, 48, 40);
+    _textView.setPadding(hPad, vPad, hPad, Math.round(8 * density));
     _seekBar = new SeekBar(context);
     _seekBar.setOnSeekBarChangeListener(this);
     _seekBar.setMax(STEPS);
+    _seekBar.setPadding(hPad, Math.round(8 * density), hPad, vPad);
     _min = float_of_string(attrs.getAttributeValue(null, "min"));
     _value = _min;
     _max = Math.max(1f, float_of_string(attrs.getAttributeValue(null, "max")));

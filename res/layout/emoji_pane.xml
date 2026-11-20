@@ -1,6 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical">
-  <com.lakmal.keycraftsinhala.EmojiGroupButtonsBar android:id="@+id/emoji_group_bar" android:layout_width="fill_parent" android:layout_height="48dp"/>
-  <com.lakmal.keycraftsinhala.EmojiGridView android:id="@+id/emoji_grid" android:layout_width="fill_parent" android:layout_height="@dimen/emoji_grid_height" android:orientation="vertical" android:numColumns="auto_fit" android:columnWidth="56dp" android:background="?attr/colorKeyboard"/>
-  <com.lakmal.keycraftsinhala.Keyboard2View android:id="@+id/emoji_bottom_row" layout="@xml/emoji_bottom_row" android:layout_width="fill_parent" android:layout_height="wrap_content" android:background="?attr/colorKeyboard"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?attr/colorKeyboard">
+
+  <!-- Mode Switcher Row: Emoji | Stickers | GIFs + Quick Search Toggle -->
+  <LinearLayout
+      android:id="@+id/emoji_mode_bar"
+      android:layout_width="match_parent"
+      android:layout_height="44dp"
+      android:orientation="horizontal"
+      android:gravity="center_vertical"
+      android:paddingStart="8dp"
+      android:paddingEnd="8dp">
+
+    <Button
+        android:id="@+id/emoji_tab_emoji"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:layout_margin="2dp"
+        android:background="@drawable/suggestions_pill_background"
+        android:text="@string/emoji_tab_emoji"
+        android:textAllCaps="false"
+        android:textSize="13sp"
+        android:textColor="?attr/colorLabel"/>
+
+    <Button
+        android:id="@+id/emoji_tab_stickers"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:layout_margin="2dp"
+        android:background="@drawable/bg_toolbar_button"
+        android:text="@string/emoji_tab_stickers"
+        android:textAllCaps="false"
+        android:textSize="13sp"
+        android:textColor="?attr/colorLabel"/>
+
+    <Button
+        android:id="@+id/emoji_tab_gifs"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:layout_margin="2dp"
+        android:background="@drawable/bg_toolbar_button"
+        android:text="@string/emoji_tab_gifs"
+        android:textAllCaps="false"
+        android:textSize="13sp"
+        android:textColor="?attr/colorLabel"/>
+  </LinearLayout>
+
+  <!-- Offline keyword filter bar (visible in Emoji tab) -->
+  <HorizontalScrollView
+      android:id="@+id/emoji_search_strip"
+      android:layout_width="match_parent"
+      android:layout_height="40dp"
+      android:scrollbars="none"
+      android:paddingStart="8dp"
+      android:paddingEnd="8dp">
+    <LinearLayout
+        android:id="@+id/emoji_search_chips"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"/>
+  </HorizontalScrollView>
+
+  <!-- Inline query input (collapsed unless Search chip is tapped) -->
+  <LinearLayout
+      android:id="@+id/emoji_search_input_row"
+      android:layout_width="match_parent"
+      android:layout_height="44dp"
+      android:orientation="horizontal"
+      android:gravity="center_vertical"
+      android:paddingStart="10dp"
+      android:paddingEnd="6dp"
+      android:visibility="gone">
+    <EditText
+        android:id="@+id/emoji_search_input"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:hint="@string/emoji_search_hint"
+        android:textColor="?attr/colorLabel"
+        android:textColorHint="?attr/colorSubLabel"
+        android:textSize="14sp"
+        android:singleLine="true"
+        android:imeOptions="actionSearch"
+        android:background="@drawable/suggestions_item_background"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"/>
+    <ImageButton
+        android:id="@+id/emoji_search_clear"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_toolbar_button"
+        android:src="@drawable/ic_close"
+        android:tint="?attr/colorLabel"
+        android:contentDescription="@string/emoji_search_clear"/>
+  </LinearLayout>
+
+  <com.lakmal.keycraftsinhala.EmojiGroupButtonsBar
+      android:id="@+id/emoji_group_bar"
+      android:layout_width="match_parent"
+      android:layout_height="48dp"/>
+
+  <!-- Content Area: Emoji Grid / Stickers Grid / GIFs List + Empty States -->
+  <FrameLayout
+      android:id="@+id/emoji_content_frame"
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/emoji_grid_height"
+      android:background="?attr/colorKeyboard">
+
+    <com.lakmal.keycraftsinhala.EmojiGridView
+        android:id="@+id/emoji_grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:numColumns="auto_fit"
+        android:columnWidth="56dp"
+        android:background="?attr/colorKeyboard"/>
+
+    <GridView
+        android:id="@+id/sticker_grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="2"
+        android:horizontalSpacing="8dp"
+        android:verticalSpacing="8dp"
+        android:padding="8dp"
+        android:visibility="gone"/>
+
+    <ListView
+        android:id="@+id/gif_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="?attr/clipboard_divider_color"
+        android:dividerHeight="1dp"
+        android:padding="6dp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/emoji_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="24dp"
+        android:textSize="14sp"
+        android:textColor="?attr/colorSubLabel"
+        android:visibility="gone"/>
+  </FrameLayout>
+
+  <com.lakmal.keycraftsinhala.Keyboard2View
+      android:id="@+id/emoji_bottom_row"
+      layout="@xml/emoji_bottom_row"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="?attr/colorKeyboard"/>
 </LinearLayout>

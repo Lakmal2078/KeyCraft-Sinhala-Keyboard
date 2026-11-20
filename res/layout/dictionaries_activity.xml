@@ -1,8 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:fitsSystemWindows="true">
-  <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:orientation="vertical">
-    <TextView style="@style/paragraph" android:text="@string/dictionaries_from_internet"/>
-    <com.lakmal.keycraftsinhala.dict.DictionaryListView device_locales="true" style="@style/dictionary_list_view"/>
-    <com.lakmal.keycraftsinhala.dict.DictionaryListView device_locales="false" style="@style/dictionary_list_view"/>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:paddingBottom="24dp">
+
+    <TextView
+        style="@style/paragraph"
+        android:text="@string/dictionaries_from_internet"
+        android:textSize="15sp"/>
+
+    <EditText
+        android:id="@+id/dictionaries_search_input"
+        style="@style/paragraph"
+        android:layout_height="48dp"
+        android:hint="@string/dictionaries_search_hint"
+        android:inputType="text"
+        android:singleLine="true"
+        android:importantForAutofill="no"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="@drawable/bg_card_surface"/>
+
+    <TextView
+        android:id="@+id/dictionaries_empty_view"
+        style="@style/paragraph"
+        android:gravity="center"
+        android:padding="24dp"
+        android:text="@string/dictionaries_no_results"
+        android:visibility="gone"/>
+
+    <com.lakmal.keycraftsinhala.dict.DictionaryListView
+        android:id="@+id/dictionaries_device_list"
+        device_locales="true"
+        style="@style/dictionary_list_view"/>
+
+    <com.lakmal.keycraftsinhala.dict.DictionaryListView
+        android:id="@+id/dictionaries_other_list"
+        device_locales="false"
+        style="@style/dictionary_list_view"/>
   </LinearLayout>
 </ScrollView>

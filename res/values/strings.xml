@@ -316,5 +316,109 @@
   <string name="quick_toolbar_theme_desc">Choose keyboard theme</string>
   <string name="candidates_toolbar_toggle_text">‹</string>
   <string name="candidates_show_toolbar_desc">Show quick actions</string>
+  <string name="quick_toolbar_suggestions_desc">Return to word suggestions</string>
+  <string name="quick_toolbar_one_hand_desc">Toggle one-handed mode</string>
+  <string name="quick_toolbar_edit_desc">Open cursor and text-editing panel</string>
+
+  <!-- One-handed & Floating mode -->
+  <string name="pref_one_hand_mode_title">One-handed mode</string>
+  <string name="pref_one_hand_mode_off">Off (full width)</string>
+  <string name="pref_one_hand_mode_left">Left-handed</string>
+  <string name="pref_one_hand_mode_right">Right-handed</string>
+  <string name="pref_floating_keyboard_title">Floating keyboard</string>
+  <string name="pref_floating_keyboard_summary">Display keyboard in a compact movable floating window</string>
+  <string name="one_hand_expand_desc">Expand to full width</string>
+  <string name="one_hand_flip_desc">Switch hand side</string>
+  <string name="one_hand_float_desc">Switch to floating keyboard</string>
+  <string name="keyboard_floating_drag_hint">⋮⋮ Drag to reposition</string>
+  <string name="keyboard_floating_dock">Dock</string>
+
+  <!-- Text Editing Panel -->
+  <string name="text_edit_select">Select</string>
+  <string name="text_edit_done">Done</string>
+  <string name="text_edit_del_word">Del Word</string>
+  <string name="text_edit_cursor_up">Move cursor up</string>
+  <string name="text_edit_cursor_down">Move cursor down</string>
+  <string name="text_edit_cursor_left">Move cursor left</string>
+  <string name="text_edit_cursor_right">Move cursor right</string>
+  <string name="key_descr_backspace">Backspace</string>
+
+  <!-- Clipboard UX -->
+  <string name="clipboard_privacy_note">Stored in temporary device memory only. Sensitive fields are skipped automatically.</string>
+  <string name="clipboard_clear_all">Clear all</string>
+  <string name="clipboard_clear_all_confirm">Clear clipboard history?</string>
+  <string name="clipboard_action_delete">Delete clipboard item</string>
+  <string name="clipboard_disabled_empty">Clipboard history is paused.</string>
+  <string name="clipboard_enable_action">Enable</string>
+  <string name="clipboard_history_empty">No copied items yet. Copied text or images will appear here.</string>
+  <string name="clipboard_pin_empty">No pinned clips. Tap the pin icon on any item to keep it here.</string>
+  <string name="clipboard_image_thumb_desc">Copied image preview</string>
+
+  <!-- Emoji, Stickers & GIFs -->
+  <string name="emoji_tab_emoji">Emoji</string>
+  <string name="emoji_tab_stickers">Stickers</string>
+  <string name="emoji_tab_gifs">GIFs</string>
+  <string name="emoji_search_chip_search">Search</string>
+  <string name="emoji_search_hint">Search emojis offline…</string>
+  <string name="emoji_search_clear">Clear search</string>
+  <string name="emoji_recents_empty">No recent emojis yet. Tap emojis from any category to build your recents.</string>
+  <string name="emoji_search_empty">No emojis match that keyword.</string>
+  <string name="emoji_category_recents">Recent emojis</string>
+  <string name="emoji_category_smileys">Smileys and emotion</string>
+  <string name="emoji_category_people">People and body</string>
+  <string name="emoji_category_animals">Animals and nature</string>
+  <string name="emoji_category_food">Food and drink</string>
+  <string name="emoji_category_travel">Travel and places</string>
+  <string name="emoji_category_activities">Activities</string>
+  <string name="emoji_category_objects">Objects</string>
+  <string name="emoji_category_symbols">Symbols</string>
+  <string name="emoji_category_flags">Flags</string>
+  <string name="emoji_skin_tone_desc">Choose skin tone variant</string>
+  <string name="stickers_commit_unsupported">This app does not accept pasted stickers or images.</string>
+  <string name="gif_empty_state">No copied GIFs found. KeyCraft stays 100%% offline and private — copy any GIF from your browser or chat to reuse it here.</string>
+  <string name="gif_item_label">GIF animation (%1$s)</string>
+
+  <!-- Color Picker & Settings -->
+  <string name="pref_color_hex_label">HEX:</string>
+  <string name="pref_color_reset">Reset</string>
+  <string name="pref_color_presets">Presets</string>
+  <string name="pref_color_red_fmt">Red: %1$d</string>
+  <string name="pref_color_green_fmt">Green: %1$d</string>
+  <string name="pref_color_blue_fmt">Blue: %1$d</string>
+  <string name="pref_color_contrast_fmt">Contrast ratio %1$.1f:1 (%2$s)</string>
+  <string name="pref_color_contrast_pass">AA Pass</string>
+  <string name="pref_color_contrast_low">Low contrast</string>
+  <string name="pref_color_preset_desc">Select preset color %1$s</string>
+  <string name="pref_color_preview_sample">Aa ක</string>
+  <string name="pref_foldable_disabled_summary">Available only on foldable devices</string>
+
+  <!-- Layouts & Dictionaries -->
+  <string name="pref_layouts_search_hint">Search layouts…</string>
+  <string name="pref_layouts_filter_all">All</string>
+  <string name="pref_layouts_filter_sinhala">Sinhala</string>
+  <string name="pref_layouts_filter_latin">Latin</string>
+  <string name="pref_layouts_filter_dev">Dev / Code</string>
+  <string name="pref_layouts_move_up">Move layout up</string>
+  <string name="pref_layouts_move_down">Move layout down</string>
+  <string name="pref_custom_layout_valid">Valid XML layout</string>
+  <string name="pref_custom_layout_error_fmt">Line %1$d: %2$s</string>
+  <string name="dictionaries_search_hint">Search language or locale…</string>
+  <string name="dictionaries_no_results">No matching dictionaries found.</string>
+  <string name="dictionaries_downloading_desc">Downloading dictionary</string>
+
+  <!-- Launcher & Accessibility -->
+  <string name="launcher_button_theme">Customize Theme</string>
+  <string name="launcher_button_settings">Settings</string>
+  <string name="a11y_swipe_action_fmt">Swipe %1$s for %2$s</string>
+  <string name="a11y_swipe_dir_nw">up-left</string>
+  <string name="a11y_swipe_dir_n">up</string>
+  <string name="a11y_swipe_dir_ne">up-right</string>
+  <string name="a11y_swipe_dir_w">left</string>
+  <string name="a11y_swipe_dir_e">right</string>
+  <string name="a11y_swipe_dir_sw">down-left</string>
+  <string name="a11y_swipe_dir_s">down</string>
+  <string name="a11y_swipe_dir_se">down-right</string>
+  <string name="a11y_long_press_action">Alternative character</string>
 </resources>
+
 
