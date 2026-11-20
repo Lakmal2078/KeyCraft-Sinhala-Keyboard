@@ -13,8 +13,8 @@
     <key c="o" ne="9" sw="("/>
     <key c="p" ne="0" sw=")"/>
   </row>
-  <row scale="10.0">
-    <key shift="0.25" c="a" nw="loc tab" ne="`" sw="?"/>
+  <row shift="0.25" scale="10.0">
+    <key c="a" nw="loc tab" ne="`" sw="?"/>
     <key c="s" ne="~" sw="&quot;"/>
     <key c="d" ne="-" sw="'"/>
     <key c="f" ne="_" sw=":"/>
@@ -22,7 +22,7 @@
     <key c="h" ne="=" sw="."/>
     <key c="j" ne="{" sw="["/>
     <key c="k" ne="}" sw="]"/>
-    <key shift="0.25" c="l" ne="|" sw="\\"/>
+    <key c="l" ne="|" sw="\\"/>
   </row>
   <row>
     <key shift="0.0" width="1.5" role="action" c="shift" ne="loc capslock"/>
