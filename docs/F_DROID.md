@@ -44,14 +44,14 @@ word-list source and both upstream license notices are retained in
   audit; verify it again with the current `fdroiddata` repository before PR.
 - A successful local Gradle build does not guarantee acceptance. Run the
   official `fdroid lint` and `fdroid build` checks and address maintainer review.
-- The first F-Droid metadata build entry must use the full Git commit hash for
-  the release tag, not the tag name. Create/publish `v1.2.0` only after the
-  release candidate is approved.
+- The `v1.2.0` release is published. The prepared F-Droid build entry below
+  pins the full source commit hash (`419e3d68d29eed6730b18102c1df6e5a5e9b6da4`),
+  rather than using the tag name as the build revision.
 
 ## Metadata template
 
-Copy the following into `fdroiddata/metadata/com.lakmal.keycraftsinhala.yml`
-after the `v1.2.0` tag is published. A draft is already prepared at
+The following metadata is ready to submit as
+`fdroiddata/metadata/com.lakmal.keycraftsinhala.yml`. The maintained draft is
 `docs/fdroiddata/com.lakmal.keycraftsinhala.yml`; its `commit` field points to
 the full source commit SHA and must remain a full hash, not a branch or tag name.
 
