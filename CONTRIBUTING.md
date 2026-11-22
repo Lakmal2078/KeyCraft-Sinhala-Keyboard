@@ -1,273 +1,82 @@
 # Contributing
 
-Thanks for contributing :)
+Thanks for your interest in contributing to KeyCraft Sinhala Keyboard. Bug reports, documentation improvements, tests, and code changes are welcome.
 
-## Building the app
+## Development requirements
 
-The application uses Gradle and can be used with Android Studio, but using
-Android Studio is not required. The build dependencies are:
-- OpenJDK 17
-- Android SDK: build tools, platform `android-36`
-- Python 3.x (required for `gen_layouts.py`, `gen_method_xml.py`, `check_layout.py`, compose compiler)
-- fontforge (required for compiling special font icons in `srcs/special_font`)
-- keytool (from JDK, used to generate local debug keystore)
+- Android Studio (recommended)
+- JDK 17
+- Android SDK with Android platform 36 and the corresponding build tools
+- Python 3 for the Sinhala generator test suite
 
-Verify that both Java tools use JDK 17 before running Gradle:
+Open the project in Android Studio, or use the Gradle wrapper from a terminal. If the Android SDK is not detected automatically, configure its location in Android Studio or set `ANDROID_HOME` / `ANDROID_SDK_ROOT`.
 
-```sh
-java -version
-javac -version
-printf 'JAVA_HOME=%s\n' "${JAVA_HOME:-}"
-```
+## Build
 
-Set `JAVA_HOME` to the JDK 17 installation and ensure `$JAVA_HOME/bin` is on
-`PATH` if either command resolves to another Java installation.
-
-Make sure the Git submodules are initialized and point to the right revision:
-
-```sh
-git submodule update --init --recursive
-```
-
-The dictionary reader used by the app is implemented in pure Java. The legacy
-`vendor/cdict` submodule is retained for source-history/reference purposes but
-is not compiled or packaged by the Android app; an Android NDK build is not
-required.
-
-See `.env.example` for environment variable options when signing debug and release APKs.
-
-For Android Studio users, no additional native-library build step is required.
-
-For Nix users, the right environment can be obtained with `nix-shell ./shell.nix`.
-Instructions to install Nix are [here](https://wiki.nixos.org/wiki/Nix_Installation_Guide).
-
-If you don't use Android Studio or Nix, you have to inform Gradle about the
-location of your Android SDK by either:
-- Setting the `ANDROID_HOME` environment variable to point to the android sdk or
-- Creating the file `local.properties` and writing
-  `sdk.dir=<location_of_android_home>` into it.
-
-Running tests:
-
-```sh
-python3 scripts/run_sinhala_python_tests.py
-./gradlew test
-./gradlew lintDebug
-```
-
-The Python discovery root is `test/sinhala`; running discovery from `test`
-currently skips these tests because that directory is not a Python package.
-
-Building the debug apk:
+From the repository root, run:
 
 ```sh
 ./gradlew assembleDebug
 ```
 
-Nix users can call gradle directly: `gradle assembleDebug`.
+The debug APK is generated under:
 
-If the build succeeds, the debug APK is located in
-`build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk`.
+```text
+build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk
+```
 
-## Debugging on your phone
+To install the debug build on a connected device with USB debugging enabled:
 
-First [Enable adb debugging on your device](https://developer.android.com/studio/command-line/adb#Enabling).
-Then connect your phone to your computer using an USB cable or via wireless
-debugging.
-
-If you use Android Studio, this process will be automatic and you don't have to
-follow this guide anymore.
-
-And finally, install the application with:
 ```sh
 ./gradlew installDebug
 ```
 
-The released version of the application won't be removed, both versions will
-be installed at the same time.
+## Tests and static analysis
 
-## Debugging the application: INSTALL_FAILED_UPDATE_INCOMPATIBLE
-
-`./gradlew installDebug` can fail with the following error message:
-
-```
-FAILURE: Build failed with an exception.
-* What went wrong:
-Execution failed for task ':installDebug'.
-> java.util.concurrent.ExecutionException: com.android.builder.testing.api.DeviceException: com.android.ddmlib.InstallException: INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package com.lakmal.keycraftsinhala.debug signatures do not match newer version; ignoring!
-```
-
-The application can't be "updated" because the temporary certificate has been
-lost. The solution is to uninstall and install again.
-The application must be enabled again in the settings.
+Run the Sinhala Python generator tests:
 
 ```sh
-adb uninstall com.lakmal.keycraftsinhala.debug
-./gradlew installDebug
+python3 scripts/run_sinhala_python_tests.py
 ```
 
-## Debug signing
+Run Android JVM unit tests and Android Lint:
 
-GitHub Actions generates an ephemeral debug keystore for each workflow run.
-The debug APK signature therefore differs between runs, so uninstall an
-existing debug build before installing an APK from a different run.
-
-For local builds, set `DEBUG_KEYSTORE` to a keystore file path and provide its
-passwords with `DEBUG_KEYSTORE_PASSWORD` and `DEBUG_KEY_PASSWORD`. Set
-`DEBUG_KEY_ALIAS` when the keystore uses an alias other than `debug`.
-
-## Guidelines
-
-### Adding a layout
-
-Layouts are defined in XML, see `srcs/layouts/latn_qwerty_us.xml`.
-An online tool for editing layout files written by @Lixquid is available
-[here](https://unexpected-keyboard-layout-editor.lixquid.com/).
-
-Makes sure to specify the `name` attribute like in `latn_qwerty_us.xml`,
-otherwise the layout won't be added to the app.
-
-The layout file must be placed in the `srcs/layouts` directory and named
-according to:
-- script (`latn` for latin, etc..)
-- layout name (eg. the name of a standard)
-- country code (or language code if more adequate)
-
-Then, run `./gradlew genLayoutsList` to add the layout to the app.
-
-The last step will update the file `res/values/layouts.xml`, that you should
-not edit directly.
-
-Run `./gradlew checkKeyboardLayouts` to check some properties about your
-layout. This will change the file `check_layout.output`, which you should
-commit.
-
-Layouts are CC0 licensed by default. If you do not want your layout to be
-released into the public domain, add a copyright notice at the top of the file
-and a mention in `srcs/layouts/LICENSE`.
-
-#### Adding a programming layout
-
-A programming layout must contain all ASCII characters.
-The current programming layouts are: QWERTY, Dvorak and Colemak.
-
-See for example, Dvorak, added in https://github.com/Julow/Unexpected-Keyboard/pull/16
-
-It's best to leave free spots on the layout for language-specific symbols that
-are added automatically when necessary.
-These symbols are defined in `res/xml/method.xml` (`extra_keys`).
-
-It's possible to place extra keys with the `loc` prefix. These keys are
-normally hidden unless they are needed.
-
-Some users cannot easily type the characters close the the edges of the screen
-due to a bulky phone case. It is best to avoid placing important characters
-there (such as the digits or punctuation).
-
-#### Adding a localized layout
-
-Localized layouts (a layout specific to a language) are gladly accepted.
-See for example: 4333575 (Bulgarian), 88e2175 (Latvian), 133b6ec (German).
-
-They don't need to contain every ASCII characters (although it's useful in
-passwords) and dead-keys.
-
-### Adding support for a language
-
-Supported locales are defined in `res/xml/method.xml`.
-
-The attributes `languageTag` and `imeSubtypeLocale` define a locale, the
-attribute `imeSubtypeExtraValue` defines the default layout and the dead-keys
-and other extra keys to show.
-
-The list of language tags (generally two letters)
-and locales (generally of the form `xx_XX`)
-can be found in this [stackoverflow answer](https://stackoverflow.com/a/7989085)
-
-### Updating translations
-
-The text used in the app is written in `res/values-<language_tag>/strings.xml`.
-
-The list of language tags can be found in this
-[stackoverflow answer](https://stackoverflow.com/a/7989085)
-
-The first part before the `_` is used, for example,
-`res/values-fr/strings.xml` for French,
-`res/values-lv/strings.xml` for Latvian.
-
-Commented-out lines indicate missing translations:
-
-```xml
-  <!-- <string name="pref_layouts_add">Add an alternate layout</string> -->
+```sh
+./gradlew test
+./gradlew lintDebug
 ```
 
-Remove the `<!--` and `-->` parts and change the text.
+For instrumentation tests, connect a compatible Android device or start an emulator:
 
-Incomplete locales use Android's default English fallback in `res/values`.
-`lint.xml` reports missing translations as warnings while this backlog is
-completed through Weblate. Do not copy English strings into locale files just
-to clear those warnings. Other lint errors, including unsupported Android API
-calls and missing components, continue to fail the build.
-
-### Adding a translation
-
-The preferred method for translating the app is to use Weblate:
-https://hosted.weblate.org/engage/unexpected-keyboard/
-
-The `res/values-<language_tag>/strings.xml` file must be created by copying the
-default translation in `res/values/strings.xml`, which contain the structure of
-the file and the English strings.
-
-Store descriptions in `fastlane/metadata/android/` are updated automatically.
-Translating changelogs is not useful.
-
-The app name might be partially translated, the "Unexpected" word should remain
-untranslated if possible.
-
-As translations need to be updated regularly, you can subscribe to this issue
-to receive a notification when an update is needed:
-https://github.com/Julow/Unexpected-Keyboard/issues/373
-
-### Adding symbols to Shift, Fn, Compose and other modifiers
-
-New key combinations can be added to builtin modifiers in the following files:
-
-- Shift in `srcs/compose/shift.json`.
-- Fn in `srcs/compose/fn.json`.
-- Compose in `srcs/compose/compose/extra.json`.
-- Other modifiers are defined in the `accent_*.json` files in `srcs/compose`.
-
-Generated code must then be updated by running:
-
-```
-./gradlew compileComposeSequences
+```sh
+./gradlew connectedDebugAndroidTest
 ```
 
-These files describe each symbols that get transformed when a given modifier is
-activated, in JSON format. For example:
+When changing keyboard layout definitions, also run:
 
-Example from `fn.json`, when `Fn` is activated, `<` becomes `«`:
-```json
-{
-  "<": "«",
-}
+```sh
+./gradlew checkKeyboardLayouts
 ```
 
-The result of a sequence can be a key name. See the list of key names in
-[doc/Possible-key-values.md](doc/Possible-key-values.md). For example from
-`fn.json`, when `Fn` is activated, space becomes `nbsp`:
-```json
-{
-  " ": "nbsp",
-}
-```
+Review generated-file changes before committing. Do not commit unrelated build outputs or local IDE files.
 
-Compose sequences are made of several steps. For example, the sequence
-`Compose V s = Š` is defined as:
-```json
-{
-  "V": {
-    "s": "Š"
-  }
-}
-```
+## Dictionary implementation and vendored sources
+
+The Android app uses the pure-Java dictionary reader in the application source tree. **`vendor/cdict` and `vendor/Android.mk` are not required to build or package the current Android app.** They are retained in the repository for reference/history and are not part of the current app build path. An Android NDK installation or native-library build is not required for the current app.
+
+## Pull request guidelines
+
+- Keep each pull request focused and describe the user-visible or maintenance impact.
+- Include the commands used to build and test the change, along with their results.
+- Add or update tests when changing behavior or generators.
+- Include screenshots for user-visible UI changes when practical.
+- Do not include signing keys, passwords, personal data, generated build directories, or unrelated files.
+- Call out any known limitations or follow-up work in the pull request description.
+
+## Reporting bugs
+
+Use the [GitHub issue tracker](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues). Include the Android version, device model, steps to reproduce, and relevant logs. Do not include passwords, private message contents, or sensitive clipboard data.
+
+## License
+
+By submitting a contribution, you agree that it may be distributed under the project's [GPL-3.0 license](LICENSE), subject to the applicable rights and notices for third-party components.

@@ -56,7 +56,6 @@ jobs:
               -storepass android \
               -validity 10000
           fi
-          chmod +x gradlew
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace

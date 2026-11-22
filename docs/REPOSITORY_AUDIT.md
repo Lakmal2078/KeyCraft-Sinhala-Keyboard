@@ -1,8 +1,26 @@
 # Repository Audit Report
 
 **Audited repository:** `Lakmal2078/KeyCraft-Sinhala-Keyboard`
-**Base commit inspected:** `afc11ae9`
-**Scope:** source, Android manifest/build scripts, generator, generated Sinhala layout, tests, workflows, and native-library integration. The baseline audit was performed at the recorded commit; follow-up remediation is being validated on the active `keycraft-branding` branch. CI remains the authoritative emulator/device-test check.
+**Historical audit baseline:** `afc11ae9`
+**Current maintenance branch:** `main`
+**Scope:** source, Android manifest/build scripts, generator, generated Sinhala layout, tests, workflows, and native-library integration. The technical findings below describe the inspected source and their original remediation context; repository-cleanup progress is tracked separately below. CI remains the authoritative emulator/device-test check.
+
+## Repository cleanup status
+
+### Phase 1 — Safe cleanup: completed
+
+- **Commit:** `fa4c1eab31aca4b9ceca6286467f6f2af3fb1b77`
+- **Removed:** `public/assets/aistudio/`, `audit_report.md`, `verification_report.md`, and duplicate Open Graph images (`assets/og-keycraft.jpg`, `assets/og-keycraft.png`, `docs/assets/og-keycraft.jpg`, `docs/assets/og-keycraft.png`).
+- **Modified:** `.gitignore`, `build.gradle.kts`, and `gradlew` (executable mode set to `100755`).
+- **Build verification:** `./gradlew assembleDebug` — **PASS**.
+
+### Phase 2 — Documentation and Gradle polish: pending
+
+README, contributor guidance, repository audit notes, Gradle configuration review, and CI workflow review are being handled as a separate change set.
+
+### Phase 3 — Resource review: pending
+
+A separate, evidence-based review of remaining resources is still required. No resource deletion is implied by completion of Phase 1.
 
 ## Executive summary
 
@@ -37,7 +55,7 @@ None confirmed.
 | AUD-05 | Bug | `gen_sinhala_phonetic_layout.py:263-274` | The invalid-`ESCAPE_LIST` branch constructed a `TypeError` but never raised it, allowing invalid configuration to be silently treated as “not escaped.” | The branch now validates entry types independently from range matching and raises on malformed entries; regression test added. |
 | AUD-06 | Maintainability Issue | `srcs/java/com/lakmal/keycraftsinhala/SinhalaInputHandler.java`; `README.md` | The browser-specific grapheme helper had no production call site; its behavior was only exercised by isolated unit tests. | Removed the unused helper and its class-specific tests. README and v1.2.0 release notes no longer claim the unintegrated grapheme-deletion behavior. |
 | AUD-07 | Maintainability Issue | `build.gradle.kts:35,45,93`; `.github/workflows/android.yml`; `.github/workflows/make-apk.yml` | The app-side `juloo.cdict.Cdict` implementation is pure Java; no JNI native declaration or `System.loadLibrary` call was found. CI nevertheless built `libcdict_java.so` and Gradle configured native library packaging. | Removed unused ABI/JNI packaging configuration and NDK build steps from CI. The vendor submodule and makefile remain in the tree; deleting vendored source is a separate repository-history decision. |
-| AUD-08 | Risk | `.github/workflows/check-generated.yml` | The generated-file workflow checked the layout list, compose data and method XML, but not the physical Sinhala layout emitted by `gen_sinhala_phonetic_layout.py`. | Added a Python unit-test step and a checked-in-output drift check; this check passed on the follow-up commit. |
+| AUD-08 | Risk | `.github/workflows/check-generated.yml` | The generated-file workflow checked the layout list, compose data and method XML, but not the physical Sinhala layout emitted by `gen_sinhala_phonetic_layout.py`. | Added a Python unit-test step and a checked-in-output drift check; this check passed after the remediation was added. |
 | AUD-09 | Risk | `srcs/java/com/lakmal/keycraftsinhala/SinhalaInputHandler.java` (removed) | The unintegrated helper attempted custom grapheme-boundary handling without editor/device-level validation. | Removed the helper rather than introducing an unverified replacement path. Any future grapheme-aware deletion must be implemented in the actual `KeyEventHandler` input path and validated on supported Android editors/devices. |
 
 ## Architecture review

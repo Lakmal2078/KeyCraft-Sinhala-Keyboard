@@ -47,7 +47,6 @@ jobs:
       - name: Prepare environment for runner
         run: |
           sed -i '/android.aapt2FromMavenOverride/d' gradle.properties || true
-          chmod +x gradlew
 
       - name: Inspect Gradle dependencies
         run: ./gradlew dependencies --configuration debugRuntimeClasspath
