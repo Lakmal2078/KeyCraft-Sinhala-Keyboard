@@ -99,6 +99,9 @@ public class CandidatesView extends LinearLayout
         if (_item_views[i] != null)
           _item_views[i].setTextColor(textColor);
       }
+      View toggle = findViewById(R.id.candidates_toolbar_toggle);
+      if (toggle instanceof TextView)
+        ((TextView)toggle).setTextColor(textColor);
     }
     else
     {

@@ -772,7 +772,30 @@ public class Keyboard2 extends InputMethodService
   private void update_top_bar_visibility()
   {
     boolean can_show_candidates = should_show_candidates();
-    boolean show_toolbar = _config.show_quick_toolbar;
+    boolean show_toolbar = _config.show_quick_toolbar && _quick_toolbar != null;
+    boolean has_active_candidates = can_show_candidates && _has_active_suggestions;
+    boolean can_side_by_side =
+        _config.split_layout || _config.wide_screen || _config.orientation_landscape;
+
+    boolean toolbar_visible;
+    boolean candidates_visible;
+    if (can_side_by_side)
+    {
+      toolbar_visible = show_toolbar;
+      candidates_visible = can_show_candidates && (!toolbar_visible || _has_active_suggestions);
+    }
+    else if (show_toolbar)
+    {
+      boolean showing_suggestions = has_active_candidates && !_show_quick_toolbar_override;
+      candidates_visible = showing_suggestions;
+      toolbar_visible = !showing_suggestions;
+    }
+    else
+    {
+      toolbar_visible = false;
+      candidates_visible = can_show_candidates;
+    }
+
     if (_quick_toolbar != null)
     {
       View translate = _quick_toolbar.findViewById(R.id.toolbar_btn_translate);
@@ -784,27 +807,28 @@ public class Keyboard2 extends InputMethodService
       }
       View backToSuggestions = _quick_toolbar.findViewById(R.id.toolbar_btn_suggestions);
       if (backToSuggestions != null)
-        backToSuggestions.setVisibility(View.GONE);
+      {
+        boolean showBack = toolbar_visible && !can_side_by_side
+            && has_active_candidates && _show_quick_toolbar_override;
+        backToSuggestions.setVisibility(showBack ? View.VISIBLE : View.GONE);
+      }
+      _quick_toolbar.setVisibility(toolbar_visible ? View.VISIBLE : View.GONE);
     }
 
-    boolean toolbar_visible = show_toolbar && _quick_toolbar != null;
-    boolean candidates_visible = can_show_candidates
-        && (!toolbar_visible || _has_active_suggestions);
-
-    if (_quick_toolbar != null)
-      _quick_toolbar.setVisibility(toolbar_visible ? View.VISIBLE : View.GONE);
     if (_candidates_view != null)
     {
       _candidates_view.setVisibility(candidates_visible ? View.VISIBLE : View.GONE);
       View toggle = _candidates_view.findViewById(R.id.candidates_toolbar_toggle);
       if (toggle != null)
-        toggle.setVisibility(View.GONE);
+      {
+        boolean showToggle = candidates_visible && show_toolbar && !can_side_by_side;
+        toggle.setVisibility(showToggle ? View.VISIBLE : View.GONE);
+      }
     }
 
     if (_top_strip_container != null && _quick_toolbar != null && _candidates_view != null)
     {
-      boolean sideBySide = toolbar_visible && candidates_visible
-          && (_config.split_layout || _config.wide_screen || _config.orientation_landscape);
+      boolean sideBySide = toolbar_visible && candidates_visible && can_side_by_side;
       int barHeight = Math.round(48f * getResources().getDisplayMetrics().density);
       _top_strip_container.setOrientation(
           sideBySide ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
@@ -824,6 +848,7 @@ public class Keyboard2 extends InputMethodService
   private void refresh_candidates_view()
   {
     _has_active_suggestions = false;
+    _show_quick_toolbar_override = false;
     if (should_show_candidates())
     {
       _candidates_view.refresh_config(_config);

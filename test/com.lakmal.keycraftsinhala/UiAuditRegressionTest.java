@@ -216,6 +216,68 @@ public class UiAuditRegressionTest
   }
 
   @Test
+  public void portraitTopStripHidesToolbarDuringActiveSuggestionsAndRestoresWhenCleared()
+      throws Exception
+  {
+    Keyboard2 keyboard = mock(Keyboard2.class, CALLS_REAL_METHODS);
+    Resources res = mock(Resources.class);
+    DisplayMetrics dm = new DisplayMetrics();
+    dm.density = 2.0f;
+    when(keyboard.getResources()).thenReturn(res);
+    when(res.getDisplayMetrics()).thenReturn(dm);
+
+    Config config = new Config();
+    config.editor_config = new EditorConfig();
+    config.editor_config.should_show_candidates_view = true;
+    config.editor_config.is_sensitive_input = false;
+    config.suggestions_enabled = true;
+    config.sinhala_transliteration = true;
+    config.show_quick_toolbar = true;
+    config.split_layout = false;
+    config.wide_screen = false;
+    config.orientation_landscape = false;
+
+    ViewGroup toolbar = mock(ViewGroup.class);
+    View backToSuggestions = mock(View.class);
+    when(toolbar.findViewById(R.id.toolbar_btn_suggestions)).thenReturn(backToSuggestions);
+    CandidatesView candidates = mock(CandidatesView.class);
+    View toolbarToggle = mock(View.class);
+    when(candidates.findViewById(R.id.candidates_toolbar_toggle)).thenReturn(toolbarToggle);
+    LinearLayout topStrip = mock(LinearLayout.class);
+
+    setField(Keyboard2.class, keyboard, "_config", config);
+    setField(Keyboard2.class, keyboard, "_quick_toolbar", toolbar);
+    setField(Keyboard2.class, keyboard, "_candidates_view", candidates);
+    setField(Keyboard2.class, keyboard, "_top_strip_container", topStrip);
+
+    Method update = Keyboard2.class.getDeclaredMethod("update_top_bar_visibility");
+    update.setAccessible(true);
+
+    // 1. Active suggestions in portrait hide toolbar and show candidates + toggle
+    setField(Keyboard2.class, keyboard, "_has_active_suggestions", true);
+    setField(Keyboard2.class, keyboard, "_show_quick_toolbar_override", false);
+    update.invoke(keyboard);
+    verify(toolbar).setVisibility(View.GONE);
+    verify(candidates).setVisibility(View.VISIBLE);
+    verify(toolbarToggle).setVisibility(View.VISIBLE);
+    verify(backToSuggestions).setVisibility(View.GONE);
+
+    // 2. Manual toolbar override swaps candidates -> toolbar without double height
+    setField(Keyboard2.class, keyboard, "_show_quick_toolbar_override", true);
+    update.invoke(keyboard);
+    verify(toolbar).setVisibility(View.VISIBLE);
+    verify(candidates).setVisibility(View.GONE);
+    verify(backToSuggestions).setVisibility(View.VISIBLE);
+
+    // 3. Clearing suggestions automatically restores toolbar and hides candidates
+    setField(Keyboard2.class, keyboard, "_has_active_suggestions", false);
+    setField(Keyboard2.class, keyboard, "_show_quick_toolbar_override", false);
+    update.invoke(keyboard);
+    verify(toolbar, org.mockito.Mockito.times(2)).setVisibility(View.VISIBLE);
+    verify(candidates, org.mockito.Mockito.times(2)).setVisibility(View.GONE);
+  }
+
+  @Test
   public void vibrantCategoryMapsExpressiveThemes()
   {
     String[] vibrantThemes = {
