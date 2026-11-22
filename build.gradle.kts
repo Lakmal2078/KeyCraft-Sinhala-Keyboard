@@ -1,6 +1,5 @@
 import buildlogic.InitDebugKeystore
 import buildlogic.ValidateReleaseSigning
-import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import java.io.FileOutputStream
 import java.util.Base64
 import java.util.Date
@@ -76,12 +75,6 @@ android {
       resources.srcDirs("test/resources")
     }
   }
-
-  // externalNativeBuild {
-  //   ndkBuild {
-  //     path = file("vendor/Android.mk")
-  //   }
-  // }
 
   signingConfigs {
     create("debugConfig") {
@@ -262,17 +255,6 @@ tasks.named("preBuild") {
   // are checked in the repository that don't need to be updated during regular
   // builds.
   mustRunAfter(genEmojis, genLayoutsList, compileComposeSequences, genMethodXml)
-}
-
-val copyDebugApkToAppPath by tasks.registering(Copy::class) {
-  from(layout.buildDirectory.dir("outputs/apk/debug"))
-  include("KeyCraft-Sinhala-Keyboard-debug.apk")
-  into(rootProject.layout.projectDirectory.dir("app/build/outputs/apk/debug"))
-  rename { "app-debug.apk" }
-}
-
-tasks.matching { it.name == "assembleDebug" }.configureEach {
-  finalizedBy(copyDebugApkToAppPath)
 }
 
 val generateReleaseApkReport by tasks.registering {

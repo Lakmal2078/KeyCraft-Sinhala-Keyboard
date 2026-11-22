@@ -7,15 +7,17 @@
 /.idea
 .DS_Store
 /captures
-/build
-buildSrc/build
+**/build/
 /app
 /libs/**/*.so
 /obj
 # Directory _build is not used anymore
 /_build
 /release
-__pycache__
+__pycache__/
+*.pyc
+.pytest_cache/
+Thumbs.db
 *.class
 .attach_pid*
 .env
