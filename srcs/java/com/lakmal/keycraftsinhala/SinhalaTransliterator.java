@@ -190,7 +190,6 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("avissawella", "අවිස්සාවේල්ල");
     COMMON_WORDS.put("beruwala", "බේරුවල");
     COMMON_WORDS.put("aluthgama", "අලුත්ගම");
-    COMMON_WORDS.put("balangoda", "බලන්ගොඩ");
     COMMON_WORDS.put("embilipitiya", "ඇඹිලිපිටිය");
     COMMON_WORDS.put("kuliyapitiya", "කුලියපිටිය");
     COMMON_WORDS.put("katunayake", "කටුනායක");
@@ -245,7 +244,7 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("switzerland", "ස්විට්සර්ලන්තය");
     COMMON_WORDS.put("thailand", "තායිලන්තය");
     COMMON_WORDS.put("maldives", "මාලදිවයින");
-    COMMON_WORDS.put("nadeeka", "නදීකා");
+    COMMON_WORDS.put("nadeekaa", "නදීකා");
     COMMON_WORDS.put("sanduni", "සඳුනි");
     COMMON_WORDS.put("anusha", "අනුෂා");
     COMMON_WORDS.put("dilani", "දිලානි");
@@ -470,7 +469,6 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("kageda", "කාගේද");
     COMMON_WORDS.put("katada", "කාටද");
     COMMON_WORDS.put("mokak", "මොකක්");
-    COMMON_WORDS.put("monada", "මොනවද");
     COMMON_WORDS.put("kiyada", "කීයද");
     COMMON_WORDS.put("apiwa", "අපිව");
     COMMON_WORDS.put("oyawa", "ඔයාව");
@@ -490,7 +488,6 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("inawa", "ඉන්නවා");
     COMMON_WORDS.put("innawa", "ඉන්නවා");
     COMMON_WORDS.put("hitanawa", "හිතනවා");
-    COMMON_WORDS.put("una", "වුණා");
     COMMON_WORDS.put("wuna", "වුණා");
     COMMON_WORDS.put("baerida", "බැරිද");
     COMMON_WORDS.put("barida", "බැරිද");
@@ -903,7 +900,7 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("langa", "ළඟ");
     COMMON_WORDS.put("lasantha", "ලසන්ත");
     COMMON_WORDS.put("late", "late");
-    COMMON_WORDS.put("lavinia", "කිස්ස");
+    COMMON_WORDS.put("lavinia", "ලවීනියා");
     COMMON_WORDS.put("lehena", "ලිහෙන");
     COMMON_WORDS.put("lehesi", "ලේසි");
     COMMON_WORDS.put("lesa", "ලෙස");

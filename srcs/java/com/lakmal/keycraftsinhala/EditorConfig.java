@@ -60,6 +60,29 @@ public final class EditorConfig
 
   public void refresh(EditorInfo info, Resources res)
   {
+    if (info == null)
+    {
+      this.info = null;
+      action_key_replacement = null;
+      enter_key_replacement = null;
+      actionId = 0;
+      selection_mode_enabled = true;
+      numeric_layout = false;
+      should_move_cursor_force_fallback = false;
+      caps_mode = 0;
+      caps_initially_enabled = false;
+      caps_initially_updated = false;
+      initial_text_before_cursor = null;
+      initial_text_after_cursor = null;
+      initial_sel_start = 0;
+      initial_sel_end = 0;
+      should_show_candidates_view = false;
+      is_sensitive_input = false;
+      is_password_input = false;
+      is_no_suggestions = false;
+      use_commit_replace_composing = false;
+      return;
+    }
     this.info = info;
     int inputType = info.inputType & InputType.TYPE_MASK_CLASS;
     int options = info.imeOptions;

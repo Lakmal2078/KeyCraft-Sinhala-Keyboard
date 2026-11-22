@@ -2,7 +2,6 @@ package com.lakmal.keycraftsinhala;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,15 +9,12 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,7 +25,6 @@ import androidx.core.content.FileProvider;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,8 +92,10 @@ final class StickerGifHelper
     View searchStrip = emojiPane.findViewById(R.id.emoji_search_strip);
     LinearLayout searchChips = emojiPane.findViewById(R.id.emoji_search_chips);
     View searchInputRow = emojiPane.findViewById(R.id.emoji_search_input_row);
-    EditText searchInput = emojiPane.findViewById(R.id.emoji_search_input);
+    TextView searchInput = emojiPane.findViewById(R.id.emoji_search_input);
+    View searchPaste = emojiPane.findViewById(R.id.emoji_search_paste);
     View searchClear = emojiPane.findViewById(R.id.emoji_search_clear);
+    LinearLayout searchLetters = emojiPane.findViewById(R.id.emoji_search_letters);
 
     EmojiGroupButtonsBar groupBar = emojiPane.findViewById(R.id.emoji_group_bar);
     EmojiGridView emojiGrid = emojiPane.findViewById(R.id.emoji_grid);
@@ -113,9 +110,23 @@ final class StickerGifHelper
     int subColor = resolveAttrColor(emojiPane.getContext(), R.attr.colorSubLabel, Color.LTGRAY);
     float density = emojiPane.getResources().getDisplayMetrics().density;
 
-    // Populate offline search chips + toggleable text input
+    // Populate offline search chips + toggleable in-IME letter search strip
     final String[] activeChipQuery = new String[] { null };
+    final StringBuilder queryBuf = new StringBuilder();
     final List<Button> tagButtons = new ArrayList<>();
+    final Runnable syncSearchState = () -> {
+      String q = queryBuf.toString();
+      if (searchInput != null)
+        searchInput.setText(q);
+      if (q.trim().isEmpty())
+      {
+        activeChipQuery[0] = null;
+        for (Button b : tagButtons)
+          b.setBackgroundResource(R.drawable.bg_toolbar_button);
+      }
+      applyEmojiSearch(emojiGrid, groupBar, q);
+    };
+
     if (searchChips != null)
     {
       searchChips.removeAllViews();
@@ -127,8 +138,14 @@ final class StickerGifHelper
           return;
         boolean show = searchInputRow.getVisibility() != View.VISIBLE;
         searchInputRow.setVisibility(show ? View.VISIBLE : View.GONE);
-        if (!show && searchInput != null)
-          searchInput.setText("");
+        if (groupBar != null)
+          groupBar.setVisibility(show ? View.GONE : View.VISIBLE);
+        if (!show)
+        {
+          queryBuf.setLength(0);
+          syncSearchState.run();
+        }
+        service.resizeEmojiPaneContent();
       });
       searchChips.addView(searchToggle, chipLayoutParams(density));
 
@@ -141,6 +158,11 @@ final class StickerGifHelper
         chip.setOnClickListener(v -> {
           boolean clearing = query.equals(activeChipQuery[0]);
           activeChipQuery[0] = clearing ? null : query;
+          queryBuf.setLength(0);
+          if (!clearing)
+            queryBuf.append(query);
+          if (searchInput != null)
+            searchInput.setText(queryBuf.toString());
           for (Button b : tagButtons)
           {
             boolean selected = b == chip && !clearing;
@@ -148,44 +170,73 @@ final class StickerGifHelper
                 ? R.drawable.suggestions_pill_background
                 : R.drawable.bg_toolbar_button);
           }
-          if (searchInput != null)
-            searchInput.setText(clearing ? "" : query);
           applyEmojiSearch(emojiGrid, groupBar, clearing ? "" : query);
         });
         searchChips.addView(chip, chipLayoutParams(density));
       }
     }
 
-    if (searchInput != null)
+    if (searchLetters != null)
     {
-      searchInput.addTextChangedListener(new TextWatcher()
-      {
-        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-        @Override
-        public void afterTextChanged(Editable s)
+      searchLetters.removeAllViews();
+      Button bksp = createChip(emojiPane.getContext(), "⌫", textColor, density);
+      bksp.setContentDescription(emojiPane.getContext().getString(R.string.emoji_search_backspace));
+      bksp.setOnClickListener(v -> {
+        if (queryBuf.length() > 0)
         {
-          String q = s == null ? "" : s.toString();
-          if (q.trim().isEmpty())
-          {
-            activeChipQuery[0] = null;
-            for (Button b : tagButtons)
-              b.setBackgroundResource(R.drawable.bg_toolbar_button);
-          }
-          applyEmojiSearch(emojiGrid, groupBar, q);
+          queryBuf.deleteCharAt(queryBuf.length() - 1);
+          syncSearchState.run();
         }
+      });
+      searchLetters.addView(bksp, chipLayoutParams(density));
+
+      Button spaceBtn = createChip(emojiPane.getContext(), "␣", textColor, density);
+      spaceBtn.setContentDescription(emojiPane.getContext().getString(R.string.emoji_search_space));
+      spaceBtn.setOnClickListener(v -> {
+        if (queryBuf.length() > 0 && queryBuf.length() < 40
+            && queryBuf.charAt(queryBuf.length() - 1) != ' ')
+        {
+          queryBuf.append(' ');
+          syncSearchState.run();
+        }
+      });
+      searchLetters.addView(spaceBtn, chipLayoutParams(density));
+
+      for (char ch = 'a'; ch <= 'z'; ch++)
+      {
+        final char letter = ch;
+        Button key = createChip(emojiPane.getContext(), String.valueOf(letter), textColor, density);
+        key.setOnClickListener(v -> {
+          if (queryBuf.length() < 40)
+          {
+            queryBuf.append(letter);
+            syncSearchState.run();
+          }
+        });
+        searchLetters.addView(key, chipLayoutParams(density));
+      }
+    }
+
+    if (searchPaste != null)
+    {
+      searchPaste.setOnClickListener(v -> {
+        String clip = ClipboardHistoryService.get_current_clip();
+        if (clip == null || clip.trim().isEmpty())
+          return;
+        String clean = clip.trim();
+        if (clean.length() > 40)
+          clean = clean.substring(0, 40);
+        queryBuf.setLength(0);
+        queryBuf.append(clean);
+        syncSearchState.run();
       });
     }
 
     if (searchClear != null)
     {
       searchClear.setOnClickListener(v -> {
-        activeChipQuery[0] = null;
-        for (Button b : tagButtons)
-          b.setBackgroundResource(R.drawable.bg_toolbar_button);
-        if (searchInput != null)
-          searchInput.setText("");
-        applyEmojiSearch(emojiGrid, groupBar, "");
+        queryBuf.setLength(0);
+        syncSearchState.run();
       });
     }
 
@@ -213,15 +264,13 @@ final class StickerGifHelper
       currentTab[0] = TAB_EMOJI;
       updateTabAppearance(tabEmoji, tabStickers, tabGifs, TAB_EMOJI);
       if (searchStrip != null) searchStrip.setVisibility(View.VISIBLE);
-      if (groupBar != null) groupBar.setVisibility(View.VISIBLE);
+      boolean searchBarOpen = searchInputRow != null && searchInputRow.getVisibility() == View.VISIBLE;
+      if (groupBar != null) groupBar.setVisibility(searchBarOpen ? View.GONE : View.VISIBLE);
       if (stickerGrid != null) stickerGrid.setVisibility(View.GONE);
       if (gifList != null) gifList.setVisibility(View.GONE);
       if (emojiGrid != null)
-      {
-        String q = searchInput != null && searchInput.getText() != null
-            ? searchInput.getText().toString() : "";
-        applyEmojiSearch(emojiGrid, groupBar, q);
-      }
+        applyEmojiSearch(emojiGrid, groupBar, queryBuf.toString());
+      service.resizeEmojiPaneContent();
     };
 
     if (tabEmoji != null)
@@ -239,6 +288,7 @@ final class StickerGifHelper
         if (gifList != null) gifList.setVisibility(View.GONE);
         if (emptyView != null) emptyView.setVisibility(View.GONE);
         if (stickerGrid != null) stickerGrid.setVisibility(View.VISIBLE);
+        service.resizeEmojiPaneContent();
       });
     }
 
@@ -253,6 +303,7 @@ final class StickerGifHelper
         if (emojiGrid != null) emojiGrid.setVisibility(View.GONE);
         if (stickerGrid != null) stickerGrid.setVisibility(View.GONE);
         refreshGifList.run();
+        service.resizeEmojiPaneContent();
       });
     }
 
@@ -536,30 +587,10 @@ final class StickerGifHelper
       label.setTextColor(_textColor);
 
       ImageView thumb = row.findViewById(android.R.id.icon);
-      Bitmap bmp = loadThumbnail(_ctx, item.uri, Math.round(40 * _density));
-      if (bmp != null)
-        thumb.setImageBitmap(bmp);
-      else
-        thumb.setImageResource(R.drawable.ic_toolbar_grid);
+      int px = Math.round(40 * _density);
+      ThumbnailLoader.loadInto(_ctx, thumb, item.uri, px, R.drawable.ic_toolbar_grid);
       thumb.setContentDescription(_ctx.getString(R.string.clipboard_image_thumb_desc));
       return row;
-    }
-
-    private static Bitmap loadThumbnail(Context ctx, Uri uri, int maxPx)
-    {
-      try (InputStream is = ctx.getContentResolver().openInputStream(uri))
-      {
-        if (is == null) return null;
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inSampleSize = 4;
-        Bitmap raw = BitmapFactory.decodeStream(is, null, opts);
-        if (raw == null) return null;
-        return Bitmap.createScaledBitmap(raw, Math.max(1, maxPx), Math.max(1, maxPx), true);
-      }
-      catch (Exception | OutOfMemoryError _e)
-      {
-        return null;
-      }
     }
   }
 }

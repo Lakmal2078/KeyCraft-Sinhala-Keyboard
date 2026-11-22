@@ -274,6 +274,10 @@ public class Keyboard2 extends InputMethodService
                 .putInt("floating_offset_x", Math.round(_keyboard_window_container.getTranslationX()))
                 .putInt("floating_offset_y", Math.round(_keyboard_window_container.getTranslationY()))
                 .apply();
+            if (event.getActionMasked() == MotionEvent.ACTION_UP
+                && Math.abs(event.getRawX() - _dragStartRawX) < 10f
+                && Math.abs(event.getRawY() - _dragStartRawY) < 10f)
+              v.performClick();
             return true;
         }
         return false;
@@ -581,6 +585,13 @@ public class Keyboard2 extends InputMethodService
       StickerGifHelper.bindEmojiPane(_emojiPane, this);
     }
 
+    resizeEmojiPaneContent();
+  }
+
+  void resizeEmojiPaneContent()
+  {
+    if (_emojiPane == null)
+      return;
     View contentFrame = _emojiPane.findViewById(R.id.emoji_content_frame);
     View grid = contentFrame != null ? contentFrame : _emojiPane.findViewById(R.id.emoji_grid);
     if (grid == null)
@@ -1013,31 +1024,45 @@ public class Keyboard2 extends InputMethodService
   }
 
   private void updateSoftInputWindowLayoutParams() {
-    final Window window = getWindow().getWindow();
+    final android.app.Dialog dialog = getWindow();
+    final Window window = (dialog != null) ? dialog.getWindow() : null;
+    if (window == null)
+      return;
     // On API >= 35, Keyboard2View behaves as edge-to-edge
     // APIs 30 to 34 have visual artifact when edge-to-edge is enabled
     if (VERSION.SDK_INT >= 35)
     {
       WindowManager.LayoutParams wattrs = window.getAttributes();
-      wattrs.layoutInDisplayCutoutMode =
-        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
-      // Allow to draw behind system bars
-      wattrs.setFitInsetsTypes(0);
+      if (wattrs != null)
+      {
+        wattrs.layoutInDisplayCutoutMode =
+          WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
+        // Allow to draw behind system bars
+        wattrs.setFitInsetsTypes(0);
+        window.setAttributes(wattrs);
+      }
       window.setDecorFitsSystemWindows(false);
     }
     updateLayoutHeightOf(window, ViewGroup.LayoutParams.MATCH_PARENT);
     final View inputArea = window.findViewById(android.R.id.inputArea);
+    if (inputArea == null)
+      return;
+    final ViewParent parent = inputArea.getParent();
+    if (!(parent instanceof View))
+      return;
+    final View inputAreaParent = (View) parent;
 
     updateLayoutHeightOf(
-            (View) inputArea.getParent(),
+            inputAreaParent,
             isFullscreenMode()
                     ? ViewGroup.LayoutParams.MATCH_PARENT
                     : ViewGroup.LayoutParams.WRAP_CONTENT);
-    updateLayoutGravityOf((View) inputArea.getParent(), Gravity.BOTTOM);
-
+    updateLayoutGravityOf(inputAreaParent, Gravity.BOTTOM);
   }
 
   private static void updateLayoutHeightOf(final Window window, final int layoutHeight) {
+    if (window == null)
+      return;
     final WindowManager.LayoutParams params = window.getAttributes();
     if (params != null && params.height != layoutHeight) {
       params.height = layoutHeight;
@@ -1046,6 +1071,8 @@ public class Keyboard2 extends InputMethodService
   }
 
   private static void updateLayoutHeightOf(final View view, final int layoutHeight) {
+    if (view == null)
+      return;
     final ViewGroup.LayoutParams params = view.getLayoutParams();
     if (params != null && params.height != layoutHeight) {
       params.height = layoutHeight;
@@ -1054,6 +1081,8 @@ public class Keyboard2 extends InputMethodService
   }
 
   private static void updateLayoutGravityOf(final View view, final int layoutGravity) {
+    if (view == null)
+      return;
     final ViewGroup.LayoutParams lp = view.getLayoutParams();
     if (lp instanceof LinearLayout.LayoutParams) {
       final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) lp;
@@ -1317,7 +1346,10 @@ public class Keyboard2 extends InputMethodService
 
   private IBinder getConnectionToken()
   {
-    return getWindow().getWindow().getAttributes().token;
+    android.app.Dialog dialog = getWindow();
+    Window window = (dialog != null) ? dialog.getWindow() : null;
+    WindowManager.LayoutParams attrs = (window != null) ? window.getAttributes() : null;
+    return (attrs != null) ? attrs.token : null;
   }
 
   private View inflate_view(int layout)

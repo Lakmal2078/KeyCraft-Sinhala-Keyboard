@@ -24,6 +24,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import androidx.customview.widget.ExploreByTouchHelper;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import android.view.Window;
 import android.view.WindowInsets;
@@ -114,7 +116,10 @@ public class Keyboard2View extends View
   private Window getParentWindow(Context context)
   {
     if (context instanceof InputMethodService)
-      return ((InputMethodService)context).getWindow().getWindow();
+    {
+      android.app.Dialog dialog = ((InputMethodService)context).getWindow();
+      return (dialog != null) ? dialog.getWindow() : null;
+    }
     if (context instanceof ContextWrapper)
       return getParentWindow(((ContextWrapper)context).getBaseContext());
     return null;
@@ -126,15 +131,21 @@ public class Keyboard2View extends View
       return;
     // The intermediate Window is a [Dialog].
     Window w = getParentWindow(context);
-    w.setNavigationBarColor(_theme.colorNavBar);
+    if (w == null)
+      return;
+    if (VERSION.SDK_INT < 35)
+      setLegacyNavigationBarColor(w, _theme.colorNavBar);
     if (VERSION.SDK_INT < 26)
       return;
-    int uiFlags = getSystemUiVisibility();
-    if (_theme.isLightNavBar)
-      uiFlags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
-    else
-      uiFlags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
-    setSystemUiVisibility(uiFlags);
+    WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(w, this);
+    if (controller != null)
+      controller.setAppearanceLightNavigationBars(_theme.isLightNavBar);
+  }
+
+  @SuppressWarnings("deprecation")
+  private static void setLegacyNavigationBarColor(Window w, int color)
+  {
+    w.setNavigationBarColor(color);
   }
 
   public void setKeyboard(KeyboardData kw)

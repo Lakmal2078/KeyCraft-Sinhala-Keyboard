@@ -57,7 +57,7 @@ KeyCraft යනු සිංහල සහ දෛනික ටයිප් කි
 - Optional Dictionaries Download කිරීමට Internet Permission භාවිත වේ.
 - Clipboard පහසුකම් සැකසුම් මඟින් පාලනය කළ හැක. Clipboard History හෝ Preview සක්‍රිය කිරීමට පෙර ඒවායේ Settings පරීක්ෂා කරන්න.
 - KeyCraft තුළ දැන්වීම් (Ads) නොමැත.
-- Keyboard preferences සහ app data cloud backup හෝ device-to-device transfer වෙත backup නොවේ.
+- Keyboard සැකසුම් (`com.lakmal.keycraftsinhala_preferences.xml`) පමණක් Android Backup / device transfer වෙත ඇතුළත් වන අතර, ඉගෙන ගත් වචන (learned predictions), download කළ dictionaries, මෑත emoji සහ clipboard දත්ත කිසිවිටෙක cloud backup නොවේ (උපාංගය තුළම පවතී).
 
 KeyCraft විවෘත මූලාශ්‍ර (Open Source) ව්‍යාපෘතියකි. Source Code එක පරීක්ෂා කර යෙදුමේ Permissions සහ ක්‍රියාකාරීත්වය පිළිබඳව වැඩිදුර සොයා බැලිය හැක.
 

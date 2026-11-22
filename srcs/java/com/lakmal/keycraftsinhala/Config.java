@@ -191,9 +191,9 @@ public class Config
     // The option value uses an unnamed scale where the baseline is around 25.
     float dpi_ratio = Math.max(dm.xdpi, dm.ydpi) / Math.min(dm.xdpi, dm.ydpi);
     float swipe_scaling = Math.min(dm.widthPixels, dm.heightPixels) / 10.f * dpi_ratio;
-    float swipe_dist_value = Float.valueOf(_prefs.getString("swipe_dist", "15"));
+    float swipe_dist_value = parseFloatPref(_prefs, "swipe_dist", 15f);
     swipe_dist_px = swipe_dist_value / 25.f * swipe_scaling;
-    float slider_sensitivity = Float.valueOf(_prefs.getString("slider_sensitivity", "30")) / 100.f;
+    float slider_sensitivity = parseFloatPref(_prefs, "slider_sensitivity", 30f) / 100.f;
     slide_step_px = slider_sensitivity * swipe_scaling;
     vibrate_custom = _prefs.getBoolean("vibrate_custom", false);
     vibrate_duration = _prefs.getInt("vibrate_duration", 20);
@@ -240,9 +240,9 @@ public class Config
     selected_number_layout = NumberLayout.of_string(_prefs.getString("number_entry_layout", "pin"));
     current_layout_narrow = _prefs.getInt("current_layout_portrait", 0);
     current_layout_wide = _prefs.getInt("current_layout_landscape", 0);
-    circle_sensitivity = Integer.valueOf(_prefs.getString("circle_sensitivity", "2"));
+    circle_sensitivity = parseIntPref(_prefs, "circle_sensitivity", 2);
     clipboard_history_enabled = _prefs.getBoolean("clipboard_history_enabled", false);
-    clipboard_history_duration = Integer.parseInt(_prefs.getString("clipboard_history_duration", "5"));
+    clipboard_history_duration = parseIntPref(_prefs, "clipboard_history_duration", 5);
     space_bar_auto_complete = _prefs.getBoolean("space_bar_auto_complete", false);
     sinhala_transliteration = _prefs.getBoolean("sinhala_transliteration", true);
     physical_keyboard_hide = _prefs.getString("physical_keyboard_behavior", "hide").equals("hide");
@@ -605,6 +605,43 @@ public class Config
       default: break;
     }
     e.apply();
+  }
+
+  static float parseFloatPref(SharedPreferences prefs, String key, float fallback)
+  {
+    try
+    {
+      String raw = prefs.getString(key, null);
+      if (raw == null)
+        return fallback;
+      String trimmed = raw.trim();
+      if (trimmed.isEmpty())
+        return fallback;
+      float val = Float.parseFloat(trimmed);
+      return (Float.isNaN(val) || Float.isInfinite(val)) ? fallback : val;
+    }
+    catch (Exception _e)
+    {
+      return fallback;
+    }
+  }
+
+  static int parseIntPref(SharedPreferences prefs, String key, int fallback)
+  {
+    try
+    {
+      String raw = prefs.getString(key, null);
+      if (raw == null)
+        return fallback;
+      String trimmed = raw.trim();
+      if (trimmed.isEmpty())
+        return fallback;
+      return Integer.parseInt(trimmed);
+    }
+    catch (Exception _e)
+    {
+      return fallback;
+    }
   }
 
   private static LayoutsPreference.Layout migrate_layout(String name)

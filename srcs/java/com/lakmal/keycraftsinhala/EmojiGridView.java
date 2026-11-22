@@ -342,8 +342,25 @@ public class EmojiGridView extends GridView
         emoji = Emoji.getEmojiByString(data[1]);
         if (emoji == null)
           continue ;
-        _lastUsed.put(emoji, Integer.valueOf(data[0]));
+        int count = parseLastUsedCount(data[0]);
+        if (count >= 0)
+          _lastUsed.put(emoji, count);
       }
+  }
+
+  static int parseLastUsedCount(String raw)
+  {
+    if (raw == null)
+      return -1;
+    try
+    {
+      int value = Integer.parseInt(raw.trim());
+      return value >= 0 ? value : -1;
+    }
+    catch (NumberFormatException _e)
+    {
+      return -1;
+    }
   }
 
   SharedPreferences emojiSharedPreferences()

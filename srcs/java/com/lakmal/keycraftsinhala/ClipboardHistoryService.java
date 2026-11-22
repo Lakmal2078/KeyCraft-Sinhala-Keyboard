@@ -47,7 +47,9 @@ public final class ClipboardHistoryService
 
   public static void set_history_enabled(boolean e)
   {
-    Config.globalConfig().set_clipboard_history_enabled(e);
+    Config cfg = Config.globalConfig();
+    if (cfg != null)
+      cfg.set_clipboard_history_enabled(e);
     if (_service == null)
       return;
     if (e)
@@ -87,7 +89,8 @@ public final class ClipboardHistoryService
     {
       _service._listener = null;
       _service.clear_history();
-      _service._cm.removePrimaryClipChangedListener(_service._system_listener);
+      if (_service._cm != null)
+        _service._cm.removePrimaryClipChangedListener(_service._system_listener);
       _service = null;
     }
   }
@@ -126,7 +129,8 @@ public final class ClipboardHistoryService
     _history = new ArrayList<HistoryEntry>();
     _cm = (ClipboardManager)ctx.getSystemService(Context.CLIPBOARD_SERVICE);
     _system_listener = this.new SystemListener();
-    _cm.addPrimaryClipChangedListener(_system_listener);
+    if (_cm != null)
+      _cm.addPrimaryClipChangedListener(_system_listener);
   }
 
   public synchronized List<String> clear_expired_and_get_history()
@@ -188,7 +192,7 @@ public final class ClipboardHistoryService
     }
     // History can differ from the current clipboard (for example after a
     // sensitive copy). Never clear an unrelated current clip.
-    if (first_pos_changed && clip.equals(get_current_clip()))
+    if (first_pos_changed && _cm != null && clip.equals(get_current_clip()))
     {
       if (VERSION.SDK_INT >= 28)
         _cm.clearPrimaryClip();
@@ -204,7 +208,8 @@ public final class ClipboardHistoryService
       empty strings. */
   public synchronized void add_clip(String clip)
   {
-    if (!Config.globalConfig().clipboard_history_enabled)
+    Config cfg = Config.globalConfig();
+    if (cfg == null || !cfg.clipboard_history_enabled)
       return;
     clear_expired_and_get_history();
     int size = _history.size();
@@ -225,7 +230,8 @@ public final class ClipboardHistoryService
       entries it lives only in memory and expires with the same TTL. */
   public synchronized void add_image_clip(Uri uri, String mime)
   {
-    if (!Config.globalConfig().clipboard_history_enabled)
+    Config cfg = Config.globalConfig();
+    if (cfg == null || !cfg.clipboard_history_enabled)
       return;
     if (uri == null || !"content".equals(uri.getScheme())
         || !ContentCommitter.is_supported_mime(mime))
@@ -286,7 +292,8 @@ public final class ClipboardHistoryService
   /** Add what is currently in the system clipboard into the history. */
   void add_current_clip()
   {
-    if (!Config.globalConfig().clipboard_history_enabled)
+    Config cfg = Config.globalConfig();
+    if (cfg == null || !cfg.clipboard_history_enabled)
       return;
     ClipData clip = read_current_clip();
     if (clip == null)
@@ -310,6 +317,8 @@ public final class ClipboardHistoryService
 
   private ClipData read_current_clip()
   {
+    if (_cm == null)
+      return null;
     ClipData clip = null;
     // getPrimaryClip might throw when the keyboard is disconnected.
     try { clip = _cm.getPrimaryClip(); } catch (Exception _e) {}
@@ -337,7 +346,8 @@ public final class ClipboardHistoryService
   }
 
   int get_history_ttl_minutes() {
-    return Config.globalConfig().clipboard_history_duration;
+    Config cfg = Config.globalConfig();
+    return (cfg != null) ? cfg.clipboard_history_duration : 5;
   }
 
   final class SystemListener implements ClipboardManager.OnPrimaryClipChangedListener

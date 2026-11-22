@@ -222,11 +222,14 @@ public class DictionaryListView extends LinearLayout
         + ".dict");
   }
 
-  /** Returns [true] on success. */
+  /** Returns [true] on success. Fails closed unless the dictionary SHA-256 matches a pinned digest. */
   boolean install_dictionary_from_internet(String dict_name)
   {
+    String expectedSha256 = SupportedDictionaries.getPinnedSha256(dict_name);
     try
     {
+      if (expectedSha256 == null || expectedSha256.isEmpty())
+        throw new SecurityException("No pinned SHA-256 digest configured for dictionary: " + dict_name);
       // Remote files are compressed with gzip at rest. Do not use server side
       // compression and force decompression.
       URLConnection con = url_of_dictionary(dict_name).openConnection();
@@ -238,16 +241,8 @@ public class DictionaryListView extends LinearLayout
            InputStream stream = new GZIPInputStream(response)) {
         data = read_bounded(stream, MAX_DICTIONARY_BYTES);
       }
+      verifyDictionaryIntegrity(dict_name, data, expectedSha256);
       Cdict.of_bytes(data); // Structural and cyclic safety validation
-      try
-      {
-        java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
-        byte[] digest = md.digest(data);
-        StringBuilder sb = new StringBuilder();
-        for (byte b : digest) sb.append(String.format("%02x", b));
-        android.util.Log.i(Logs.TAG, "Verified dictionary " + dict_name + " SHA-256: " + sb.toString());
-      }
-      catch (Throwable ignored) {}
       _dictionaries.install(dict_name, data);
       return true;
     }
@@ -260,6 +255,7 @@ public class DictionaryListView extends LinearLayout
         try (InputStream inp = getContext().getAssets().open("dict/" + dict_name + ".dict")) {
           data = read_bounded(inp, MAX_DICTIONARY_BYTES);
         }
+        verifyDictionaryIntegrity(dict_name, data, expectedSha256);
         Cdict.of_bytes(data);
         _dictionaries.install(dict_name, data);
         return true;
@@ -268,6 +264,49 @@ public class DictionaryListView extends LinearLayout
       Logs.exn("", e);
       return false;
     }
+  }
+
+  /**
+   * Verifies [data] against a pinned lowercase/uppercase 64-character SHA-256 hex digest using a
+   * constant-time comparison. Throws [SecurityException] if the digest is missing, malformed, or
+   * does not match.
+   */
+  static void verifyDictionaryIntegrity(String dictName, byte[] data, String expectedSha256Hex)
+  {
+    if (data == null)
+      throw new SecurityException("Dictionary payload is null for: " + dictName);
+    if (expectedSha256Hex == null || expectedSha256Hex.trim().isEmpty())
+      throw new SecurityException("No trusted SHA-256 digest pinned for dictionary: " + dictName);
+    byte[] expectedBytes = decodeHexSha256(expectedSha256Hex.trim());
+    if (expectedBytes == null)
+      throw new SecurityException("Malformed pinned SHA-256 digest for dictionary: " + dictName);
+    try
+    {
+      java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+      byte[] actualBytes = md.digest(data);
+      if (!java.security.MessageDigest.isEqual(actualBytes, expectedBytes))
+        throw new SecurityException("SHA-256 checksum mismatch for dictionary: " + dictName);
+    }
+    catch (java.security.NoSuchAlgorithmException e)
+    {
+      throw new SecurityException("SHA-256 unavailable for dictionary verification", e);
+    }
+  }
+
+  private static byte[] decodeHexSha256(String hex)
+  {
+    if (hex == null || hex.length() != 64)
+      return null;
+    byte[] out = new byte[32];
+    for (int i = 0; i < 32; i++)
+    {
+      int hi = Character.digit(hex.charAt(i * 2), 16);
+      int lo = Character.digit(hex.charAt(i * 2 + 1), 16);
+      if (hi < 0 || lo < 0)
+        return null;
+      out[i] = (byte) ((hi << 4) | lo);
+    }
+    return out;
   }
 
   /** Read a dictionary with a caller-supplied hard byte limit. Does not close [input]. */

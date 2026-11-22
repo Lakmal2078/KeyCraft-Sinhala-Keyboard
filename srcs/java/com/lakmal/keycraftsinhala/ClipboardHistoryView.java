@@ -3,8 +3,6 @@ package com.lakmal.keycraftsinhala;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.View;
@@ -13,7 +11,6 @@ import android.view.ViewParent;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -223,24 +220,6 @@ public final class ClipboardHistoryView extends NonScrollListView
       _service.remove_on_clipboard_history_change(this);
   }
 
-  private Bitmap loadThumbnail(Uri uri)
-  {
-    try (InputStream is = getContext().getContentResolver().openInputStream(uri))
-    {
-      if (is == null) return null;
-      BitmapFactory.Options opts = new BitmapFactory.Options();
-      opts.inSampleSize = 4;
-      Bitmap bmp = BitmapFactory.decodeStream(is, null, opts);
-      if (bmp == null) return null;
-      int px = Math.round(40 * getResources().getDisplayMetrics().density);
-      return Bitmap.createScaledBitmap(bmp, Math.max(1, px), Math.max(1, px), true);
-    }
-    catch (Exception | OutOfMemoryError _e)
-    {
-      return null;
-    }
-  }
-
   class ClipboardEntriesAdapter extends BaseAdapter
   {
     public ClipboardEntriesAdapter() {}
@@ -279,21 +258,13 @@ public final class ClipboardHistoryView extends NonScrollListView
         {
           if (android.os.Build.VERSION.SDK_INT >= 21)
             thumb.setClipToOutline(true);
-          Bitmap bmp = loadThumbnail(entry.uri);
-          if (bmp != null)
-          {
-            thumb.setImageBitmap(bmp);
-            thumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
-          }
-          else
-          {
-            thumb.setImageResource(R.drawable.ic_toolbar_grid);
-            thumb.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-          }
+          int px = Math.round(40 * getResources().getDisplayMetrics().density);
+          ThumbnailLoader.loadInto(getContext(), thumb, entry.uri, px, R.drawable.ic_toolbar_grid);
           thumb.setVisibility(View.VISIBLE);
         }
         else
         {
+          thumb.setTag(null);
           thumb.setVisibility(View.GONE);
         }
       }

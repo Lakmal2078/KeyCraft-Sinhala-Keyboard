@@ -362,6 +362,10 @@
   <string name="emoji_tab_gifs">GIFs</string>
   <string name="emoji_search_chip_search">Search</string>
   <string name="emoji_search_hint">Search emojis offline…</string>
+  <string name="emoji_search_keys_hint">Tap letters below or paste…</string>
+  <string name="emoji_search_paste">Paste clipboard text into search</string>
+  <string name="emoji_search_space">Space</string>
+  <string name="emoji_search_backspace">Delete last search letter</string>
   <string name="emoji_search_clear">Clear search</string>
   <string name="emoji_recents_empty">No recent emojis yet. Tap emojis from any category to build your recents.</string>
   <string name="emoji_search_empty">No emojis match that keyword.</string>

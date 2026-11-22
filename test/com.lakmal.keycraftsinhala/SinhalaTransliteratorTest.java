@@ -350,6 +350,33 @@ public class SinhalaTransliteratorTest
     assertEquals("සුබ උදෑසනක්!", SinhalaTransliterator.transliterate("suba udaesanak!"));
   }
 
+  @Test
+  public void testNoDuplicateCommonWordsAndCleanedMappings() throws Exception
+  {
+    assertEquals("උනා", SinhalaTransliterator.transliterate("una"));
+    assertEquals("වුණා", SinhalaTransliterator.transliterate("wuna"));
+    assertEquals("ලවීනියා", SinhalaTransliterator.transliterate("lavinia"));
+    assertEquals("ගල්කිස්ස", SinhalaTransliterator.transliterate("galkissa"));
+    assertEquals("නදීක", SinhalaTransliterator.transliterate("nadeeka"));
+    assertEquals("නදීකා", SinhalaTransliterator.transliterate("nadeekaa"));
+    assertEquals("මොනද", SinhalaTransliterator.transliterate("monada"));
+    assertEquals("මොනවද", SinhalaTransliterator.transliterate("monawada"));
+    assertEquals("බලංගොඩ", SinhalaTransliterator.transliterate("balangoda"));
+
+    String src = new String(java.nio.file.Files.readAllBytes(
+        new java.io.File("srcs/java/com/lakmal/keycraftsinhala/SinhalaTransliterator.java").toPath()),
+        java.nio.charset.StandardCharsets.UTF_8);
+    java.util.regex.Matcher m = java.util.regex.Pattern
+        .compile("COMMON_WORDS\\.put\\(\"([^\"]+)\",")
+        .matcher(src);
+    java.util.Set<String> seen = new java.util.HashSet<>();
+    while (m.find())
+    {
+      String key = m.group(1);
+      assertTrue("Duplicate COMMON_WORDS key found: " + key, seen.add(key));
+    }
+  }
+
   public static void main(String[] args)
   {
     SinhalaTransliteratorTest test = new SinhalaTransliteratorTest();
