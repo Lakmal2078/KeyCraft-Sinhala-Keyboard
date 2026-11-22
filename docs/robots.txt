@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/sitemap.xml

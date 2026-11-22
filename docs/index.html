@@ -26,6 +26,7 @@
   <meta name="twitter:title" content="KeyCraft — Sinhala Keyboard for Android">
   <meta name="twitter:description" content="Write Sinhala your way with a free, open-source Android keyboard.">
   <meta name="twitter:image" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-preview.jpg">
+  <meta name="twitter:image:alt" content="KeyCraft Sinhala keyboard hero visual">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -36,6 +37,7 @@
     "softwareVersion": "1.2.0",
     "description": "A free, open-source Android keyboard with on-device Singlish-to-Sinhala transliteration, corner-swipe gestures, Termux coding layout and Material 3 themes.",
     "url": "https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/",
+    "image": "https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-preview.jpg",
     "downloadUrl": "https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/download/v1.2.0/KeyCraft-Sinhala-Keyboard-release.apk",
     "license": "https://www.gnu.org/licenses/gpl-3.0.html",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
@@ -67,9 +69,10 @@
     }
 
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+    html { scroll-behavior: smooth; scroll-padding-top: 88px; overflow-x: clip; }
     body {
       margin: 0;
+      overflow-x: clip;
       color: var(--text);
       background:
         radial-gradient(ellipse 75% 45% at 85% -6%, var(--accent-soft), transparent 60%),
@@ -198,11 +201,17 @@
     .section-head p { margin: 0; color: var(--muted); }
 
     .m3-card {
+      min-width: 0;
       background: linear-gradient(155deg, var(--surface-2), var(--surface-1));
       border: 1px solid var(--line);
       border-radius: var(--radius-xl);
       padding: 24px;
       box-shadow: 0 12px 32px rgba(4, 9, 20, 0.25);
+    }
+    .noscript-banner {
+      margin: 18px 0 0; padding: 14px 18px; border-radius: var(--radius-md);
+      border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text);
+      font-size: .92rem;
     }
 
     /* Hero Section */
@@ -210,6 +219,7 @@
       display: grid; grid-template-columns: 1.05fr .95fr;
       align-items: center; gap: 42px; padding: 54px 0 44px;
     }
+    .hero > div { min-width: 0; }
     .hero-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 6px 14px; border-radius: 999px;
@@ -278,6 +288,7 @@
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
     }
     .smart-step {
+      min-width: 0;
       display: flex; flex-direction: column; justify-content: space-between; gap: 16px;
       padding: 22px; border-radius: var(--radius-lg);
       background: linear-gradient(160deg, var(--surface-2), var(--surface-1));
@@ -293,7 +304,7 @@
       background: var(--accent); color: var(--accent-ink); font-weight: 900; font-size: .95rem;
     }
     .step-check-btn {
-      display: inline-flex; align-items: center; gap: 7px;
+      display: inline-flex; align-items: center; gap: 7px; min-height: 38px;
       padding: 7px 12px; border-radius: 999px; cursor: pointer;
       border: 1px solid var(--line-strong); background: rgba(9, 17, 30, 0.7);
       color: var(--muted); font-size: .8rem; font-weight: 700;
@@ -305,7 +316,7 @@
     .smart-step p { margin: 0; color: var(--muted); font-size: .92rem; }
     .oem-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
     .oem-tab {
-      padding: 4px 10px; border-radius: 999px; font-size: .76rem; font-weight: 700;
+      min-height: 38px; padding: 6px 12px; border-radius: 999px; font-size: .78rem; font-weight: 700;
       border: 1px solid var(--line); background: #091220; color: var(--muted); cursor: pointer;
     }
     .oem-tab[aria-selected="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
@@ -357,12 +368,14 @@
 
     /* Interactive Mini Keyboard Preview Stage */
     .kbd-device {
+      min-width: 0;
       --kbd-bg: #171A21;
       --kbd-grad: linear-gradient(180deg, #101722, #253448);
       --kbd-key: #252B36;
       --kbd-action: #303A4A;
       --kbd-space: #202734;
       --kbd-active: #163B52;
+      --kbd-active-text: #67D5FF;
       --kbd-text: #F4F7FB;
       --kbd-sub: #B8C4D6;
       --kbd-accent: #67D5FF;
@@ -380,7 +393,7 @@
       background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
       font-size: .92rem;
     }
-    .kbd-typed-stream { font-weight: 700; color: var(--text); min-height: 24px; }
+    .kbd-typed-stream { font-weight: 700; color: var(--text); min-height: 24px; overflow-wrap: anywhere; }
     .kbd-stage {
       border-radius: 18px; padding: 10px 8px 12px;
       background: var(--kbd-grad);
@@ -403,8 +416,8 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .kbd-cand.best {
-      background: var(--kbd-active); color: var(--kbd-accent);
-      border: 1px solid var(--kbd-accent);
+      background: var(--kbd-active); color: var(--kbd-active-text);
+      border: 1px solid var(--kbd-border);
     }
     .kbd-row {
       display: grid; gap: 4px; margin-bottom: 5px;
@@ -414,6 +427,7 @@
     .kbd-row.r-mod { grid-template-columns: 1.35fr repeat(7, 1fr) 1.35fr; }
     .kbd-row.r-bot { grid-template-columns: 1.35fr 1fr 3.2fr 1fr 1.45fr; margin-bottom: 0; }
     .vkey {
+      min-width: 0;
       position: relative; height: 42px; padding: 0; border-radius: var(--kbd-radius);
       border: 1px solid var(--kbd-border);
       background: var(--kbd-key); color: var(--kbd-text);
@@ -425,7 +439,7 @@
     .vkey:active, .vkey.flash { transform: translateY(1px); background: var(--kbd-active); }
     .vkey.action { background: var(--kbd-action); font-size: .82rem; font-weight: 700; }
     .vkey.space { background: var(--kbd-space); font-size: .78rem; color: var(--kbd-sub); }
-    .vkey.enter { background: var(--kbd-active); color: var(--kbd-accent); border-color: var(--kbd-accent); font-weight: 800; }
+    .vkey.enter { background: var(--kbd-active); color: var(--kbd-active-text); border-color: var(--kbd-border); font-weight: 800; }
     .vkey-sub {
       position: absolute; top: 2px; right: 4px; font-size: .58rem; line-height: 1;
       color: var(--kbd-sub); font-weight: 700; opacity: 0.9;
@@ -501,7 +515,7 @@
     .guide-tab-btn strong { display: block; font-size: .98rem; margin-bottom: 2px; }
     .guide-tab-btn span { display: block; color: var(--muted); font-size: .84rem; line-height: 1.45; }
 
-    .guide-stage { min-height: 360px; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+    .guide-stage { min-width: 0; min-height: 360px; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
     .gesture-key-demo {
       display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 56px); gap: 8px;
       max-width: 260px; margin: 12px auto; padding: 14px; border-radius: 20px;
@@ -526,7 +540,7 @@
     }
 
     /* Visual Feature Showcase Carousel (Self-contained M3 Scenarios) */
-    .gallery-shell { position: relative; }
+    .gallery-shell { position: relative; min-width: 0; overflow: hidden; }
     .gallery {
       display: grid; grid-auto-flow: column; grid-auto-columns: minmax(270px, 31.5%);
       gap: 16px; overflow-x: auto; padding: 4px 2px 16px; scroll-snap-type: x mandatory;
@@ -593,9 +607,14 @@
     @media (max-width: 640px) {
       .wrap { width: min(100% - 28px, var(--max)); }
       .header-inner { flex-direction: column; align-items: stretch; padding: 12px 0; gap: 10px; }
-      .nav-wrap { justify-content: space-between; }
-      nav a { padding: 6px 9px; font-size: .82rem; }
+      .nav-wrap { justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+      nav a { padding: 8px 10px; font-size: .84rem; }
       section { padding: 42px 0; }
+      .m3-card, .smart-step { padding: 18px; }
+      .kbd-device { padding: 10px; }
+      .vkey { height: 40px; font-size: .86rem; }
+      .vkey.action, .vkey.space { font-size: .74rem; }
+      .oem-tab, .m3-chip, .step-check-btn { min-height: 42px; }
       .swatch-grid { grid-template-columns: repeat(2, 1fr); }
       .security-grid { grid-template-columns: 1fr; }
       .gallery { grid-auto-columns: 82%; }
@@ -614,7 +633,7 @@
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="./" aria-label="KeyCraft home">
-        <img src="assets/favicon.png" alt="" width="40" height="40">
+        <img src="assets/favicon.png" alt="" width="40" height="40" decoding="async">
         <span>KeyCraft</span>
         <span class="brand-badge">v1.2.0</span>
       </a>
@@ -635,6 +654,11 @@
   </header>
 
   <main id="main" class="wrap">
+    <noscript>
+      <div class="noscript-banner">
+        <strong>JavaScript is currently disabled.</strong> Official APK downloads, SHA-256 checksum, installation steps, Singlish vowel rules, FAQ and Privacy details remain visible below. Enable JavaScript for the Sinhala language switcher and interactive previews.
+      </div>
+    </noscript>
     <!-- Material 3 Hero -->
     <section class="hero" aria-labelledby="hero-title">
       <div>
@@ -675,7 +699,7 @@
       </div>
 
       <div class="hero-stage">
-        <img class="preview-img" src="assets/og-preview.jpg" alt="KeyCraft Sinhala keyboard hero visual" width="1200" height="630" fetchpriority="high">
+        <img class="preview-img" src="assets/og-preview.jpg" alt="KeyCraft Sinhala keyboard hero visual" width="1200" height="630" fetchpriority="high" decoding="async">
         <div class="hero-stat-strip">
           <div class="stat-mini">
             <strong>25+ Themes</strong>
@@ -768,7 +792,7 @@
                 <button type="button" class="oem-tab" role="tab" aria-selected="false" data-oem="samsung">Samsung</button>
                 <button type="button" class="oem-tab" role="tab" aria-selected="false" data-oem="xiaomi">Xiaomi</button>
               </div>
-              <div class="oem-tip-box" id="oem-tip-text"></div>
+              <div class="oem-tip-box" id="oem-tip-text">Settings → Apps → Special app access → Install unknown apps → select your browser/Files app → toggle Allow from this source.</div>
             </div>
           </article>
 
@@ -868,7 +892,7 @@
               <button type="button" class="vkey" data-vkey="l">l<span class="vkey-sub">\</span></button>
             </div>
             <div class="kbd-row r-mod">
-              <button type="button" class="vkey action" data-vkey="shift">⇧</button>
+              <button type="button" class="vkey action" data-vkey="shift" aria-label="Shift">⇧</button>
               <button type="button" class="vkey" data-vkey="z">z</button>
               <button type="button" class="vkey" data-vkey="x">x</button>
               <button type="button" class="vkey" data-vkey="c">c<span class="vkey-sub">&lt;</span></button>
@@ -876,14 +900,14 @@
               <button type="button" class="vkey" data-vkey="b">b<span class="vkey-sub">?</span></button>
               <button type="button" class="vkey" data-vkey="n">n<span class="vkey-sub">:</span></button>
               <button type="button" class="vkey" data-vkey="m">m<span class="vkey-sub">"</span></button>
-              <button type="button" class="vkey action" data-vkey="back">⌫</button>
+              <button type="button" class="vkey action" data-vkey="back" aria-label="Backspace">⌫</button>
             </div>
             <div class="kbd-row r-bot">
-              <button type="button" class="vkey action" data-vkey="sym">123+</button>
-              <button type="button" class="vkey action" data-vkey="si">සි</button>
-              <button type="button" class="vkey space" data-vkey=" ">සිංහල · Singlish</button>
-              <button type="button" class="vkey action" data-vkey=".">.</button>
-              <button type="button" class="vkey enter" data-vkey="enter">↵</button>
+              <button type="button" class="vkey action" data-vkey="sym" aria-label="Symbols layout">123+</button>
+              <button type="button" class="vkey action" data-vkey="si" aria-label="Toggle Sinhala mode">සි</button>
+              <button type="button" class="vkey space" data-vkey=" " aria-label="Space bar">සිංහල · Singlish</button>
+              <button type="button" class="vkey action" data-vkey="." aria-label="Period">.</button>
+              <button type="button" class="vkey enter" data-vkey="enter" aria-label="Enter">↵</button>
             </div>
           </div>
         </div>
@@ -918,7 +942,11 @@
             <span><span class="en">Simulated Suggestion Bar &amp; Output</span><span class="si" lang="si">Candidate තීරුව සහ ප්‍රතිදානය</span></span>
             <span style="color:var(--accent)">අ · ක</span>
           </div>
-          <div class="candidate-strip-sim" id="candidate-strip-sim" aria-label="Simulated candidate suggestions"></div>
+          <div class="candidate-strip-sim" id="candidate-strip-sim" aria-label="Simulated candidate suggestions">
+            <span class="cand-pill">lanka</span>
+            <span class="cand-pill primary-cand">ලංකා</span>
+            <span class="cand-pill">ලංකා්</span>
+          </div>
           <output id="sinhala-output" class="output-box" aria-live="polite" aria-atomic="true">අම්මා කොහොමද? ශ්‍රී ලංකා</output>
         </div>
       </div>
@@ -937,7 +965,16 @@
             <button type="button" class="m3-chip" role="tab" aria-selected="false" data-guide-cat="conjuncts"><span class="en">Conjuncts</span><span class="si" lang="si">බැඳි අකුරු</span></button>
           </div>
         </div>
-        <div class="cheat-grid" id="cheat-grid"></div>
+        <div class="cheat-grid" id="cheat-grid">
+          <div class="cheat-chip"><span class="cheat-roman">a</span><span class="cheat-sinhala">අ</span></div>
+          <div class="cheat-chip"><span class="cheat-roman">aa</span><span class="cheat-sinhala">ආ</span></div>
+          <div class="cheat-chip"><span class="cheat-roman">ae</span><span class="cheat-sinhala">ඇ</span></div>
+          <div class="cheat-chip"><span class="cheat-roman">aae</span><span class="cheat-sinhala">ඈ</span></div>
+          <div class="cheat-chip"><span class="cheat-roman">i</span><span class="cheat-sinhala">ඉ</span></div>
+          <div class="cheat-chip"><span class="cheat-roman">ii</span><span class="cheat-sinhala">ඊ</span></div>
+          <div class="cheat-chip"><span class="cheat-roman">u</span><span class="cheat-sinhala">උ</span></div>
+          <div class="cheat-chip"><span class="cheat-roman">uu</span><span class="cheat-sinhala">ඌ</span></div>
+        </div>
       </div>
     </section>
 
@@ -988,7 +1025,13 @@
           </button>
         </div>
 
-        <div class="m3-card guide-stage" id="guide-stage-panel"></div>
+        <div class="m3-card guide-stage" id="guide-stage-panel">
+          <div>
+            <span class="section-kicker">Built-in Tools</span>
+            <h3>5 actions from a single key · Quick Calculator · Smart Snippets</h3>
+            <p style="color:var(--muted)">Tap center for the main letter or slide toward any corner for digits and symbols. KeyCraft also evaluates math expressions inline, expands <code>//date</code> / <code>//time</code> snippets, offers a Termux developer row, and isolates password/incognito fields.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -1184,6 +1227,10 @@
       try {
         const savedLang = localStorage.getItem("keycraft-site-language");
         if (savedLang === "si" || savedLang === "en") state.lang = savedLang;
+        const savedTheme = localStorage.getItem("keycraft-theme-id");
+        if (savedTheme) state.themeId = savedTheme;
+        const savedSync = localStorage.getItem("keycraft-sync-accent");
+        if (savedSync === "false") state.syncAccent = false;
       } catch {}
 
       // 2. Smart Setup Checklist + Progress Bar + OEM Tips
@@ -1266,19 +1313,48 @@
         });
       });
 
+      function fallbackCopyText(text) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, text.length);
+        let ok = false;
+        try { ok = document.execCommand("copy"); } catch {}
+        document.body.removeChild(ta);
+        return ok;
+      }
+
       const copyBtn = document.getElementById("copy-checksum");
       const checksumEl = document.getElementById("sha256-value");
       const copyStatus = document.getElementById("copy-status");
       if (copyBtn && checksumEl && copyStatus) {
         copyBtn.addEventListener("click", async () => {
           const hash = checksumEl.textContent.trim();
-          try {
-            await navigator.clipboard.writeText(hash);
+          let copied = false;
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+            try {
+              await navigator.clipboard.writeText(hash);
+              copied = true;
+            } catch {}
+          }
+          if (!copied) copied = fallbackCopyText(hash);
+          if (copied) {
             copyStatus.textContent = getLang() === "si" ? "✓ Copy කළා" : "✓ Copied";
             state.steps[1] = true;
             saveSteps();
             renderSetupProgress();
-          } catch {
+          } else {
+            try {
+              const range = document.createRange();
+              range.selectNodeContents(checksumEl);
+              const sel = window.getSelection();
+              sel.removeAllRanges();
+              sel.addRange(range);
+            } catch {}
             copyStatus.textContent = getLang() === "si" ? "Select කර copy කරන්න" : "Select hash manually";
           }
         });
@@ -1286,23 +1362,24 @@
 
       // 3. Live Keyboard Theme Studio (authentic themes from res/values/themes.xml)
       const themes = [
-        { id: "dark", name: "KeyCraft Dark", cat: "dark", labelSi: "Dark", bg: "#171A21", grad: "linear-gradient(180deg,#101722,#253448)", key: "#252B36", action: "#303A4A", space: "#202734", active: "#163B52", text: "#F4F7FB", sub: "#B8C4D6", accent: "#67D5FF", border: "#303A49", radius: "7px", siteAccent: "#69e0c0", siteStrong: "#9af2d9" },
-        { id: "aurora_flow", name: "Aurora Flow", cat: "vibrant", labelSi: "Vibrant", bg: "#11162E", grad: "linear-gradient(160deg,#173D66,#34204F)", key: "#202B49", action: "#283452", space: "#1A2540", active: "#2F69C0", text: "#F2F5FF", sub: "#B8C7E8", accent: "#9FE8D4", border: "#3B5483", radius: "9px", siteAccent: "#69e0c0", siteStrong: "#9FE8D4" },
-        { id: "cyberpunk_neon", name: "Cyberpunk Neon", cat: "vibrant", labelSi: "Vibrant", bg: "#0B0C10", grad: "linear-gradient(180deg,#0B0C10,#171224)", key: "#1F2833", action: "#451B38", space: "#1F2833", active: "#00F0FF", text: "#66FCF1", sub: "#FF4393", accent: "#00F0FF", border: "#00F0FF", radius: "6px", siteAccent: "#66FCF1", siteStrong: "#9ffdf7" },
-        { id: "sinhala_sand", name: "Sinhala Sand", cat: "srilanka", labelSi: "Sri Lanka", bg: "#FFF4E6", grad: "linear-gradient(180deg,#EAC9A6,#FFF2DE)", key: "#FFFFFF", action: "#F2E0D0", space: "#F5E5D6", active: "#E8B78E", text: "#39271F", sub: "#795548", accent: "#8B4513", border: "#DCC5B2", radius: "7px", siteAccent: "#f5b971", siteStrong: "#ffd7a6" },
-        { id: "lanka_maroon", name: "Lanka Maroon", cat: "srilanka", labelSi: "Sri Lanka", bg: "#2A080E", grad: "linear-gradient(180deg,#3D0C14,#1A0509)", key: "#4A121D", action: "#801826", space: "#3E0E18", active: "#FFC107", text: "#FFFDF7", sub: "#FFC107", accent: "#FFD54F", border: "#6B1D2C", radius: "8px", siteAccent: "#FFD54F", siteStrong: "#ffe68c" },
-        { id: "lanka_blue", name: "Lanka Blue", cat: "srilanka", labelSi: "Sri Lanka", bg: "#0A1A2F", grad: "linear-gradient(180deg,#0B2040,#050C16)", key: "#112D55", action: "#173B70", space: "#0F2545", active: "#1F4F99", text: "#E8F1FF", sub: "#99C2FF", accent: "#A2C7FF", border: "#1C4685", radius: "8px", siteAccent: "#7cb4ff", siteStrong: "#b3d4ff" },
-        { id: "dracula", name: "Dracula", cat: "terminal", labelSi: "Terminal", bg: "#282A36", grad: "linear-gradient(180deg,#171522,#35204B)", key: "#343746", action: "#7446A8", space: "#343746", active: "#FF4FA3", text: "#F8F8F2", sub: "#96A1C2", accent: "#50FA7B", border: "#4B5068", radius: "10px", siteAccent: "#ff79c6", siteStrong: "#ffa7da" },
-        { id: "tokyo_night", name: "Tokyo Night", cat: "terminal", labelSi: "Terminal", bg: "#1A1B26", grad: "linear-gradient(180deg,#10162B,#1E2C54)", key: "#24283B", action: "#343B58", space: "#24283B", active: "#38BDF8", text: "#C0CAF5", sub: "#BB9AF7", accent: "#9ECE6A", border: "#343B59", radius: "6px", siteAccent: "#7dcfff", siteStrong: "#b4e5ff" },
-        { id: "ocean_breeze", name: "Ocean Breeze", cat: "light", labelSi: "Light", bg: "#E5FCF7", grad: "linear-gradient(180deg,#E5FCF7,#CCF5EC)", key: "#FFFFFF", action: "#C9F5E9", space: "#C0F0E2", active: "#9DE9D8", text: "#123F3B", sub: "#39736B", accent: "#006B61", border: "#A4DCCE", radius: "8px", siteAccent: "#69e0c0", siteStrong: "#9af2d9" },
-        { id: "royal_gold", name: "Royal Gold", cat: "vibrant", labelSi: "Vibrant", bg: "#211A08", grad: "linear-gradient(180deg,#4A3A0B,#171205)", key: "#382D0B", action: "#4B3B10", space: "#2D2409", active: "#B18A16", text: "#FFF8D8", sub: "#D8C783", accent: "#FFD54F", border: "#79611B", radius: "8px", siteAccent: "#ffd54f", siteStrong: "#ffe896" },
-        { id: "sunset_glow", name: "Sunset Glow", cat: "vibrant", labelSi: "Vibrant", bg: "#1A121E", grad: "linear-gradient(155deg,#B71C1C,#E65100)", key: "#2A1830", action: "#491D3D", space: "#251730", active: "#582B48", text: "#FFF8E1", sub: "#FFA726", accent: "#FFD54F", border: "#662844", radius: "9px", siteAccent: "#ffb74d", siteStrong: "#ffd591" },
-        { id: "oled_black", name: "OLED Black", cat: "dark", labelSi: "Dark", bg: "#000000", grad: "linear-gradient(180deg,#000000,#080D12)", key: "#090B0E", action: "#0D1A21", space: "#050709", active: "#003B46", text: "#FFFFFF", sub: "#C8C8C8", accent: "#55C7FF", border: "#292929", radius: "4px", siteAccent: "#55c7ff", siteStrong: "#99deff" }
+        { id: "dark", name: "KeyCraft Dark", cat: "dark", labelSi: "Dark", bg: "#171A21", grad: "linear-gradient(180deg,#101722,#253448)", key: "#252B36", action: "#303A4A", space: "#202734", active: "#163B52", activeText: "#9BE7FF", text: "#F4F7FB", sub: "#B8C4D6", accent: "#67D5FF", border: "#303A49", radius: "7px", siteAccent: "#69e0c0", siteStrong: "#9af2d9" },
+        { id: "aurora_flow", name: "Aurora Flow", cat: "vibrant", labelSi: "Vibrant", bg: "#11162E", grad: "linear-gradient(160deg,#173D66,#34204F)", key: "#202B49", action: "#283452", space: "#1A2540", active: "#2F69C0", activeText: "#FFFFFF", text: "#F2F5FF", sub: "#B8C7E8", accent: "#9FE8D4", border: "#3B5483", radius: "9px", siteAccent: "#69e0c0", siteStrong: "#9FE8D4" },
+        { id: "cyberpunk_neon", name: "Cyberpunk Neon", cat: "vibrant", labelSi: "Vibrant", bg: "#0B0C10", grad: "linear-gradient(180deg,#0B0C10,#171224)", key: "#1F2833", action: "#451B38", space: "#1F2833", active: "#00F0FF", activeText: "#06161B", text: "#66FCF1", sub: "#FF4393", accent: "#00F0FF", border: "#00F0FF", radius: "6px", siteAccent: "#66FCF1", siteStrong: "#9ffdf7" },
+        { id: "sinhala_sand", name: "Sinhala Sand", cat: "srilanka", labelSi: "Sri Lanka", bg: "#FFF4E6", grad: "linear-gradient(180deg,#EAC9A6,#FFF2DE)", key: "#FFFFFF", action: "#F2E0D0", space: "#F5E5D6", active: "#E8B78E", activeText: "#2A1810", text: "#39271F", sub: "#795548", accent: "#8B4513", border: "#DCC5B2", radius: "7px", siteAccent: "#f5b971", siteStrong: "#ffd7a6" },
+        { id: "lanka_maroon", name: "Lanka Maroon", cat: "srilanka", labelSi: "Sri Lanka", bg: "#2A080E", grad: "linear-gradient(180deg,#3D0C14,#1A0509)", key: "#4A121D", action: "#801826", space: "#3E0E18", active: "#FFC107", activeText: "#2A080E", text: "#FFFDF7", sub: "#FFC107", accent: "#FFD54F", border: "#6B1D2C", radius: "8px", siteAccent: "#FFD54F", siteStrong: "#ffe68c" },
+        { id: "lanka_blue", name: "Lanka Blue", cat: "srilanka", labelSi: "Sri Lanka", bg: "#0A1A2F", grad: "linear-gradient(180deg,#0B2040,#050C16)", key: "#112D55", action: "#173B70", space: "#0F2545", active: "#1F4F99", activeText: "#F0F6FF", text: "#E8F1FF", sub: "#99C2FF", accent: "#A2C7FF", border: "#1C4685", radius: "8px", siteAccent: "#7cb4ff", siteStrong: "#b3d4ff" },
+        { id: "dracula", name: "Dracula", cat: "terminal", labelSi: "Terminal", bg: "#282A36", grad: "linear-gradient(180deg,#171522,#35204B)", key: "#343746", action: "#7446A8", space: "#343746", active: "#FF4FA3", activeText: "#171522", text: "#F8F8F2", sub: "#96A1C2", accent: "#50FA7B", border: "#4B5068", radius: "10px", siteAccent: "#ff79c6", siteStrong: "#ffa7da" },
+        { id: "tokyo_night", name: "Tokyo Night", cat: "terminal", labelSi: "Terminal", bg: "#1A1B26", grad: "linear-gradient(180deg,#10162B,#1E2C54)", key: "#24283B", action: "#343B58", space: "#24283B", active: "#38BDF8", activeText: "#0B1220", text: "#C0CAF5", sub: "#BB9AF7", accent: "#9ECE6A", border: "#343B59", radius: "6px", siteAccent: "#7dcfff", siteStrong: "#b4e5ff" },
+        { id: "ocean_breeze", name: "Ocean Breeze", cat: "light", labelSi: "Light", bg: "#E5FCF7", grad: "linear-gradient(180deg,#E5FCF7,#CCF5EC)", key: "#FFFFFF", action: "#C9F5E9", space: "#C0F0E2", active: "#9DE9D8", activeText: "#0C312D", text: "#123F3B", sub: "#39736B", accent: "#006B61", border: "#A4DCCE", radius: "8px", siteAccent: "#69e0c0", siteStrong: "#9af2d9" },
+        { id: "royal_gold", name: "Royal Gold", cat: "vibrant", labelSi: "Vibrant", bg: "#211A08", grad: "linear-gradient(180deg,#4A3A0B,#171205)", key: "#382D0B", action: "#4B3B10", space: "#2D2409", active: "#B18A16", activeText: "#171205", text: "#FFF8D8", sub: "#D8C783", accent: "#FFD54F", border: "#79611B", radius: "8px", siteAccent: "#ffd54f", siteStrong: "#ffe896" },
+        { id: "sunset_glow", name: "Sunset Glow", cat: "vibrant", labelSi: "Vibrant", bg: "#1A121E", grad: "linear-gradient(155deg,#B71C1C,#E65100)", key: "#2A1830", action: "#491D3D", space: "#251730", active: "#582B48", activeText: "#FFE082", text: "#FFF8E1", sub: "#FFA726", accent: "#FFD54F", border: "#662844", radius: "9px", siteAccent: "#ffb74d", siteStrong: "#ffd591" },
+        { id: "oled_black", name: "OLED Black", cat: "dark", labelSi: "Dark", bg: "#000000", grad: "linear-gradient(180deg,#000000,#080D12)", key: "#090B0E", action: "#0D1A21", space: "#050709", active: "#003B46", activeText: "#8BE3FF", text: "#FFFFFF", sub: "#C8C8C8", accent: "#55C7FF", border: "#292929", radius: "4px", siteAccent: "#55c7ff", siteStrong: "#99deff" }
       ];
 
       function applyTheme(themeId) {
         const theme = themes.find(t => t.id === themeId) || themes[0];
         state.themeId = theme.id;
+        try { localStorage.setItem("keycraft-theme-id", theme.id); } catch {}
         const dev = document.getElementById("kbd-preview-stage");
         if (dev) {
           dev.style.setProperty("--kbd-bg", theme.bg);
@@ -1311,6 +1388,7 @@
           dev.style.setProperty("--kbd-action", theme.action);
           dev.style.setProperty("--kbd-space", theme.space);
           dev.style.setProperty("--kbd-active", theme.active);
+          dev.style.setProperty("--kbd-active-text", theme.activeText || theme.accent);
           dev.style.setProperty("--kbd-text", theme.text);
           dev.style.setProperty("--kbd-sub", theme.sub);
           dev.style.setProperty("--kbd-accent", theme.accent);
@@ -1369,8 +1447,10 @@
 
       const syncCheckbox = document.getElementById("sync-page-accent");
       if (syncCheckbox) {
+        syncCheckbox.checked = state.syncAccent;
         syncCheckbox.addEventListener("change", () => {
           state.syncAccent = syncCheckbox.checked;
+          try { localStorage.setItem("keycraft-sync-accent", String(state.syncAccent)); } catch {}
           applyTheme(state.themeId);
         });
       }
@@ -1412,7 +1492,7 @@
       };
 
       const consonants = [
-        ["ksh","ක්‍ෂ"],["chch","ච්ච"],["nndh","ඳ"],["shri","ශ්‍රී"],["shh","ෂ්"],["chh","ඡ"],
+        ["ksh","ක්‍ෂ"],["chch","ච්ච"],["nndh","ඳ"],["shri","ශ්‍රී"],["shh","ෂ"],["chh","ඡ"],
         ["nng","ඟ"],["mmb","ඹ"],["nnd","ඬ"],["nd","ඳ"],["kh","ඛ"],["gh","ඝ"],
         ["ch","ච"],["jh","ඣ"],["th","ත"],["dh","ධ"],["ph","ඵ"],["bh","භ"],
         ["sh","ශ"],["ny","ඤ"],["gn","ඤ"],["kn","ඤ"],["jn","ඥ"],["mb","ඹ"],["ng","ඟ"],
@@ -1455,6 +1535,11 @@
               index += 1;
               const rv = matchAt(lower, index, dependentVowels);
               if (rv) { output += rv[1]; index += rv[0].length; }
+            } else if (lower[index] === "y" && cMatch[0] !== "y" && matchAt(lower, index + 1, dependentVowels)) {
+              output += "\u0DCA\u200Dය";
+              index += 1;
+              const yv = matchAt(lower, index, dependentVowels);
+              if (yv) { output += yv[1]; index += yv[0].length; }
             } else {
               output += "්";
             }
@@ -1503,10 +1588,15 @@
           b.className = "cand-pill" + (item.isBest ? " primary-cand" : "");
           b.textContent = item.label;
           b.addEventListener("click", () => {
-            if (item.label === activeToken) {
-              singlishInput.focus();
+            candSim.querySelectorAll(".cand-pill").forEach(p => p.classList.remove("primary-cand"));
+            b.classList.add("primary-cand");
+            const converted = transliterateText(val);
+            const parts = converted.trimEnd().split(/\s+/);
+            if (parts.length && activeToken) {
+              parts[parts.length - 1] = item.label;
+              sinhalaOutput.textContent = parts.join(" ");
             } else {
-              sinhalaOutput.textContent = transliterateText(val);
+              sinhalaOutput.textContent = item.label;
             }
           });
           candSim.appendChild(b);
@@ -1542,8 +1632,8 @@
           ["kee", "කේ"], ["ko", "කො"], ["koo", "කෝ"], ["k", "ක්"]
         ],
         conjuncts: [
-          ["shri", "ශ්‍රී"], ["ksh", "ක්‍ෂ"], ["nndh", "ඳ"], ["nng", "ඟ"],
-          ["mmb", "ඹ"], ["nnd", "ඬ"], ["nya", "ඤ"], ["jna", "ඥ"],
+          ["shri", "ශ්‍රී"], ["ksha", "ක්‍ෂ"], ["nndha", "ඳ"], ["nnga", "ඟ"],
+          ["mmba", "ඹ"], ["nnda", "ඬ"], ["nya", "ඤ"], ["jna", "ඥ"],
           ["kra", "ක්‍ර"], ["kya", "ක්‍ය"], ["ayubowan", "ආයුබෝවන්"], ["lankawa", "ලංකාව"]
         ]
       };
@@ -1557,6 +1647,7 @@
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "cheat-chip";
+          btn.setAttribute("aria-label", `Insert ${roman} (${siChar})`);
           btn.innerHTML = `<span class="cheat-roman">${roman}</span><span class="cheat-sinhala">${siChar}</span>`;
           btn.addEventListener("click", () => {
             if (!singlishInput) return;
@@ -1592,11 +1683,48 @@
 
       function evalSafeCalc(expr) {
         const clean = expr.replace(/\s+/g, "");
-        if (clean === "25*4+10") return "110";
-        if (clean === "sqrt(144)") return "12";
-        if (clean === "1500*0.15") return "225";
-        if (clean === "round(9.6)") return "10";
-        return "110";
+        const sqrtMatch = clean.match(/^sqrt\(([\d.]+)\)$/);
+        if (sqrtMatch) {
+          const val = Math.sqrt(Number(sqrtMatch[1]));
+          return Number.isFinite(val) ? String(Number(val.toFixed(6))) : "0";
+        }
+        const roundMatch = clean.match(/^round\(([\d.]+)\)$/);
+        if (roundMatch) {
+          const val = Math.round(Number(roundMatch[1]));
+          return Number.isFinite(val) ? String(val) : "0";
+        }
+        const tokens = clean.match(/\d+(?:\.\d+)?|[+\-*/()]/g);
+        if (!tokens || tokens.join("") !== clean) return "0";
+        let pos = 0;
+        function parseExpr() {
+          let left = parseTerm();
+          while (tokens[pos] === "+" || tokens[pos] === "-") {
+            const op = tokens[pos++];
+            const right = parseTerm();
+            left = op === "+" ? left + right : left - right;
+          }
+          return left;
+        }
+        function parseTerm() {
+          let left = parseFactor();
+          while (tokens[pos] === "*" || tokens[pos] === "/") {
+            const op = tokens[pos++];
+            const right = parseFactor();
+            left = op === "*" ? left * right : (right === 0 ? NaN : left / right);
+          }
+          return left;
+        }
+        function parseFactor() {
+          if (tokens[pos] === "(") {
+            pos++;
+            const val = parseExpr();
+            if (tokens[pos] === ")") pos++;
+            return val;
+          }
+          return Number(tokens[pos++]);
+        }
+        const result = parseExpr();
+        return Number.isFinite(result) ? String(Number(result.toFixed(6))) : "0";
       }
 
       function renderFeatureGuide() {
