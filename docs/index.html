@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101827">
-  <meta name="description" content="Type Sinhala naturally on Android with KeyCraft: on-device Singlish transliteration, swipe gestures, customizable layouts, themes and productivity tools. Free, open-source and ad-free.">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="Type Sinhala naturally on Android with KeyCraft: on-device Singlish transliteration, Material 3 themes, corner-swipe gestures, Termux coding layout and productivity tools. Free, open-source and ad-free.">
   <title>KeyCraft — Sinhala Keyboard for Android</title>
   <link rel="canonical" href="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="apple-touch-icon" href="assets/favicon.png">
   <!-- Open Graph Tags -->
   <meta property="og:title" content="KeyCraft — Sinhala Keyboard for Android" />
-  <meta property="og:description" content="Write Sinhala your way. Try the live Singlish demo, explore real app screenshots and download KeyCraft for Android." />
-  <meta property="og:image" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-keycraft.jpg?v=20261120_3" />
-  <meta property="og:image:secure_url" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-keycraft.jpg?v=20261120_3" />
-  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:description" content="Write Sinhala your way. Try the interactive Singlish guide, preview live Material 3 themes and install KeyCraft for Android." />
+  <meta property="og:image" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-keycraft.png" />
+  <meta property="og:image:secure_url" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-keycraft.png" />
+  <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:url" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/" />
@@ -23,7 +23,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="KeyCraft — Sinhala Keyboard for Android">
   <meta name="twitter:description" content="Write Sinhala your way with a free, open-source Android keyboard.">
-  <meta name="twitter:image" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-keycraft.jpg?v=20261120_3">
+  <meta name="twitter:image" content="https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/assets/og-keycraft.png">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -31,7 +31,8 @@
     "name": "KeyCraft Sinhala Keyboard",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Android",
-    "description": "A free, open-source Android keyboard with on-device Singlish-to-Sinhala transliteration, swipe typing, customizable layouts and themes.",
+    "softwareVersion": "1.2.0",
+    "description": "A free, open-source Android keyboard with on-device Singlish-to-Sinhala transliteration, corner-swipe gestures, Termux coding layout and Material 3 themes.",
     "url": "https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/",
     "downloadUrl": "https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/download/v1.2.0/KeyCraft-Sinhala-Keyboard-release.apk",
     "license": "https://www.gnu.org/licenses/gpl-3.0.html",
@@ -42,185 +43,585 @@
     :root {
       color-scheme: dark;
       --bg: #0b1220;
-      --surface: #111d30;
-      --surface-2: #17263b;
-      --text: #f2f7fc;
-      --muted: #a8b7ca;
+      --surface-1: #111c30;
+      --surface-2: #16243b;
+      --surface-3: #1d2f4a;
+      --text: #f3f7fc;
+      --muted: #a8b8cd;
       --accent: #69e0c0;
       --accent-strong: #9af2d9;
-      --line: #2b3d55;
-      --max: 1120px;
-      --radius: 20px;
+      --accent-ink: #06251e;
+      --accent-soft: rgba(105, 224, 192, 0.14);
+      --tertiary: #ff9f43;
+      --line: #293c57;
+      --line-strong: #3c5678;
+      --max: 1160px;
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --shadow-lg: 0 24px 64px rgba(3, 8, 18, 0.55);
+      --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Sinhala", "Iskoola Pota", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
     }
+
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
     body {
       margin: 0;
       color: var(--text);
-      background: radial-gradient(ellipse at 80% -10%, #214657 0, transparent 38%), var(--bg);
-      font: 16px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(ellipse 75% 45% at 85% -6%, var(--accent-soft), transparent 60%),
+        radial-gradient(ellipse 55% 35% at 8% 18%, rgba(56, 189, 248, 0.08), transparent 65%),
+        var(--bg);
+      font: 16px/1.65 var(--font-sans);
+      -webkit-font-smoothing: antialiased;
     }
+
     a { color: var(--accent); text-underline-offset: 4px; }
     a:hover { color: var(--accent-strong); }
-    button, textarea { font: inherit; }
+    button, input, textarea { font: inherit; color: inherit; }
     button, a { -webkit-tap-highlight-color: transparent; }
-    :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+
     .skip-link {
-      position: fixed; z-index: 20; top: 12px; left: 12px; transform: translateY(-160%);
-      padding: 10px 16px; border-radius: 10px; background: var(--accent); color: #06251e; font-weight: 800;
+      position: fixed; z-index: 50; top: 12px; left: 12px; transform: translateY(-180%);
+      padding: 10px 16px; border-radius: 12px; background: var(--accent);
+      color: var(--accent-ink); font-weight: 800; text-decoration: none;
     }
     .skip-link:focus { transform: translateY(0); }
+
     .wrap { width: min(var(--max), calc(100% - 40px)); margin-inline: auto; }
-    .site-header {
-      position: sticky; top: 0; z-index: 10; backdrop-filter: blur(18px);
-      background: #0b1220dc; border-bottom: 1px solid #ffffff12;
-    }
-    .header-inner { min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 22px; }
-    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--text); text-decoration: none; font-weight: 800; font-size: 1.12rem; }
-    .brand img { width: 42px; height: 42px; border-radius: 13px; }
-    .nav-wrap { display: flex; align-items: center; justify-content: flex-end; gap: 22px; }
-    nav { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; }
-    nav a { color: var(--muted); text-decoration: none; font-size: .92rem; }
-    nav a:hover { color: var(--text); }
-    .lang-switch {
-      display: inline-flex; gap: 3px; padding: 4px; border: 1px solid var(--line);
-      border-radius: 999px; background: var(--surface); white-space: nowrap;
-    }
-    .lang-switch button {
-      border: 0; border-radius: 999px; padding: 6px 10px; color: var(--muted);
-      background: transparent; cursor: pointer; font-size: .82rem; font-weight: 800;
-    }
-    .lang-switch button[aria-pressed="true"] { color: #06251e; background: var(--accent); }
-    .hero { display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 56px; padding: 82px 0 76px; }
-    .eyebrow { color: var(--accent); font-size: .78rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
-    h1 { max-width: 720px; margin: 14px 0 20px; font-size: clamp(2.7rem, 6vw, 5rem); line-height: 1.04; letter-spacing: -.055em; }
-    h2 { margin: 0 0 14px; font-size: clamp(1.8rem, 4vw, 2.45rem); line-height: 1.15; letter-spacing: -.035em; }
-    h3 { line-height: 1.3; }
-    .lead { max-width: 650px; color: var(--muted); font-size: clamp(1.04rem, 2vw, 1.18rem); }
-    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-    .button {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      min-height: 48px; padding: 11px 18px; border: 1px solid var(--line);
-      border-radius: 12px; color: var(--text); background: #ffffff08;
-      font-weight: 800; text-decoration: none; cursor: pointer;
-    }
-    .button.primary { border-color: var(--accent); color: #06251e; background: var(--accent); }
-    .button.primary:hover { color: #06251e; background: var(--accent-strong); }
-    .button:hover { border-color: var(--accent); }
-    .hero-art { position: relative; }
-    .preview { display: block; width: 100%; height: auto; border: 1px solid #ffffff22; border-radius: 22px; box-shadow: 0 30px 90px #0008; }
-    .trust-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 24px; }
-    .pill { padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: .84rem; }
-    section { padding: 64px 0; scroll-margin-top: 94px; }
-    .section-head { max-width: 720px; margin-bottom: 28px; }
-    .section-head p { color: var(--muted); margin: 0; }
-    .section-kicker { display: block; margin-bottom: 8px; color: var(--accent); font-size: .76rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-    .demo-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 18px; align-items: stretch; }
-    .panel, .tile, .step, .faq-item { background: linear-gradient(145deg, #17263b, #101c2e); border: 1px solid var(--line); border-radius: var(--radius); }
-    .panel { padding: 24px; }
-    .demo-label { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; color: var(--muted); font-size: .9rem; font-weight: 700; }
-    textarea {
-      display: block; width: 100%; min-height: 140px; resize: vertical; padding: 15px;
-      border: 1px solid #3a506d; border-radius: 13px; color: var(--text);
-      background: #091321; line-height: 1.7;
-    }
-    .demo-examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
-    .example {
-      padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px;
-      color: var(--muted); background: #ffffff08; cursor: pointer; font-size: .84rem;
-    }
-    .example:hover { border-color: var(--accent); color: var(--text); }
-    .output-box {
-      min-height: 140px; padding: 20px; border: 1px solid #3a506d; border-radius: 13px;
-      background: #091321; font-size: clamp(1.25rem, 3vw, 1.8rem); line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-    .demo-note { margin: 12px 0 0; color: var(--muted); font-size: .82rem; }
-    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-    .tile { padding: 22px; }
-    .tile-icon { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 14px; border-radius: 13px; color: var(--accent); background: #69e0c018; font-size: 1.25rem; }
-    .tile h3 { margin: 0 0 7px; font-size: 1.04rem; }
-    .tile p { margin: 0; color: var(--muted); font-size: .94rem; }
-    .gallery-shell { position: relative; }
-    .gallery {
-      display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 30%);
-      gap: 16px; overflow-x: auto; padding: 4px 3px 18px; scroll-snap-type: x mandatory;
-      scrollbar-color: #52716f var(--surface); scrollbar-width: thin;
-    }
-    .shot { min-width: 0; margin: 0; padding: 12px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); scroll-snap-align: start; }
-    .shot img { display: block; width: 100%; height: auto; aspect-ratio: 1280 / 1290; object-fit: contain; border-radius: 10px; background: #091321; }
-    .shot figcaption { padding: 10px 3px 2px; color: var(--muted); font-size: .88rem; text-align: center; }
-    .gallery-controls { display: flex; justify-content: flex-end; gap: 9px; margin-top: 12px; }
-    .icon-button { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; color: var(--text); background: var(--surface); cursor: pointer; }
-    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; counter-reset: install; }
-    .step { padding: 23px; counter-increment: install; }
-    .step::before {
-      content: "0" counter(install); display: inline-grid; place-items: center; width: 42px; height: 42px;
-      margin-bottom: 14px; border-radius: 13px; color: #06251e; background: var(--accent); font-weight: 900;
-    }
-    .step h3 { margin: 0 0 8px; }
-    .step p { margin: 0; color: var(--muted); font-size: .94rem; }
-    .security-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .security-card { padding: 23px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
-    .security-card h3 { margin: 0 0 8px; }
-    .security-card p { margin: 0; color: var(--muted); }
-    .checksum { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; }
-    .checksum code { flex: 1; padding: 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--accent-strong); background: #091321; font-size: .78rem; overflow-wrap: anywhere; }
-    .copy-button { flex: 0 0 auto; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); background: var(--surface-2); cursor: pointer; }
-    .faq-list { display: grid; gap: 10px; }
-    .faq-item { padding: 0 18px; }
-    .faq-item summary { padding: 17px 28px 17px 0; cursor: pointer; font-weight: 750; }
-    .faq-item p { margin: 0; padding: 0 0 18px; color: var(--muted); }
-    .cta { padding: 36px; border: 1px solid #3b6c67; border-radius: 24px; background: radial-gradient(circle at 90% 0%, #23514c, transparent 48%), var(--surface); }
-    .cta p { max-width: 680px; color: var(--muted); }
-    footer { margin-top: 56px; padding: 26px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
-    .footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+
+    /* Language switching */
     .si { display: none; }
     body[data-lang="si"] .en { display: none !important; }
     body[data-lang="si"] .si { display: initial; }
-    @media (max-width: 820px) {
-      .header-inner { align-items: flex-start; padding: 14px 0; flex-direction: column; }
-      .nav-wrap { width: 100%; justify-content: space-between; }
-      nav { gap: 13px; }
-      .hero { grid-template-columns: 1fr; gap: 32px; padding-top: 54px; }
-      .hero-art { max-width: 680px; }
-      .feature-grid { grid-template-columns: repeat(2, 1fr); }
-      .gallery { grid-auto-columns: minmax(230px, 45%); }
+    body[data-lang="si"] .si-block { display: block; }
+    .si-block { display: none; }
+    body[data-lang="si"] .en-block { display: none !important; }
+
+    /* Material 3 Top App Bar */
+    .site-header {
+      position: sticky; top: 0; z-index: 30;
+      backdrop-filter: blur(18px);
+      background: rgba(11, 18, 32, 0.86);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
-    @media (max-width: 600px) {
+    .header-inner {
+      min-height: 74px; display: flex; align-items: center;
+      justify-content: space-between; gap: 18px;
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: 11px;
+      color: var(--text); text-decoration: none; font-weight: 800; font-size: 1.12rem;
+      letter-spacing: -0.02em;
+    }
+    .brand img { width: 40px; height: 40px; border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); }
+    .brand-badge {
+      padding: 2px 8px; border-radius: 999px; font-size: .72rem; font-weight: 800;
+      background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(105, 224, 192, 0.3);
+    }
+    .nav-wrap { display: flex; align-items: center; gap: 18px; }
+    nav { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+    nav a {
+      padding: 8px 12px; border-radius: 999px;
+      color: var(--muted); text-decoration: none; font-size: .9rem; font-weight: 600;
+      transition: background .18s ease, color .18s ease;
+    }
+    nav a:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); }
+    .lang-switch {
+      display: inline-flex; gap: 3px; padding: 4px;
+      border: 1px solid var(--line); border-radius: 999px;
+      background: var(--surface-2); white-space: nowrap;
+    }
+    .lang-switch button {
+      border: 0; border-radius: 999px; padding: 6px 12px; color: var(--muted);
+      background: transparent; cursor: pointer; font-size: .82rem; font-weight: 800;
+      transition: background .18s ease, color .18s ease;
+    }
+    .lang-switch button[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); }
+
+    /* M3 Buttons & Chips */
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      min-height: 48px; padding: 12px 20px; border: 1px solid var(--line-strong);
+      border-radius: 999px; color: var(--text); background: var(--surface-2);
+      font-weight: 700; text-decoration: none; cursor: pointer;
+      transition: transform .15s ease, border-color .18s ease, background .18s ease;
+    }
+    .button:hover { border-color: var(--accent); background: var(--surface-3); }
+    .button:active { transform: scale(0.98); }
+    .button.primary {
+      border-color: var(--accent); color: var(--accent-ink); background: var(--accent);
+      font-weight: 800; box-shadow: 0 10px 28px rgba(105, 224, 192, 0.22);
+    }
+    .button.primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--accent-ink); }
+    .button.tonal {
+      border-color: transparent; background: var(--accent-soft); color: var(--accent-strong);
+    }
+    .button.tonal:hover { background: rgba(105, 224, 192, 0.24); }
+    .button.sm { min-height: 38px; padding: 7px 14px; font-size: .86rem; }
+
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .m3-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      min-height: 38px; padding: 6px 14px; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--surface-1);
+      color: var(--muted); font-size: .85rem; font-weight: 700; cursor: pointer;
+      transition: all .16s ease;
+    }
+    .m3-chip:hover { border-color: var(--accent); color: var(--text); }
+    .m3-chip[aria-pressed="true"], .m3-chip.active {
+      background: var(--accent-soft); border-color: var(--accent); color: var(--accent-strong);
+    }
+
+    /* Section Headings */
+    section { padding: 56px 0; scroll-margin-top: 86px; }
+    .section-head { max-width: 740px; margin-bottom: 28px; }
+    .section-kicker {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 5px 12px; margin-bottom: 12px; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent);
+      font-size: .76rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+    }
+    h1 {
+      margin: 14px 0 18px;
+      font-size: clamp(2.55rem, 5.4vw, 4.4rem); line-height: 1.06; letter-spacing: -.045em;
+    }
+    h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.75rem, 3.6vw, 2.4rem); line-height: 1.16; letter-spacing: -.03em;
+    }
+    h3 { margin: 0 0 8px; font-size: 1.1rem; line-height: 1.3; }
+    .section-head p { margin: 0; color: var(--muted); }
+
+    .m3-card {
+      background: linear-gradient(155deg, var(--surface-2), var(--surface-1));
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: 0 12px 32px rgba(4, 9, 20, 0.25);
+    }
+
+    /* Hero Section */
+    .hero {
+      display: grid; grid-template-columns: 1.05fr .95fr;
+      align-items: center; gap: 42px; padding: 54px 0 44px;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 999px;
+      background: var(--surface-2); border: 1px solid var(--line-strong);
+      color: var(--accent); font-size: .8rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    }
+    .hero-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .lead { max-width: 610px; color: var(--muted); font-size: clamp(1.02rem, 1.8vw, 1.15rem); margin: 0; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+    .trust-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .pill {
+      padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03); color: var(--muted); font-size: .82rem; font-weight: 600;
+    }
+    .hero-stage {
+      position: relative;
+      padding: 18px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(160deg, rgba(29, 47, 74, 0.85), rgba(14, 23, 39, 0.95));
+      border: 1px solid var(--line-strong);
+      box-shadow: var(--shadow-lg);
+    }
+    .preview-img {
+      display: block; width: 100%; height: auto;
+      border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .hero-stat-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px;
+    }
+    .stat-mini {
+      padding: 12px 14px; border-radius: var(--radius-md);
+      background: rgba(9, 17, 30, 0.72); border: 1px solid var(--line);
+    }
+    .stat-mini strong { display: block; color: var(--accent); font-size: 1.06rem; }
+    .stat-mini span { display: block; color: var(--muted); font-size: .78rem; }
+
+    /* Smart Setup Progress Bar & Checklist */
+    .setup-shell {
+      display: grid; gap: 20px;
+    }
+    .progress-banner {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px;
+      padding: 20px 24px; border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--surface-3), var(--surface-2));
+      border: 1px solid var(--line-strong);
+    }
+    .progress-meta { flex: 1 1 280px; }
+    .progress-title-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px;
+    }
+    .progress-title-row strong { font-size: 1rem; }
+    .progress-pct {
+      padding: 4px 10px; border-radius: 999px; font-weight: 800; font-size: .82rem;
+      background: var(--accent-soft); color: var(--accent);
+    }
+    .progress-track {
+      width: 100%; height: 10px; border-radius: 999px;
+      background: #0a1220; overflow: hidden; border: 1px solid var(--line);
+    }
+    .progress-fill {
+      height: 100%; width: 0%; border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), #38bdf8);
+      transition: width .32s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .smart-step {
+      display: flex; flex-direction: column; justify-content: space-between; gap: 16px;
+      padding: 22px; border-radius: var(--radius-lg);
+      background: linear-gradient(160deg, var(--surface-2), var(--surface-1));
+      border: 1px solid var(--line); transition: border-color .2s ease, transform .18s ease;
+    }
+    .smart-step.completed {
+      border-color: var(--accent);
+      background: linear-gradient(160deg, rgba(22, 48, 56, 0.9), var(--surface-1));
+    }
+    .step-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .step-num {
+      display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 12px;
+      background: var(--accent); color: var(--accent-ink); font-weight: 900; font-size: .95rem;
+    }
+    .step-check-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 12px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--line-strong); background: rgba(9, 17, 30, 0.7);
+      color: var(--muted); font-size: .8rem; font-weight: 700;
+      transition: all .18s ease;
+    }
+    .step-check-btn[aria-checked="true"] {
+      background: var(--accent); border-color: var(--accent); color: var(--accent-ink);
+    }
+    .smart-step p { margin: 0; color: var(--muted); font-size: .92rem; }
+    .oem-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .oem-tab {
+      padding: 4px 10px; border-radius: 999px; font-size: .76rem; font-weight: 700;
+      border: 1px solid var(--line); background: #091220; color: var(--muted); cursor: pointer;
+    }
+    .oem-tab[aria-selected="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .oem-tip-box {
+      margin-top: 8px; padding: 10px 12px; border-radius: 12px;
+      background: #091220; border: 1px solid var(--line); color: var(--text); font-size: .82rem;
+    }
+    .checksum-inline {
+      margin-top: 10px; padding: 10px 12px; border-radius: 12px;
+      background: #091220; border: 1px solid var(--line);
+    }
+    .checksum-inline code {
+      display: block; font-family: var(--font-mono); font-size: .72rem;
+      color: var(--accent-strong); overflow-wrap: anywhere; margin-bottom: 8px;
+    }
+
+    /* Live Theme Studio */
+    .theme-studio-grid {
+      display: grid; grid-template-columns: 1.02fr .98fr; gap: 20px; align-items: start;
+    }
+    .swatch-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px;
+    }
+    .theme-swatch {
+      display: flex; flex-direction: column; gap: 8px; padding: 11px; text-align: left;
+      border-radius: var(--radius-md); border: 1px solid var(--line);
+      background: rgba(9, 17, 30, 0.72); cursor: pointer;
+      transition: transform .15s ease, border-color .18s ease;
+    }
+    .theme-swatch:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .theme-swatch[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+      background: var(--surface-3);
+    }
+    .swatch-preview-strip {
+      display: flex; align-items: center; gap: 4px; height: 22px;
+      padding: 4px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .swatch-preview-strip span { flex: 1; height: 100%; border-radius: 5px; }
+    .swatch-name { font-size: .82rem; font-weight: 700; color: var(--text); line-height: 1.25; }
+    .swatch-cat { font-size: .72rem; color: var(--muted); }
+    .theme-sync-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      margin-top: 16px; padding: 12px 14px; border-radius: var(--radius-md);
+      background: rgba(9, 17, 30, 0.68); border: 1px solid var(--line); font-size: .86rem;
+    }
+    .theme-sync-row input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+
+    /* Interactive Mini Keyboard Preview Stage */
+    .kbd-device {
+      --kbd-bg: #171A21;
+      --kbd-grad: linear-gradient(180deg, #101722, #253448);
+      --kbd-key: #252B36;
+      --kbd-action: #303A4A;
+      --kbd-space: #202734;
+      --kbd-active: #163B52;
+      --kbd-text: #F4F7FB;
+      --kbd-sub: #B8C4D6;
+      --kbd-accent: #67D5FF;
+      --kbd-border: #303A49;
+      --kbd-radius: 8px;
+      border-radius: 24px;
+      padding: 16px;
+      background: #080e1a;
+      border: 1px solid var(--line-strong);
+      box-shadow: var(--shadow-lg);
+    }
+    .kbd-app-preview {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px 14px; margin-bottom: 10px; border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: .92rem;
+    }
+    .kbd-typed-stream { font-weight: 700; color: var(--text); min-height: 24px; }
+    .kbd-stage {
+      border-radius: 18px; padding: 10px 8px 12px;
+      background: var(--kbd-grad);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--kbd-text);
+      transition: background .25s ease;
+    }
+    .kbd-toolbar {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+      padding: 2px 4px 8px; text-align: center; font-size: .82rem; opacity: 0.9;
+    }
+    .kbd-toolbar span { padding: 4px 0; border-radius: 8px; }
+    .kbd-candidates {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+      padding: 4px 4px 10px; align-items: center; text-align: center;
+    }
+    .kbd-cand {
+      padding: 6px 8px; border-radius: 999px; font-size: .84rem; font-weight: 700;
+      color: var(--kbd-text); background: rgba(255, 255, 255, 0.06);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .kbd-cand.best {
+      background: var(--kbd-active); color: var(--kbd-accent);
+      border: 1px solid var(--kbd-accent);
+    }
+    .kbd-row {
+      display: grid; gap: 4px; margin-bottom: 5px;
+    }
+    .kbd-row.r10 { grid-template-columns: repeat(10, 1fr); }
+    .kbd-row.r9 { grid-template-columns: repeat(9, 1fr); padding-inline: 5%; }
+    .kbd-row.r-mod { grid-template-columns: 1.35fr repeat(7, 1fr) 1.35fr; }
+    .kbd-row.r-bot { grid-template-columns: 1.35fr 1fr 3.2fr 1fr 1.45fr; margin-bottom: 0; }
+    .vkey {
+      position: relative; height: 42px; padding: 0; border-radius: var(--kbd-radius);
+      border: 1px solid var(--kbd-border);
+      background: var(--kbd-key); color: var(--kbd-text);
+      display: grid; place-items: center; cursor: pointer;
+      font-size: .95rem; font-weight: 600;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+      transition: transform .08s ease, background .15s ease;
+    }
+    .vkey:active, .vkey.flash { transform: translateY(1px); background: var(--kbd-active); }
+    .vkey.action { background: var(--kbd-action); font-size: .82rem; font-weight: 700; }
+    .vkey.space { background: var(--kbd-space); font-size: .78rem; color: var(--kbd-sub); }
+    .vkey.enter { background: var(--kbd-active); color: var(--kbd-accent); border-color: var(--kbd-accent); font-weight: 800; }
+    .vkey-sub {
+      position: absolute; top: 2px; right: 4px; font-size: .58rem; line-height: 1;
+      color: var(--kbd-sub); font-weight: 700; opacity: 0.9;
+    }
+
+    /* Interactive Singlish Sandbox & Phonetic Guide */
+    .demo-layout {
+      display: grid; grid-template-columns: .95fr 1.05fr; gap: 18px; align-items: stretch;
+    }
+    .demo-label {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      margin-bottom: 10px; color: var(--muted); font-size: .88rem; font-weight: 700;
+    }
+    .badge-live {
+      padding: 3px 9px; border-radius: 999px; font-size: .74rem;
+      background: var(--accent-soft); color: var(--accent); font-weight: 800;
+    }
+    textarea {
+      display: block; width: 100%; min-height: 126px; resize: vertical; padding: 14px 16px;
+      border: 1px solid var(--line-strong); border-radius: var(--radius-md); color: var(--text);
+      background: #091220; line-height: 1.7;
+    }
+    .candidate-strip-sim {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+      padding: 10px 12px; margin-bottom: 12px; border-radius: var(--radius-md);
+      background: #091220; border: 1px solid var(--line);
+    }
+    .cand-pill {
+      padding: 6px 13px; border-radius: 999px; border: 1px solid var(--line);
+      background: var(--surface-2); color: var(--text); font-size: .9rem; font-weight: 700; cursor: pointer;
+    }
+    .cand-pill.primary-cand {
+      background: rgba(255, 159, 67, 0.2); border-color: var(--tertiary); color: #ffd4a3;
+    }
+    .output-box {
+      min-height: 126px; padding: 18px; border: 1px solid var(--line-strong); border-radius: var(--radius-md);
+      background: #091220; font-size: clamp(1.25rem, 2.8vw, 1.75rem); line-height: 1.65;
+      overflow-wrap: anywhere;
+    }
+    .demo-examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .cheat-sheet-card { margin-top: 18px; }
+    .cheat-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 10px; margin-top: 16px;
+    }
+    .cheat-chip {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 10px 13px; border-radius: var(--radius-md);
+      border: 1px solid var(--line); background: #091220; cursor: pointer;
+      text-align: left; transition: border-color .16s ease, transform .12s ease;
+    }
+    .cheat-chip:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .cheat-roman { font-family: var(--font-mono); font-size: .85rem; color: var(--accent); font-weight: 700; }
+    .cheat-sinhala { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+
+    /* Interactive Feature Quick Guides */
+    .guide-shell {
+      display: grid; grid-template-columns: .92fr 1.08fr; gap: 20px; align-items: start;
+    }
+    .guide-nav { display: grid; gap: 10px; }
+    .guide-tab-btn {
+      display: flex; align-items: flex-start; gap: 14px; padding: 15px 16px; text-align: left;
+      border-radius: var(--radius-lg); border: 1px solid var(--line);
+      background: var(--surface-1); cursor: pointer; transition: all .18s ease;
+    }
+    .guide-tab-btn:hover { border-color: var(--line-strong); background: var(--surface-2); }
+    .guide-tab-btn[aria-selected="true"] {
+      border-color: var(--accent); background: linear-gradient(145deg, rgba(22, 48, 58, 0.9), var(--surface-2));
+    }
+    .guide-ico {
+      flex: 0 0 auto; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 13px;
+      background: var(--accent-soft); color: var(--accent); font-size: 1.2rem; font-weight: 800;
+    }
+    .guide-tab-btn strong { display: block; font-size: .98rem; margin-bottom: 2px; }
+    .guide-tab-btn span { display: block; color: var(--muted); font-size: .84rem; line-height: 1.45; }
+
+    .guide-stage { min-height: 360px; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+    .gesture-key-demo {
+      display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 56px); gap: 8px;
+      max-width: 260px; margin: 12px auto; padding: 14px; border-radius: 20px;
+      background: #091220; border: 1px solid var(--line-strong);
+    }
+    .gz {
+      display: grid; place-items: center; border-radius: 10px; border: 1px dashed var(--line);
+      color: var(--muted); font-size: .86rem; font-weight: 700; cursor: pointer; background: rgba(255, 255, 255, 0.02);
+    }
+    .gz.center { border-style: solid; background: var(--surface-3); color: var(--text); font-size: 1.35rem; }
+    .gz.selected { border-style: solid; border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    .calc-sim-row {
+      display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0;
+    }
+    .calc-result-banner {
+      padding: 14px 16px; border-radius: var(--radius-md); background: #091220;
+      border: 1px solid var(--line-strong); display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .calc-badge {
+      padding: 6px 14px; border-radius: 999px; background: rgba(255, 159, 67, 0.22);
+      border: 1px solid var(--tertiary); color: #ffd4a3; font-weight: 800;
+    }
+
+    /* Visual Feature Showcase Carousel (Self-contained M3 Scenarios) */
+    .gallery-shell { position: relative; }
+    .gallery {
+      display: grid; grid-auto-flow: column; grid-auto-columns: minmax(270px, 31.5%);
+      gap: 16px; overflow-x: auto; padding: 4px 2px 16px; scroll-snap-type: x mandatory;
+      scrollbar-color: var(--line-strong) var(--surface-1); scrollbar-width: thin;
+    }
+    .showcase-card {
+      margin: 0; padding: 18px; border-radius: var(--radius-lg);
+      border: 1px solid var(--line); background: linear-gradient(160deg, var(--surface-2), var(--surface-1));
+      scroll-snap-align: start; display: flex; flex-direction: column; gap: 12px;
+    }
+    .mini-screen {
+      border-radius: 14px; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #091220; min-height: 168px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+    }
+    .mini-bar {
+      display: flex; gap: 6px; padding: 6px 8px; border-radius: 10px; background: rgba(255, 255, 255, 0.06);
+      font-size: .78rem; justify-content: space-between;
+    }
+    .mini-pill-accent {
+      padding: 2px 9px; border-radius: 999px; background: var(--tertiary); color: #1b0e02; font-weight: 800;
+    }
+    .mini-keys-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
+    }
+    .mini-k {
+      padding: 7px 0; text-align: center; border-radius: 7px; font-size: .74rem; font-weight: 700;
+      background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.09);
+    }
+    .gallery-controls { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+    .icon-button {
+      width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-strong);
+      background: var(--surface-2); color: var(--text); cursor: pointer; font-weight: 800;
+    }
+    .icon-button:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Trust, FAQ & CTA */
+    .security-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .faq-list { display: grid; gap: 10px; }
+    .faq-item {
+      padding: 0 20px; border-radius: var(--radius-lg);
+      background: linear-gradient(155deg, var(--surface-2), var(--surface-1));
+      border: 1px solid var(--line);
+    }
+    .faq-item summary { padding: 17px 12px 17px 0; cursor: pointer; font-weight: 700; }
+    .faq-item p { margin: 0; padding: 0 0 18px; color: var(--muted); font-size: .95rem; }
+    .cta {
+      padding: 36px; border-radius: var(--radius-xl);
+      border: 1px solid rgba(105, 224, 192, 0.35);
+      background: radial-gradient(circle at 90% 10%, var(--accent-soft), transparent 52%), var(--surface-2);
+    }
+    .cta p { max-width: 680px; color: var(--muted); }
+
+    footer {
+      margin-top: 44px; padding: 28px 0 42px; border-top: 1px solid var(--line);
+      color: var(--muted); font-size: .9rem;
+    }
+    .footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; }
+
+    @media (max-width: 960px) {
+      .hero, .theme-studio-grid, .demo-layout, .guide-shell { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .gallery { grid-auto-columns: minmax(250px, 46%); }
+    }
+    @media (max-width: 640px) {
       .wrap { width: min(100% - 28px, var(--max)); }
-      .nav-wrap { align-items: flex-start; }
-      nav { max-width: 78%; gap: 8px 14px; }
-      nav a { font-size: .84rem; }
-      .hero { padding: 42px 0 34px; }
-      section { padding: 48px 0; }
-      .demo-layout, .security-grid { grid-template-columns: 1fr; }
-      .feature-grid, .steps { grid-template-columns: 1fr; }
-      .gallery { grid-auto-columns: 78%; }
+      .header-inner { flex-direction: column; align-items: stretch; padding: 12px 0; gap: 10px; }
+      .nav-wrap { justify-content: space-between; }
+      nav a { padding: 6px 9px; font-size: .82rem; }
+      section { padding: 42px 0; }
+      .swatch-grid { grid-template-columns: repeat(2, 1fr); }
+      .security-grid { grid-template-columns: 1fr; }
+      .gallery { grid-auto-columns: 82%; }
+      .hero-stat-strip { grid-template-columns: 1fr; }
       .cta { padding: 24px; }
-      .checksum { flex-direction: column; }
-      .checksum code { width: 100%; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
     }
   </style>
 </head>
 <body data-lang="en">
   <a class="skip-link" href="#main"><span class="en">Skip to content</span><span class="si" lang="si">අන්තර්ගතයට යන්න</span></a>
+
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="./" aria-label="KeyCraft home">
-        <img src="assets/favicon.png" alt="" width="42" height="42">
+        <img src="assets/favicon.png" alt="" width="40" height="40">
         <span>KeyCraft</span>
+        <span class="brand-badge">v1.2.0</span>
       </a>
       <div class="nav-wrap">
         <nav aria-label="Main navigation">
-          <a href="#demo"><span class="en">Live demo</span><span class="si" lang="si">Live Demo</span></a>
-          <a href="#features"><span class="en">Features</span><span class="si" lang="si">විශේෂාංග</span></a>
-          <a href="#screenshots"><span class="en">Screenshots</span><span class="si" lang="si">තිර රූප</span></a>
-          <a href="#install"><span class="en">Install</span><span class="si" lang="si">ස්ථාපනය</span></a>
+          <a href="#setup"><span class="en">Smart Setup</span><span class="si" lang="si">Setup</span></a>
+          <a href="#themes"><span class="en">Theme Studio</span><span class="si" lang="si">Themes</span></a>
+          <a href="#demo"><span class="en">Singlish Lab</span><span class="si" lang="si">Singlish</span></a>
+          <a href="#guides"><span class="en">Quick Guides</span><span class="si" lang="si">Guides</span></a>
           <a href="#faq">FAQ</a>
         </nav>
         <div class="lang-switch" role="group" aria-label="Language">
@@ -232,153 +633,492 @@
   </header>
 
   <main id="main" class="wrap">
+    <!-- Material 3 Hero -->
     <section class="hero" aria-labelledby="hero-title">
       <div>
-        <div class="eyebrow"><span class="en">A keyboard that feels like yours</span><span class="si" lang="si">ඔබේ රිද්මයට ගැළපෙන Keyboard එකක්</span></div>
+        <div class="hero-eyebrow">
+          <span class="hero-dot" aria-hidden="true"></span>
+          <span class="en">Material 3 · Open-Source Sinhala IME</span>
+          <span class="si" lang="si">Material 3 · විවෘත මූලාශ්‍ර සිංහල Keyboard</span>
+        </div>
         <h1 id="hero-title">
           <span class="en">Sinhala typing, <span style="color:var(--accent)">your way.</span></span>
           <span class="si" lang="si">සිංහල ලිවීම <span style="color:var(--accent)">ලස්සනට, ඉක්මනට.</span></span>
         </h1>
         <p class="lead">
-          <span class="en">Turn Singlish into Sinhala as you type. Make the keyboard yours with corner-swipe gestures, flexible layouts, themes and practical tools — all in a free, open-source Android app.</span>
-          <span class="si" lang="si">Singlish ටයිප් කරන අතරතුරම සිංහලට හරවන්න. Corner-swipe gestures, වෙනස් කළ හැකි layouts, themes සහ ප්‍රයෝජනවත් tools සමඟ Keyboard එක ඔබට ගැළපෙන ලෙස සකස් කරගන්න.</span>
+          <span class="en">Type Singlish naturally across messaging, Chrome web apps and AI chats. Customize 25+ themes, corner-swipe gestures, Termux coding rows and productivity tools — free and ad-free.</span>
+          <span class="si" lang="si">WhatsApp, Chrome Web Apps සහ AI chats ඇතුළු සෑම තැනකම පහසුවෙන් Singlish වලින් සිංහල ටයිප් කරන්න. Themes 25+, corner-swipe gestures, Termux coding layout සහ productivity tools සමඟ නොමිලේ.</span>
         </p>
         <div class="actions">
           <a class="button primary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0">
-            <span aria-hidden="true">↓</span><span class="en">Download APK · v1.2.0</span><span class="si" lang="si">APK Download · v1.2.0</span>
+            <span aria-hidden="true">↓</span>
+            <span class="en">Download APK · v1.2.0</span>
+            <span class="si" lang="si">APK Download · v1.2.0</span>
           </a>
-          <a class="button" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard"><span class="en">View source</span><span class="si" lang="si">Source Code</span></a>
+          <a class="button tonal" href="#demo">
+            <span class="en">Try Singlish Lab</span>
+            <span class="si" lang="si">Singlish අත්හදා බලන්න</span>
+          </a>
+          <a class="button" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard">
+            <span class="en">GitHub Source</span>
+            <span class="si" lang="si">Source Code</span>
+          </a>
         </div>
         <div class="trust-row" aria-label="KeyCraft highlights">
-          <span class="pill">GPL-3.0 · Open source</span>
-          <span class="pill"><span class="en">No ads</span><span class="si" lang="si">දැන්වීම් නැහැ</span></span>
-          <span class="pill"><span class="en">On-device typing</span><span class="si" lang="si">උපාංගය තුළම typing</span></span>
+          <span class="pill">GPL-3.0 Open Source</span>
+          <span class="pill"><span class="en">Zero Ads</span><span class="si" lang="si">දැන්වීම් නැහැ</span></span>
+          <span class="pill"><span class="en">On-Device Transliteration</span><span class="si" lang="si">උපාංගය තුළම පරිවර්තනය</span></span>
+          <span class="pill"><span class="en">SHA-256 Verified</span><span class="si" lang="si">SHA-256 තහවුරු කළ APK</span></span>
         </div>
       </div>
-      <div class="hero-art">
-        <img class="preview" src="assets/og-keycraft.png" alt="KeyCraft Sinhala keyboard app preview" width="1200" height="800" fetchpriority="high">
+
+      <div class="hero-stage">
+        <img class="preview-img" src="assets/og-keycraft.png" alt="KeyCraft Sinhala keyboard hero visual" width="1200" height="630" fetchpriority="high">
+        <div class="hero-stat-strip">
+          <div class="stat-mini">
+            <strong>25+ Themes</strong>
+            <span><span class="en">Vibrant, Sri Lanka &amp; Dark</span><span class="si" lang="si">Vibrant, Sri Lanka සහ Dark</span></span>
+          </div>
+          <div class="stat-mini">
+            <strong>Singlish + ෴</strong>
+            <span><span class="en">Full conjuncts &amp; suggestions</span><span class="si" lang="si">බැඳි අකුරු සහ යෝජනා</span></span>
+          </div>
+          <div class="stat-mini">
+            <strong>100% Local</strong>
+            <span><span class="en">No keystroke cloud logging</span><span class="si" lang="si">දත්ත රැස් කිරීමක් නැහැ</span></span>
+          </div>
+        </div>
       </div>
     </section>
 
+    <!-- Smart Setup Progress Bar & Checklist -->
+    <section id="setup" aria-labelledby="setup-title">
+      <div class="section-head">
+        <span class="section-kicker"><span class="en">Smart Setup Cards</span><span class="si" lang="si">පියවරෙන් පියවර සැකසුම</span></span>
+        <h2 id="setup-title"><span class="en">Install &amp; enable in 3 guided steps</span><span class="si" lang="si">පියවර 3කින් Install කර සක්‍රිය කරන්න</span></h2>
+        <p><span class="en">Track your installation progress as you download the official APK, grant install permission and activate KeyCraft on Android. Progress is saved automatically in this browser.</span><span class="si" lang="si">නිල APK එක Download කර, Install අවසරය ලබා දී, Android හි KeyCraft සක්‍රිය කරන ආකාරය පහත checklist එකෙන් track කරන්න.</span></p>
+      </div>
+
+      <div class="setup-shell">
+        <div class="progress-banner" role="region" aria-label="Installation progress">
+          <div class="progress-meta">
+            <div class="progress-title-row">
+              <strong id="setup-progress-label">
+                <span class="en">Setup Checklist Progress</span>
+                <span class="si" lang="si">සැකසුම් ප්‍රගතිය</span>
+              </strong>
+              <span class="progress-pct" id="setup-progress-pct" aria-live="polite">0% · 0/3</span>
+            </div>
+            <div class="progress-track" aria-hidden="true">
+              <div class="progress-fill" id="setup-progress-fill"></div>
+            </div>
+          </div>
+          <button type="button" class="button sm" id="reset-setup-btn">
+            <span class="en">Reset checklist</span>
+            <span class="si" lang="si">නැවත සකසන්න</span>
+          </button>
+        </div>
+
+        <div class="steps-grid">
+          <!-- Step 1 -->
+          <article class="smart-step" data-step-card="1">
+            <div>
+              <div class="step-top">
+                <span class="step-num">01</span>
+                <button type="button" class="step-check-btn" role="checkbox" aria-checked="false" data-step-toggle="1">
+                  <span aria-hidden="true">✓</span>
+                  <span class="en">Mark done</span>
+                  <span class="si" lang="si">සම්පූර්ණයි</span>
+                </button>
+              </div>
+              <h3 style="margin-top:14px"><span class="en">Download &amp; verify APK</span><span class="si" lang="si">APK එක Download සහ තහවුරු කරන්න</span></h3>
+              <p><span class="en">Download the official release APK and compare its SHA-256 digest if verifying manually.</span><span class="si" lang="si">නිල GitHub Release පිටුවෙන් APK ගොනුව ලබාගෙන SHA-256 hash එක පරීක්ෂා කරන්න.</span></p>
+              <div class="checksum-inline">
+                <code id="sha256-value">dc275ec4f0fcbe8592dafb943b78294e7ad5737b4ec6bf0b8a3aad93d06433dd</code>
+                <button class="button sm" type="button" id="copy-checksum">
+                  <span class="en">Copy SHA-256</span>
+                  <span class="si" lang="si">Hash Copy කරන්න</span>
+                </button>
+                <span id="copy-status" style="margin-left:8px;font-size:.78rem;color:var(--accent)" role="status" aria-live="polite"></span>
+              </div>
+            </div>
+            <a class="button primary sm" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0">
+              <span class="en">Open v1.2.0 Release ↗</span>
+              <span class="si" lang="si">v1.2.0 Release වෙත ↗</span>
+            </a>
+          </article>
+
+          <!-- Step 2 -->
+          <article class="smart-step" data-step-card="2">
+            <div>
+              <div class="step-top">
+                <span class="step-num">02</span>
+                <button type="button" class="step-check-btn" role="checkbox" aria-checked="false" data-step-toggle="2">
+                  <span aria-hidden="true">✓</span>
+                  <span class="en">Mark done</span>
+                  <span class="si" lang="si">සම්පූර්ණයි</span>
+                </button>
+              </div>
+              <h3 style="margin-top:14px"><span class="en">Allow install from this source</span><span class="si" lang="si">Install අවසරය ලබා දෙන්න</span></h3>
+              <p><span class="en">Tap the downloaded APK in your browser or file manager, then toggle “Allow from this source”. Choose your phone brand below for exact menu steps:</span><span class="si" lang="si">Download කළ ගොනුව open කළ විට අවසර ඉල්ලුවහොත් “Allow from this source” සක්‍රිය කරන්න:</span></p>
+              <div class="oem-tabs" role="tablist" aria-label="Android brand instructions">
+                <button type="button" class="oem-tab" role="tab" aria-selected="true" data-oem="stock">Pixel / Stock</button>
+                <button type="button" class="oem-tab" role="tab" aria-selected="false" data-oem="samsung">Samsung</button>
+                <button type="button" class="oem-tab" role="tab" aria-selected="false" data-oem="xiaomi">Xiaomi</button>
+              </div>
+              <div class="oem-tip-box" id="oem-tip-text"></div>
+            </div>
+          </article>
+
+          <!-- Step 3 -->
+          <article class="smart-step" data-step-card="3">
+            <div>
+              <div class="step-top">
+                <span class="step-num">03</span>
+                <button type="button" class="step-check-btn" role="checkbox" aria-checked="false" data-step-toggle="3">
+                  <span aria-hidden="true">✓</span>
+                  <span class="en">Mark done</span>
+                  <span class="si" lang="si">සම්පූර්ණයි</span>
+                </button>
+              </div>
+              <h3 style="margin-top:14px"><span class="en">Enable KeyCraft &amp; switch IME</span><span class="si" lang="si">KeyCraft Enable කර Default ලෙස තෝරන්න</span></h3>
+              <p><span class="en">Open the installed KeyCraft app and complete the built-in 2-tap setup: Enable in System Keyboard Settings, select KeyCraft in the Input Method Picker, then type your first word!</span><span class="si" lang="si">KeyCraft App එක විවෘත කර Enable Keyboard → Select KeyCraft ලෙස තෝරා සිංහල typing ආරම්භ කරන්න.</span></p>
+            </div>
+            <a class="button tonal sm" href="#demo">
+              <span class="en">Practice Singlish first ↓</span>
+              <span class="si" lang="si">පළමුව Singlish පුහුණු වන්න ↓</span>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Theme Studio -->
+    <section id="themes" aria-labelledby="themes-title">
+      <div class="section-head">
+        <span class="section-kicker"><span class="en">Live Theme Preview</span><span class="si" lang="si">සජීවී Theme Studio</span></span>
+        <h2 id="themes-title"><span class="en">Preview KeyCraft themes live</span><span class="si" lang="si">KeyCraft Themes සජීවීව අත්හදා බලන්න</span></h2>
+        <p><span class="en">Filter by category, pick any theme swatch and tap keys on the interactive preview keyboard. You can also sync this page's Material accent colour with your chosen theme.</span><span class="si" lang="si">පහත categories වලින් theme එකක් තෝරා සජීවී keyboard preview එකේ පෙනුම සහ වර්ණ පරීක්ෂා කරන්න.</span></p>
+      </div>
+
+      <div class="theme-studio-grid">
+        <div class="m3-card">
+          <div class="chip-row" id="theme-category-chips" role="group" aria-label="Theme categories">
+            <button type="button" class="m3-chip active" data-theme-cat="all" aria-pressed="true"><span class="en">All</span><span class="si" lang="si">සියල්ල</span></button>
+            <button type="button" class="m3-chip" data-theme-cat="vibrant" aria-pressed="false">Vibrant</button>
+            <button type="button" class="m3-chip" data-theme-cat="srilanka" aria-pressed="false"><span class="en">Sri Lanka</span><span class="si" lang="si">ශ්‍රී ලංකා</span></button>
+            <button type="button" class="m3-chip" data-theme-cat="terminal" aria-pressed="false">Terminal</button>
+            <button type="button" class="m3-chip" data-theme-cat="dark" aria-pressed="false">Dark</button>
+            <button type="button" class="m3-chip" data-theme-cat="light" aria-pressed="false">Light</button>
+          </div>
+
+          <div class="swatch-grid" id="theme-swatch-grid" role="group" aria-label="Keyboard themes"></div>
+
+          <label class="theme-sync-row">
+            <span>
+              <strong id="active-theme-title">KeyCraft Dark</strong>
+              <span style="display:block;color:var(--muted);font-size:.8rem">
+                <span class="en">Sync landing page accent colour with theme</span>
+                <span class="si" lang="si">Theme වර්ණය පිටුවේ accent සඳහාත් යොදන්න</span>
+              </span>
+            </span>
+            <input type="checkbox" id="sync-page-accent" checked>
+          </label>
+        </div>
+
+        <div class="kbd-device" id="kbd-preview-stage" aria-label="Interactive keyboard theme preview">
+          <div class="kbd-app-preview">
+            <span class="kbd-typed-stream" id="kbd-preview-stream">සමහර</span>
+            <button type="button" class="button sm" id="kbd-preview-reset" style="min-height:32px;padding:4px 10px;font-size:.76rem">
+              <span class="en">Clear</span><span class="si" lang="si">මකන්න</span>
+            </button>
+          </div>
+          <div class="kbd-stage" id="kbd-stage-surface">
+            <div class="kbd-toolbar" aria-hidden="true">
+              <span>⊞</span><span>✥</span><span>文A</span><span>📋</span><span>🎨</span><span>⌨</span><span>⚙</span>
+            </div>
+            <div class="kbd-candidates">
+              <span class="kbd-cand">Samahara</span>
+              <span class="kbd-cand best">සමහර</span>
+              <span class="kbd-cand">ෂමහර</span>
+            </div>
+            <div class="kbd-row r10">
+              <button type="button" class="vkey" data-vkey="q">q<span class="vkey-sub">1</span></button>
+              <button type="button" class="vkey" data-vkey="w">w<span class="vkey-sub">2</span></button>
+              <button type="button" class="vkey" data-vkey="e">e<span class="vkey-sub">3</span></button>
+              <button type="button" class="vkey" data-vkey="r">r<span class="vkey-sub">4</span></button>
+              <button type="button" class="vkey" data-vkey="t">t<span class="vkey-sub">5</span></button>
+              <button type="button" class="vkey" data-vkey="y">y<span class="vkey-sub">6</span></button>
+              <button type="button" class="vkey" data-vkey="u">u<span class="vkey-sub">7</span></button>
+              <button type="button" class="vkey" data-vkey="i">i<span class="vkey-sub">8</span></button>
+              <button type="button" class="vkey" data-vkey="o">o<span class="vkey-sub">9</span></button>
+              <button type="button" class="vkey" data-vkey="p">p<span class="vkey-sub">0</span></button>
+            </div>
+            <div class="kbd-row r9">
+              <button type="button" class="vkey" data-vkey="a">a<span class="vkey-sub">@</span></button>
+              <button type="button" class="vkey" data-vkey="s">s<span class="vkey-sub">#</span></button>
+              <button type="button" class="vkey" data-vkey="d">d<span class="vkey-sub">$</span></button>
+              <button type="button" class="vkey" data-vkey="f">f<span class="vkey-sub">%</span></button>
+              <button type="button" class="vkey" data-vkey="g">g<span class="vkey-sub">-</span></button>
+              <button type="button" class="vkey" data-vkey="h">h<span class="vkey-sub">=</span></button>
+              <button type="button" class="vkey" data-vkey="j">j<span class="vkey-sub">{ }</span></button>
+              <button type="button" class="vkey" data-vkey="k">k<span class="vkey-sub">[ ]</span></button>
+              <button type="button" class="vkey" data-vkey="l">l<span class="vkey-sub">\</span></button>
+            </div>
+            <div class="kbd-row r-mod">
+              <button type="button" class="vkey action" data-vkey="shift">⇧</button>
+              <button type="button" class="vkey" data-vkey="z">z</button>
+              <button type="button" class="vkey" data-vkey="x">x</button>
+              <button type="button" class="vkey" data-vkey="c">c<span class="vkey-sub">&lt;</span></button>
+              <button type="button" class="vkey" data-vkey="v">v<span class="vkey-sub">&gt;</span></button>
+              <button type="button" class="vkey" data-vkey="b">b<span class="vkey-sub">?</span></button>
+              <button type="button" class="vkey" data-vkey="n">n<span class="vkey-sub">:</span></button>
+              <button type="button" class="vkey" data-vkey="m">m<span class="vkey-sub">"</span></button>
+              <button type="button" class="vkey action" data-vkey="back">⌫</button>
+            </div>
+            <div class="kbd-row r-bot">
+              <button type="button" class="vkey action" data-vkey="sym">123+</button>
+              <button type="button" class="vkey action" data-vkey="si">සි</button>
+              <button type="button" class="vkey space" data-vkey=" ">සිංහල · Singlish</button>
+              <button type="button" class="vkey action" data-vkey=".">.</button>
+              <button type="button" class="vkey enter" data-vkey="enter">↵</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Singlish Sandbox & Phonetic Guide -->
     <section id="demo" aria-labelledby="demo-title">
       <div class="section-head">
-        <span class="section-kicker"><span class="en">Try it now</span><span class="si" lang="si">දැන්ම අත්හදා බලන්න</span></span>
-        <h2 id="demo-title"><span class="en">Type Singlish. See Sinhala.</span><span class="si" lang="si">Singlish ටයිප් කරලා සිංහල බලන්න.</span></h2>
-        <p><span class="en">A small, in-browser preview of common phonetic words. No text is sent to a server.</span><span class="si" lang="si">සාමාන්‍ය වචන සඳහා කුඩා browser preview එකක්. ඔබ ටයිප් කරන දේ server එකකට යවන්නේ නැහැ.</span></p>
+        <span class="section-kicker"><span class="en">Interactive Singlish Lab</span><span class="si" lang="si">සජීවී Singlish මාර්ගෝපදේශය</span></span>
+        <h2 id="demo-title"><span class="en">Type Singlish. Master Sinhala rules.</span><span class="si" lang="si">Singlish ටයිප් කර සිංහල අකුරු රීති ඉගෙන ගන්න.</span></h2>
+        <p><span class="en">Test words live in your browser with simulated KeyCraft candidate pills, or click any phonetic rule chip below to insert vowels, pillam and conjuncts right away.</span><span class="si" lang="si">පහත කොටුවේ Singlish ටයිප් කර බලන්න, නැතිනම් cheat sheet එකේ ඕනෑම උදාහරණයක් ක්ලික් කර සිංහලට හැරෙන ආකාරය බලන්න.</span></p>
       </div>
+
       <div class="demo-layout">
-        <div class="panel">
-          <label class="demo-label" for="singlish-input"><span class="en">Your Singlish</span><span class="si" lang="si">ඔබේ Singlish</span><span>LIVE</span></label>
-          <textarea id="singlish-input" spellcheck="false" autocomplete="off" autocapitalize="off">amma kohomada?</textarea>
-          <div class="demo-examples" aria-label="Example phrases">
-            <button class="example" type="button" data-example="amma">amma</button>
-            <button class="example" type="button" data-example="kohomada">kohomada</button>
-            <button class="example" type="button" data-example="ayubowan">ayubowan</button>
-            <button class="example" type="button" data-example="sinhala">sinhala</button>
+        <div class="m3-card">
+          <div class="demo-label">
+            <label for="singlish-input"><span class="en">Your Singlish input</span><span class="si" lang="si">ඔබේ Singlish වචන</span></label>
+            <span class="badge-live">100% ON-DEVICE</span>
+          </div>
+          <textarea id="singlish-input" spellcheck="false" autocomplete="off" autocapitalize="off">amma kohomada? sri lanka</textarea>
+          <div class="demo-examples" aria-label="Sample phrases">
+            <button class="m3-chip" type="button" data-example="amma kohomada?">amma kohomada?</button>
+            <button class="m3-chip" type="button" data-example="ayubowan sri lanka">ayubowan sri lanka</button>
+            <button class="m3-chip" type="button" data-example="samahara welawata">samahara welawata</button>
+            <button class="m3-chip" type="button" data-example="sthuthiyi oba hamatama">sthuthiyi</button>
           </div>
         </div>
-        <div class="panel">
-          <div class="demo-label"><span class="en">Sinhala preview</span><span class="si" lang="si">සිංහල Preview</span><span aria-hidden="true">අ</span></div>
-          <output id="sinhala-output" class="output-box" aria-live="polite" aria-atomic="true">අම්මා කොහොමද?</output>
-          <p class="demo-note"><span class="en">This preview covers common examples and basic phonetic rules. The Android app includes the full transliteration engine, suggestions and personal corrections.</span><span class="si" lang="si">මෙම preview එකේ සාමාන්‍ය වචන සහ මූලික phonetic rules පමණක් ඇතුළත්. Android App එකේ සම්පූර්ණ transliteration engine, suggestions සහ ඔබේ corrections තිබේ.</span></p>
+
+        <div class="m3-card">
+          <div class="demo-label">
+            <span><span class="en">Simulated Suggestion Bar &amp; Output</span><span class="si" lang="si">Candidate තීරුව සහ ප්‍රතිදානය</span></span>
+            <span style="color:var(--accent)">අ · ක</span>
+          </div>
+          <div class="candidate-strip-sim" id="candidate-strip-sim" aria-label="Simulated candidate suggestions"></div>
+          <output id="sinhala-output" class="output-box" aria-live="polite" aria-atomic="true">අම්මා කොහොමද? ශ්‍රී ලංකා</output>
         </div>
       </div>
+
+      <!-- Categorized Interactive Cheat Sheet -->
+      <div class="m3-card cheat-sheet-card">
+        <div class="progress-title-row" style="flex-wrap:wrap;gap:12px">
+          <div>
+            <h3><span class="en">Interactive Singlish Phonetic Reference</span><span class="si" lang="si">Singlish අකුරු මාර්ගෝපදේශය (ක්ලික් කර අත්හදා බලන්න)</span></h3>
+            <p style="margin:0;color:var(--muted);font-size:.9rem"><span class="en">Click any key mapping card to insert it into the live sandbox above.</span><span class="si" lang="si">ඕනෑම අකුරක් ක්ලික් කර ඉහත sandbox එකට එක් කරන්න.</span></p>
+          </div>
+          <div class="chip-row" id="guide-cat-chips" role="tablist" aria-label="Phonetic categories">
+            <button type="button" class="m3-chip active" role="tab" aria-selected="true" data-guide-cat="vowels"><span class="en">Vowels</span><span class="si" lang="si">ස්වර</span></button>
+            <button type="button" class="m3-chip" role="tab" aria-selected="false" data-guide-cat="consonants"><span class="en">Consonants</span><span class="si" lang="si">ව්‍යංජන</span></button>
+            <button type="button" class="m3-chip" role="tab" aria-selected="false" data-guide-cat="pillam"><span class="en">Pillam</span><span class="si" lang="si">පිල්ලම්</span></button>
+            <button type="button" class="m3-chip" role="tab" aria-selected="false" data-guide-cat="conjuncts"><span class="en">Conjuncts</span><span class="si" lang="si">බැඳි අකුරු</span></button>
+          </div>
+        </div>
+        <div class="cheat-grid" id="cheat-grid"></div>
+      </div>
     </section>
 
-    <section id="features" aria-labelledby="features-title">
+    <!-- Interactive Feature Quick Guides -->
+    <section id="guides" aria-labelledby="guides-title">
       <div class="section-head">
-        <span class="section-kicker"><span class="en">Made for everyday typing</span><span class="si" lang="si">දෛනික typing සඳහා</span></span>
-        <h2 id="features-title"><span class="en">Useful tools. Not just a keyboard.</span><span class="si" lang="si">Keyboard එකකට වඩා වැඩි පහසුකම්.</span></h2>
-        <p><span class="en">A practical set of features you can tune to the way you write, work and communicate.</span><span class="si" lang="si">ඔබ ලියන, වැඩ කරන සහ සන්නිවේදනය කරන ආකාරයට සකස් කරගත හැකි පහසුකම්.</span></p>
+        <span class="section-kicker"><span class="en">Feature Quick Guides</span><span class="si" lang="si">විශේෂාංග මාර්ගෝපදේශ</span></span>
+        <h2 id="guides-title"><span class="en">Explore KeyCraft's built-in productivity tools</span><span class="si" lang="si">KeyCraft හි ප්‍රධාන පහසුකම් ඉක්මනින් හඳුනාගන්න</span></h2>
+        <p><span class="en">Select any tool below to inspect interactive examples, gestures and shortcuts.</span><span class="si" lang="si">පහත විශේෂාංග තෝරා ඒවා භාවිත කරන ආකාරය සජීවීව බලන්න.</span></p>
       </div>
-      <div class="feature-grid">
-        <article class="tile"><div class="tile-icon" aria-hidden="true">අ</div><h3>Singlish → Sinhala</h3><p><span class="en">On-device phonetic transliteration with word suggestions and correction support.</span><span class="si" lang="si">වචන යෝජනා සහ නිවැරදි කිරීම් සමඟ උපාංගය තුළම Singlish → Sinhala පරිවර්තනය.</span></p></article>
-        <article class="tile"><div class="tile-icon" aria-hidden="true">↗</div><h3><span class="en">Corner-swipe gestures</span><span class="si" lang="si">Corner-swipe Gestures</span></h3><p><span class="en">Reach extra characters and actions with quick swipes from key corners.</span><span class="si" lang="si">Keys වල කොන්වලින් swipe කර අමතර අක්ෂර සහ actions ඉක්මනින් ලබාගන්න.</span></p></article>
-        <article class="tile"><div class="tile-icon" aria-hidden="true">∑</div><h3><span class="en">Quick calculator</span><span class="si" lang="si">Quick Calculator</span></h3><p><span class="en">Do everyday calculations without leaving the app you are typing in.</span><span class="si" lang="si">ඔබ භාවිත කරන App එකෙන් ඉවත් නොවී සාමාන්‍ය ගණනය කිරීම් කරන්න.</span></p></article>
-        <article class="tile"><div class="tile-icon" aria-hidden="true">▤</div><h3><span class="en">Clipboard history</span><span class="si" lang="si">Clipboard History</span></h3><p><span class="en">Keep useful copied text close by. Clipboard history is optional and off by default.</span><span class="si" lang="si">නිතර භාවිත කරන copy කළ text ළඟ තබාගන්න. Clipboard History විකල්ප පහසුකමක් වන අතර මුලින්ම අක්‍රියයි.</span></p></article>
-        <article class="tile"><div class="tile-icon" aria-hidden="true">⌘</div><h3><span class="en">Flexible layouts</span><span class="si" lang="si">වෙනස් කළ හැකි Layouts</span></h3><p><span class="en">Choose phonetic Sinhala or a Termux-inspired coding layout with handy symbols and controls.</span><span class="si" lang="si">Phonetic Sinhala හෝ පහසු symbols සහ controls සහිත Termux coding layout එක තෝරන්න.</span></p></article>
-        <article class="tile"><div class="tile-icon" aria-hidden="true">◐</div><h3><span class="en">Themes &amp; personalisation</span><span class="si" lang="si">Themes සහ අභිරුචිකරණය</span></h3><p><span class="en">Adjust colours, key shapes, spacing, size and typing behaviour to suit you.</span><span class="si" lang="si">වර්ණ, key shapes, spacing, ප්‍රමාණය සහ typing හැසිරීම ඔබට කැමති ලෙස වෙනස් කරන්න.</span></p></article>
+
+      <div class="guide-shell">
+        <div class="guide-nav" role="tablist" aria-label="Feature quick guides">
+          <button type="button" class="guide-tab-btn" role="tab" aria-selected="true" data-guide-tab="gestures">
+            <span class="guide-ico" aria-hidden="true">↗</span>
+            <div>
+              <strong><span class="en">Corner-Swipe Gestures</span><span class="si" lang="si">Corner-Swipe Gestures</span></strong>
+              <span><span class="en">Tap center or slide to 4 corners for numbers &amp; symbols</span><span class="si" lang="si">මැද tap කර හෝ කොන් 4ට swipe කර අංක සහ සංකේත ගන්න</span></span>
+            </div>
+          </button>
+          <button type="button" class="guide-tab-btn" role="tab" aria-selected="false" data-guide-tab="calculator">
+            <span class="guide-ico" aria-hidden="true">∑</span>
+            <div>
+              <strong><span class="en">Quick Calculator</span><span class="si" lang="si">Quick Calculator</span></strong>
+              <span><span class="en">Evaluate math formulas directly inside the suggestion strip</span><span class="si" lang="si">App එකෙන් ඉවත් නොවී suggestion bar හරහා ගණනය කරන්න</span></span>
+            </div>
+          </button>
+          <button type="button" class="guide-tab-btn" role="tab" aria-selected="false" data-guide-tab="snippets">
+            <span class="guide-ico" aria-hidden="true">⚡</span>
+            <div>
+              <strong><span class="en">Smart Snippets</span><span class="si" lang="si">Smart Snippets</span></strong>
+              <span><span class="en">Type // or .. triggers to expand dates and templates fast</span><span class="si" lang="si">// හෝ .. මගින් දිනය සහ කෙටි වාක්‍ය ඉක්මනින් ඇතුළත් කරන්න</span></span>
+            </div>
+          </button>
+          <button type="button" class="guide-tab-btn" role="tab" aria-selected="false" data-guide-tab="termux">
+            <span class="guide-ico" aria-hidden="true">⌘</span>
+            <div>
+              <strong><span class="en">Termux &amp; Coding Layout</span><span class="si" lang="si">Termux සහ Coding Layout</span></strong>
+              <span><span class="en">Dedicated Esc, Ctrl, Tab, brackets and arrow D-pad</span><span class="si" lang="si">Esc, Ctrl, Tab, brackets සහ arrow keys සමඟ coding පහසුව</span></span>
+            </div>
+          </button>
+          <button type="button" class="guide-tab-btn" role="tab" aria-selected="false" data-guide-tab="privacy">
+            <span class="guide-ico" aria-hidden="true">🛡</span>
+            <div>
+              <strong><span class="en">Web Safe &amp; Privacy Guard</span><span class="si" lang="si">Web Safe සහ Privacy ආරක්ෂාව</span></strong>
+              <span><span class="en">Clean Chrome &amp; Gemini typing, split/one-hand &amp; password lock</span><span class="si" lang="si">Chrome සහ Gemini වල නිවැරදි සිංහල typing සහ password ආරක්ෂාව</span></span>
+            </div>
+          </button>
+        </div>
+
+        <div class="m3-card guide-stage" id="guide-stage-panel"></div>
       </div>
     </section>
 
+    <!-- Visual Feature Showcase Strip (Zero-broken-asset M3 cards) -->
     <section id="screenshots" aria-labelledby="screenshots-title">
       <div class="section-head">
-        <span class="section-kicker"><span class="en">See it in action</span><span class="si" lang="si">භාවිතයේදී බලන්න</span></span>
-        <h2 id="screenshots-title"><span class="en">A closer look at KeyCraft</span><span class="si" lang="si">KeyCraft App එකේ තිර රූප</span></h2>
-        <p><span class="en">Real screenshots from the Android app. Swipe or use the arrow controls to explore all six.</span><span class="si" lang="si">Android App එකෙන් ලබාගත් සැබෑ screenshots හයම බලන්න swipe කරන්න, නැතිනම් arrow buttons භාවිත කරන්න.</span></p>
+        <span class="section-kicker"><span class="en">Visual Overview</span><span class="si" lang="si">Keyboard දසුන්</span></span>
+        <h2 id="screenshots-title"><span class="en">Built for phones, foldables &amp; developers</span><span class="si" lang="si">සෑම තිරයකටම ගැළපෙන නිර්මාණය</span></h2>
+        <p><span class="en">Swipe or use the controls to inspect all six signature modes inside KeyCraft.</span><span class="si" lang="si">KeyCraft ඇතුළත ඇති ප්‍රධාන modes හය පහතින් බලන්න.</span></p>
       </div>
       <div class="gallery-shell">
-        <div class="gallery" id="screenshot-gallery" tabindex="0" aria-label="KeyCraft app screenshots">
-          <figure class="shot"><img src="assets/gallery/keycraft-01.jpg" alt="KeyCraft Sinhala phonetic keyboard with custom red theme" width="1000" height="557" loading="lazy"><figcaption><span class="en">Sinhala phonetic keyboard</span><span class="si" lang="si">සිංහල Phonetic Keyboard</span></figcaption></figure>
-          <figure class="shot"><img src="assets/gallery/keycraft-02.jpg" alt="KeyCraft English keyboard in a warm beige theme" width="1000" height="581" loading="lazy"><figcaption><span class="en">Warm beige theme</span><span class="si" lang="si">Beige Theme එක</span></figcaption></figure>
-          <figure class="shot"><img src="assets/gallery/keycraft-03.jpg" alt="KeyCraft English keyboard in a dark blue theme" width="1000" height="582" loading="lazy"><figcaption><span class="en">Dark blue theme</span><span class="si" lang="si">Dark Blue Theme එක</span></figcaption></figure>
-          <figure class="shot"><img src="assets/gallery/keycraft-04.jpg" alt="KeyCraft numeric calculator keyboard layout" width="1000" height="586" loading="lazy"><figcaption><span class="en">Calculator layout</span><span class="si" lang="si">Calculator Layout එක</span></figcaption></figure>
-          <figure class="shot"><img src="assets/gallery/keycraft-05.jpg" alt="KeyCraft emoji and flag selection panel" width="1000" height="582" loading="lazy"><figcaption><span class="en">Emoji &amp; flag panel</span><span class="si" lang="si">Emoji සහ Flags Panel එක</span></figcaption></figure>
-          <figure class="shot"><img src="assets/gallery/keycraft-06.jpg" alt="KeyCraft keyboard with a light custom theme" width="1000" height="601" loading="lazy"><figcaption><span class="en">Light custom theme</span><span class="si" lang="si">Light Theme එක</span></figcaption></figure>
+        <div class="gallery" id="screenshot-gallery" tabindex="0" aria-label="KeyCraft capability showcase cards">
+          <figure class="showcase-card">
+            <div class="mini-screen" style="background:linear-gradient(155deg,#101722,#253448)">
+              <div class="mini-bar"><span>Samahara</span><span class="mini-pill-accent">සමහර</span><span>ෂමහර</span></div>
+              <div class="mini-keys-grid">
+                <span class="mini-k">q¹</span><span class="mini-k">w²</span><span class="mini-k">e³</span><span class="mini-k">r⁴</span><span class="mini-k">t⁵</span><span class="mini-k">y⁶</span>
+                <span class="mini-k">a</span><span class="mini-k">s</span><span class="mini-k">d</span><span class="mini-k">f</span><span class="mini-k">g</span><span class="mini-k">h</span>
+              </div>
+              <div style="text-align:center;font-size:.76rem;color:#67D5FF;font-weight:700">සිංහල Phonetic · Spacebar Commit</div>
+            </div>
+            <figcaption style="text-align:center;color:var(--muted);font-size:.9rem"><span class="en">Singlish → Sinhala Phonetic Bar</span><span class="si" lang="si">සිංහල Phonetic සහ Suggestion තීරුව</span></figcaption>
+          </figure>
+
+          <figure class="showcase-card">
+            <div class="mini-screen" style="background:linear-gradient(155deg,#2b151a,#4a121d)">
+              <div class="mini-bar"><span>🎨 Lanka Maroon</span><span style="color:#FFC107;font-weight:800">★ Sri Lanka</span></div>
+              <div class="mini-keys-grid">
+                <span class="mini-k" style="background:#5c1927;border-color:#922b3d">අ</span><span class="mini-k" style="background:#5c1927;border-color:#922b3d">ආ</span><span class="mini-k" style="background:#5c1927;border-color:#922b3d">ක</span><span class="mini-k" style="background:#5c1927;border-color:#922b3d">ම</span><span class="mini-k" style="background:#5c1927;border-color:#922b3d">ර</span><span class="mini-k" style="background:#FFC107;color:#2a080e">↵</span>
+              </div>
+              <div style="text-align:center;font-size:.76rem;color:#FFD54F;font-weight:700">25+ Categorized Theme Picker</div>
+            </div>
+            <figcaption style="text-align:center;color:var(--muted);font-size:.9rem"><span class="en">Vibrant &amp; Sri Lanka Heritage Themes</span><span class="si" lang="si">Vibrant සහ Sri Lanka Themes</span></figcaption>
+          </figure>
+
+          <figure class="showcase-card">
+            <div class="mini-screen" style="background:linear-gradient(155deg,#10162b,#1e2c54)">
+              <div class="mini-bar"><span style="font-family:var(--font-mono)">25*4+10</span><span class="mini-pill-accent">= 110</span></div>
+              <div class="mini-keys-grid">
+                <span class="mini-k">7</span><span class="mini-k">8</span><span class="mini-k">9</span><span class="mini-k">÷</span><span class="mini-k">(</span><span class="mini-k">)</span>
+                <span class="mini-k">4</span><span class="mini-k">5</span><span class="mini-k">6</span><span class="mini-k">×</span><span class="mini-k">+</span><span class="mini-k">-</span>
+              </div>
+              <div style="text-align:center;font-size:.76rem;color:#38BDF8;font-weight:700">Inline Quick Calculator</div>
+            </div>
+            <figcaption style="text-align:center;color:var(--muted);font-size:.9rem"><span class="en">Instant Math in Candidate Bar</span><span class="si" lang="si">Candidate තීරුවේම Quick Calculator</span></figcaption>
+          </figure>
+
+          <figure class="showcase-card">
+            <div class="mini-screen" style="background:linear-gradient(155deg,#091418,#10242c)">
+              <div class="mini-bar" style="font-family:var(--font-mono)"><span>Esc</span><span>Ctrl</span><span>Alt</span><span>Tab</span><span>{ }</span></div>
+              <div class="mini-keys-grid">
+                <span class="mini-k">~</span><span class="mini-k">|</span><span class="mini-k">/</span><span class="mini-k">\</span><span class="mini-k">[</span><span class="mini-k">]</span>
+                <span class="mini-k">←</span><span class="mini-k">↓</span><span class="mini-k">↑</span><span class="mini-k">→</span><span class="mini-k">$_</span><span class="mini-k">↵</span>
+              </div>
+              <div style="text-align:center;font-size:.76rem;color:#69e0c0;font-weight:700">Zero-Gap Termux Coding Layout</div>
+            </div>
+            <figcaption style="text-align:center;color:var(--muted);font-size:.9rem"><span class="en">Termux Developer Layout</span><span class="si" lang="si">Termux Coding Layout එක</span></figcaption>
+          </figure>
+
+          <figure class="showcase-card">
+            <div class="mini-screen" style="background:linear-gradient(155deg,#181321,#342044)">
+              <div class="mini-bar"><span>😀</span><span>❤</span><span>🙏</span><span>🎉</span><span>🇱🇰</span></div>
+              <div class="mini-keys-grid">
+                <span class="mini-k">😊</span><span class="mini-k">👍</span><span class="mini-k">🔥</span><span class="mini-k">✨</span><span class="mini-k">😂</span><span class="mini-k">🥳</span>
+              </div>
+              <div style="text-align:center;font-size:.76rem;color:#CBA6F7;font-weight:700">Emoji, Flags &amp; Opt-In Clipboard</div>
+            </div>
+            <figcaption style="text-align:center;color:var(--muted);font-size:.9rem"><span class="en">Emoji &amp; Clipboard History Pane</span><span class="si" lang="si">Emoji සහ Clipboard History පැනලය</span></figcaption>
+          </figure>
+
+          <figure class="showcase-card">
+            <div class="mini-screen" style="background:linear-gradient(155deg,#0d1b2a,#1b3a4b)">
+              <div class="mini-bar"><span>⊟ Split</span><span>📱 One-Hand</span><span>⧉ Float</span></div>
+              <div style="display:grid;grid-template-columns:1fr 22px 1fr;gap:6px">
+                <div class="mini-keys-grid" style="grid-template-columns:repeat(3,1fr)"><span class="mini-k">q</span><span class="mini-k">w</span><span class="mini-k">e</span><span class="mini-k">a</span><span class="mini-k">s</span><span class="mini-k">d</span></div>
+                <div></div>
+                <div class="mini-keys-grid" style="grid-template-columns:repeat(3,1fr)"><span class="mini-k">u</span><span class="mini-k">i</span><span class="mini-k">o</span><span class="mini-k">j</span><span class="mini-k">k</span><span class="mini-k">l</span></div>
+              </div>
+              <div style="text-align:center;font-size:.76rem;color:#9af2d9;font-weight:700">Foldable &amp; Tablet Ergonomics</div>
+            </div>
+            <figcaption style="text-align:center;color:var(--muted);font-size:.9rem"><span class="en">Split, One-Hand &amp; Floating Modes</span><span class="si" lang="si">Split, One-Hand සහ Floating Modes</span></figcaption>
+          </figure>
         </div>
         <div class="gallery-controls">
-          <button class="icon-button" type="button" data-gallery-dir="-1" aria-label="Previous screenshots">←</button>
-          <button class="icon-button" type="button" data-gallery-dir="1" aria-label="Next screenshots">→</button>
+          <button class="icon-button" type="button" data-gallery-dir="-1" aria-label="Previous showcase card">←</button>
+          <button class="icon-button" type="button" data-gallery-dir="1" aria-label="Next showcase card">→</button>
         </div>
       </div>
     </section>
 
-    <section id="install" aria-labelledby="install-title">
-      <div class="section-head">
-        <span class="section-kicker"><span class="en">Get started</span><span class="si" lang="si">ආරම්භ කරමු</span></span>
-        <h2 id="install-title"><span class="en">Install in three simple steps</span><span class="si" lang="si">පියවර තුනකින් Install කරගන්න</span></h2>
-        <p><span class="en">Download the APK from the official GitHub release. Android may ask you to allow installation from the app you used to download it.</span><span class="si" lang="si">නිල GitHub Release එකෙන් APK එක Download කරන්න. Download කළ App එක හරහා Install කිරීමට Android අවසර ඉල්ලිය හැක.</span></p>
-      </div>
-      <div class="steps">
-        <article class="step"><h3><span class="en">Download the APK</span><span class="si" lang="si">APK එක Download කරන්න</span></h3><p><span class="en">Open the official release page and download KeyCraft-Sinhala-Keyboard-release.apk.</span><span class="si" lang="si">නිල Release පිටුවට ගොස් KeyCraft-Sinhala-Keyboard-release.apk ගොනුව Download කරන්න.</span></p><p><a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0"><span class="en">Open v1.2.0 release ↗</span><span class="si" lang="si">v1.2.0 Release පිටුව ↗</span></a></p></article>
-        <article class="step"><h3><span class="en">Allow this source</span><span class="si" lang="si">මෙම Source එකට අවසර දෙන්න</span></h3><p><span class="en">If prompted, tap Settings and enable “Allow from this source” for your browser or file manager. The exact menu can vary by Android version.</span><span class="si" lang="si">අවසර ඉල්ලුවහොත් Settings තට්ටු කර Browser හෝ File Manager එකට “Allow from this source” සක්‍රිය කරන්න. Android Version එක අනුව මෙනුව වෙනස් විය හැක.</span></p></article>
-        <article class="step"><h3><span class="en">Install &amp; enable</span><span class="si" lang="si">Install කර Enable කරන්න</span></h3><p><span class="en">Install the app, open KeyCraft, then follow Android’s keyboard settings to enable it and choose it as your default keyboard.</span><span class="si" lang="si">App එක Install කර KeyCraft විවෘත කරන්න. ඉන්පසු Android Keyboard Settings හරහා Enable කර Default Keyboard ලෙස තෝරන්න.</span></p></article>
-      </div>
-    </section>
-
+    <!-- Trust & Verification -->
     <section id="trust" aria-labelledby="trust-title">
       <div class="section-head">
-        <span class="section-kicker"><span class="en">Privacy &amp; verification</span><span class="si" lang="si">පෞද්ගලිකත්වය සහ තහවුරු කිරීම</span></span>
-        <h2 id="trust-title"><span class="en">Know what you install</span><span class="si" lang="si">Install කරන දේ ගැන දැනුවත් වෙන්න</span></h2>
-        <p><span class="en">KeyCraft is open source, ad-free and designed to keep core Sinhala typing on your device.</span><span class="si" lang="si">KeyCraft විවෘත මූලාශ්‍ර, දැන්වීම් රහිත App එකක්. මූලික සිංහල typing ඔබේ උපාංගය තුළම සිදු වේ.</span></p>
+        <span class="section-kicker"><span class="en">Privacy &amp; Architecture</span><span class="si" lang="si">පෞද්ගලිකත්වය සහ විවෘත බව</span></span>
+        <h2 id="trust-title"><span class="en">Respects your words and device</span><span class="si" lang="si">ඔබේ දත්ත සහ පෞද්ගලිකත්වය සුරකියි</span></h2>
+        <p><span class="en">Built cleanly without ad SDKs, keystroke telemetry or hidden trackers.</span><span class="si" lang="si">දැන්වීම් SDK හෝ රහසිගත දත්ත එකතු කිරීම් නොමැතිව නිර්මාණය කර ඇත.</span></p>
       </div>
       <div class="security-grid">
-        <article class="security-card"><h3>⌁ <span class="en">On-device by design</span><span class="si" lang="si">උපාංගය තුළම ක්‍රියාත්මකයි</span></h3><p><span class="en">Core Sinhala transliteration runs locally. Internet permission is used to download optional dictionaries; this is not a claim that every feature is permanently offline.</span><span class="si" lang="si">මූලික සිංහල පරිවර්තනය උපාංගය තුළම ක්‍රියාත්මකයි. Optional dictionaries Download කිරීමට Internet අවසරය භාවිත වේ. සියලුම පහසුකම් සම්පූර්ණයෙන් offline බව මෙයින් අදහස් නොවේ.</span></p></article>
-        <article class="security-card"><h3>◇ <span class="en">Free &amp; open source</span><span class="si" lang="si">නොමිලේ සහ Open Source</span></h3><p><span class="en">No ads. Licensed under GPL-3.0. Review the source code and privacy information before installing.</span><span class="si" lang="si">දැන්වීම් නැහැ. GPL-3.0 බලපත්‍රය යටතේ නිකුත් කර ඇත. Install කිරීමට පෙර Source Code සහ Privacy තොරතුරු පරීක්ෂා කළ හැක.</span></p><p><a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/blob/main/LICENSE">GPL-3.0 License</a> · <a href="privacy.html"><span class="en">Privacy details</span><span class="si" lang="si">Privacy තොරතුරු</span></a></p></article>
-        <article class="security-card" style="grid-column:1/-1">
-          <h3><span class="en">SHA-256 release checksum</span><span class="si" lang="si">SHA-256 Release Checksum</span></h3>
-          <p><span class="en">Verify that your downloaded APK matches the official v1.2.0 release file.</span><span class="si" lang="si">ඔබ Download කළ APK එක නිල v1.2.0 Release ගොනුවට ගැළපෙනවාදැයි තහවුරු කරන්න.</span></p>
-          <div class="checksum">
-            <code id="sha256-value">dc275ec4f0fcbe8592dafb943b78294e7ad5737b4ec6bf0b8a3aad93d06433dd</code>
-            <button class="copy-button" type="button" id="copy-checksum"><span class="en">Copy hash</span><span class="si" lang="si">Copy කරන්න</span></button>
-          </div>
-          <p style="margin-top:12px"><a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/download/v1.2.0/KeyCraft-Sinhala-Keyboard-release.apk.sha256"><span class="en">Download the official .sha256 file ↗</span><span class="si" lang="si">නිල .sha256 ගොනුව ලබාගන්න ↗</span></a></p>
-          <p id="copy-status" class="demo-note" role="status" aria-live="polite"></p>
+        <article class="m3-card">
+          <h3>⌁ <span class="en">On-device typing by design</span><span class="si" lang="si">උපාංගය තුළම සිංහල පරිවර්තනය</span></h3>
+          <p style="margin:0;color:var(--muted)"><span class="en">Core Singlish transliteration and personal dictionary suggestions run locally on Android. Password and incognito inputs automatically disable context reading, translation prompts and learning.</span><span class="si" lang="si">සිංහල පරිවර්තනය සහ වචන යෝජනා උපාංගය තුළම සිදු වේ. Password හා Incognito ක්ෂේත්‍ර වලදී learning හා suggestions ආරක්ෂිතව අක්‍රිය වේ.</span></p>
+        </article>
+        <article class="m3-card">
+          <h3>◇ <span class="en">Free &amp; GPL-3.0 Open Source</span><span class="si" lang="si">නොමිලේ සහ GPL-3.0 Open Source</span></h3>
+          <p style="margin:0 0 12px;color:var(--muted)"><span class="en">Audit the full Kotlin/Java codebase, report issues or build from source. Network permission is only used when downloading optional dictionaries.</span><span class="si" lang="si">සම්පූර්ණ Source Code එක පරීක්ෂා කළ හැක. අන්තර්ජාල අවසරය භාවිත වන්නේ optional dictionaries download කිරීමට පමණි.</span></p>
+          <a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/blob/main/LICENSE">GPL-3.0 License</a> · <a href="privacy.html"><span class="en">Full privacy notice</span><span class="si" lang="si">Privacy විස්තර</span></a>
         </article>
       </div>
     </section>
 
+    <!-- FAQ -->
     <section id="faq" aria-labelledby="faq-title">
       <div class="section-head">
         <span class="section-kicker"><span class="en">Good to know</span><span class="si" lang="si">දැනගත යුතු දේ</span></span>
         <h2 id="faq-title"><span class="en">Frequently asked questions</span><span class="si" lang="si">නිතර අසන ප්‍රශ්න</span></h2>
       </div>
       <div class="faq-list">
-        <details class="faq-item"><summary><span class="en">Does KeyCraft work without internet?</span><span class="si" lang="si">Internet නැතිව KeyCraft වැඩ කරනවාද?</span></summary><p><span class="en">Core Singlish-to-Sinhala transliteration runs on-device. Internet access is used when you choose to download optional dictionaries.</span><span class="si" lang="si">මූලික Singlish-to-Sinhala පරිවර්තනය උපාංගය තුළම සිදු වේ. ඔබ Optional Dictionaries Download කරන විට Internet අවශ්‍ය වේ.</span></p></details>
-        <details class="faq-item"><summary><span class="en">How is KeyCraft different from Gboard or Helakuru?</span><span class="si" lang="si">Gboard හෝ Helakuru වලට වඩා KeyCraft වෙනස් වන්නේ කෙසේද?</span></summary><p><span class="en">KeyCraft focuses on customisable layouts, on-device Sinhala transliteration and an open-source, ad-free experience. Other keyboards have their own strengths; compare the features that matter to your workflow.</span><span class="si" lang="si">KeyCraft අවධානය යොමු කරන්නේ වෙනස් කළ හැකි layouts, උපාංගය තුළම සිදුවන Sinhala transliteration සහ Open Source, දැන්වීම් රහිත අත්දැකීමකටයි. අනෙකුත් Keyboards වලටත් ඒවාටම විශේෂ පහසුකම් තිබෙන නිසා ඔබට අවශ්‍ය දේ අනුව සසඳා බලන්න.</span></p></details>
-        <details class="faq-item"><summary><span class="en">Does it collect what I type?</span><span class="si" lang="si">මම ටයිප් කරන දේ App එක එකතු කරනවාද?</span></summary><p><span class="en">Sinhala transliteration runs locally on your device. Clipboard history is optional and disabled by default. See the <a href="privacy.html">privacy page</a> and source code for details.</span><span class="si" lang="si">සිංහල පරිවර්තනය ඔබේ උපාංගය තුළම සිදු වේ. Clipboard History විකල්ප පහසුකමක් වන අතර මුලින් අක්‍රියයි. වැඩි විස්තර සඳහා <a href="privacy.html">Privacy පිටුව</a> සහ Source Code බලන්න.</span></p></details>
-        <details class="faq-item"><summary><span class="en">Is KeyCraft free?</span><span class="si" lang="si">KeyCraft නොමිලේද?</span></summary><p><span class="en">Yes. KeyCraft is free, open source under GPL-3.0 and contains no ads.</span><span class="si" lang="si">ඔව්. KeyCraft නොමිලේ ලබාගත හැකි අතර GPL-3.0 යටතේ Open Source කර ඇත. දැන්වීම් නොමැත.</span></p></details>
-        <details class="faq-item"><summary><span class="en">Where should I download the APK?</span><span class="si" lang="si">APK එක Download කළ යුත්තේ කොහෙන්ද?</span></summary><p><span class="en">Only use the <a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0">official GitHub Releases page</a>. Avoid APK mirror sites and verify the SHA-256 checksum if possible.</span><span class="si" lang="si"><a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0">නිල GitHub Releases පිටුවෙන්</a> පමණක් Download කරන්න. වෙනත් APK mirror sites භාවිතයෙන් වළකින්න. හැකි නම් SHA-256 checksum එකත් තහවුරු කරන්න.</span></p></details>
+        <details class="faq-item"><summary><span class="en">Does KeyCraft work without internet?</span><span class="si" lang="si">Internet නැතිව KeyCraft වැඩ කරනවාද?</span></summary><p><span class="en">Yes. Core Singlish-to-Sinhala transliteration, gestures, snippets and the calculator run completely offline on your device. Internet access is only used if you choose to download extra dictionaries.</span><span class="si" lang="si">ඔව්. මූලික Singlish-to-Sinhala typing, gestures, snippets සහ calculator සම්පූර්ණයෙන්ම offline වැඩ කරයි.</span></p></details>
+        <details class="faq-item"><summary><span class="en">Does Sinhala work smoothly in Chrome web apps and Gemini?</span><span class="si" lang="si">Chrome Web Apps සහ Gemini වැනි apps වල සිංහල හොඳින් වැඩ කරනවාද?</span></summary><p><span class="en">Yes. KeyCraft detects Chrome/WebView editors and AI chat boxes to apply atomic text updates without duplicating characters, while keeping word suggestions visible even when apps request no-autocorrect.</span><span class="si" lang="si">ඔව්. Chrome, WebViews සහ Gemini වැනි apps වල අකුරු දෙගුණ නොවී පිරිසිදුව type වන අතර suggestion තීරුවද නිවැරදිව දිස්වේ.</span></p></details>
+        <details class="faq-item"><summary><span class="en">Does KeyCraft collect what I type?</span><span class="si" lang="si">මම ටයිප් කරන දේ App එක එකතු කරනවාද?</span></summary><p><span class="en">No. Transliteration runs locally, clipboard history is opt-in and off by default, and password/incognito fields never log or read surrounding text. See the <a href="privacy.html">privacy page</a>.</span><span class="si" lang="si">නැහැ. සියල්ල ඔබේ උපාංගය තුළම සිදු වේ. Clipboard History මුලින්ම අක්‍රියයි. වැඩි විස්තර <a href="privacy.html">Privacy පිටුවෙන්</a> බලන්න.</span></p></details>
+        <details class="faq-item"><summary><span class="en">Is KeyCraft free and ad-free?</span><span class="si" lang="si">KeyCraft සම්පූර්ණයෙන් නොමිලේද?</span></summary><p><span class="en">Yes. KeyCraft is 100% free, GPL-3.0 licensed open-source software with zero ads.</span><span class="si" lang="si">ඔව්. දැන්වීම් නොමැති GPL-3.0 විවෘත මූලාශ්‍ර මෘදුකාංගයකි.</span></p></details>
+        <details class="faq-item"><summary><span class="en">Where should I download the official APK?</span><span class="si" lang="si">නිල APK එක Download කළ යුත්තේ කොහෙන්ද?</span></summary><p><span class="en">Download only from the <a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0">official GitHub Releases page</a> and verify the SHA-256 hash shown in Setup Step 1.</span><span class="si" lang="si"><a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0">නිල GitHub Releases පිටුවෙන්</a> පමණක් Download කර Setup Step 1 හි SHA-256 hash එක සමඟ තහවුරු කරන්න.</span></p></details>
       </div>
     </section>
 
     <section aria-labelledby="cta-title">
       <div class="cta">
         <span class="section-kicker"><span class="en">Make Sinhala typing yours</span><span class="si" lang="si">සිංහල typing ඔබට ගැළපෙන ලෙස</span></span>
-        <h2 id="cta-title"><span class="en">Ready to try KeyCraft?</span><span class="si" lang="si">KeyCraft අත්හදා බලන්න සූදානම්ද?</span></h2>
-        <p><span class="en">Get the latest release, explore the source, or help improve the project on GitHub.</span><span class="si" lang="si">අලුත්ම Release එක ලබාගන්න, Source Code පරීක්ෂා කරන්න, නැතිනම් GitHub හරහා ව්‍යාපෘතිය දියුණු කිරීමට දායක වන්න.</span></p>
+        <h2 id="cta-title"><span class="en">Ready to switch to KeyCraft?</span><span class="si" lang="si">KeyCraft අත්හදා බලන්න සූදානම්ද?</span></h2>
+        <p><span class="en">Get the signed v1.2.0 release APK, explore the source code, or contribute themes and phonetic improvements on GitHub.</span><span class="si" lang="si">v1.2.0 APK එක ලබාගන්න, Source Code පරීක්ෂා කරන්න, නැතිනම් GitHub හරහා ව්‍යාපෘතියට දායක වන්න.</span></p>
         <div class="actions">
-          <a class="button primary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0"><span class="en">Download KeyCraft</span><span class="si" lang="si">KeyCraft Download කරන්න</span></a>
+          <a class="button primary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.2.0"><span class="en">Download KeyCraft APK</span><span class="si" lang="si">KeyCraft APK Download කරන්න</span></a>
           <a class="button" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard"><span class="en">Contribute on GitHub</span><span class="si" lang="si">GitHub හරහා දායක වන්න</span></a>
         </div>
       </div>
@@ -387,46 +1127,290 @@
 
   <footer>
     <div class="wrap footer-inner">
-      <span>© KeyCraft Sinhala Keyboard · GPL-3.0</span>
-      <span><a href="privacy.html"><span class="en">Privacy</span><span class="si" lang="si">Privacy</span></a> · <a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard"><span class="en">GitHub</span><span class="si" lang="si">GitHub</span></a></span>
+      <span>© KeyCraft Sinhala Keyboard · GPL-3.0 Open Source</span>
+      <span><a href="privacy.html"><span class="en">Privacy</span><span class="si" lang="si">Privacy</span></a> · <a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard">GitHub</a></span>
     </div>
   </footer>
 
   <script>
     (() => {
       const body = document.body;
+      const root = document.documentElement;
       const languageButtons = [...document.querySelectorAll("[data-lang-choice]")];
 
-      function setLanguage(language) {
-        const next = language === "si" ? "si" : "en";
-        body.dataset.lang = next;
-        document.documentElement.lang = next;
-        document.title = next === "si" ? "KeyCraft — Android සඳහා සිංහල Keyboard" : "KeyCraft — Sinhala Keyboard for Android";
-        languageButtons.forEach(button => {
-          button.setAttribute("aria-pressed", String(button.dataset.langChoice === next));
-        });
-        try { localStorage.setItem("keycraft-site-language", next); } catch {}
+      const state = {
+        lang: "en",
+        steps: { 1: false, 2: false, 3: false },
+        oem: "stock",
+        themeCat: "all",
+        themeId: "dark",
+        syncAccent: true,
+        guideCat: "vowels",
+        guideTab: "gestures",
+        calcExpr: "25*4+10",
+        gestureZone: "center"
+      };
+
+      function getLang() {
+        return state.lang === "si" ? "si" : "en";
       }
 
-      languageButtons.forEach(button => button.addEventListener("click", () => setLanguage(button.dataset.langChoice)));
+      // 1. Language Switcher
+      function setLanguage(language) {
+        const next = language === "si" ? "si" : "en";
+        state.lang = next;
+        body.dataset.lang = next;
+        root.lang = next;
+        document.title = next === "si"
+          ? "KeyCraft — Android සඳහා සිංහල Keyboard"
+          : "KeyCraft — Sinhala Keyboard for Android";
+        languageButtons.forEach(btn => {
+          btn.setAttribute("aria-pressed", String(btn.dataset.langChoice === next));
+        });
+        try { localStorage.setItem("keycraft-site-language", next); } catch {}
+        renderSetupProgress();
+        renderOemTip();
+        renderSwatches();
+        renderCheatSheet();
+        renderFeatureGuide();
+        updateDemo();
+      }
+
+      languageButtons.forEach(btn =>
+        btn.addEventListener("click", () => setLanguage(btn.dataset.langChoice))
+      );
       try {
-        const savedLanguage = localStorage.getItem("keycraft-site-language");
-        if (savedLanguage) setLanguage(savedLanguage);
+        const savedLang = localStorage.getItem("keycraft-site-language");
+        if (savedLang === "si" || savedLang === "en") state.lang = savedLang;
       } catch {}
 
+      // 2. Smart Setup Checklist + Progress Bar + OEM Tips
+      const oemTips = {
+        stock: {
+          en: "Settings → Apps → Special app access → Install unknown apps → select your browser/Files app → toggle Allow from this source.",
+          si: "Settings → Apps → Special app access → Install unknown apps → ඔබේ Browser හෝ Files App එක තෝරා Allow from this source සක්‍රිය කරන්න."
+        },
+        samsung: {
+          en: "Settings → Apps → ⋮ (Top menu) → Special access → Install unknown apps → enable your browser or My Files.",
+          si: "Settings → Apps → ⋮ මෙනුව → Special access → Install unknown apps → Browser හෝ My Files සක්‍රිය කරන්න."
+        },
+        xiaomi: {
+          en: "When prompted on APK tap, choose Settings → turn on Allow from this source → accept the 10-second security prompt.",
+          si: "APK එක tap කළ විට එන Settings වෙත ගොස් Allow from this source සක්‍රිය කර තත්පර 10 තහවුරු කිරීම OK කරන්න."
+        }
+      };
+
+      try {
+        const savedSteps = JSON.parse(localStorage.getItem("keycraft-setup-steps") || "null");
+        if (savedSteps && typeof savedSteps === "object") {
+          state.steps = { 1: !!savedSteps[1], 2: !!savedSteps[2], 3: !!savedSteps[3] };
+        }
+      } catch {}
+
+      function saveSteps() {
+        try { localStorage.setItem("keycraft-setup-steps", JSON.stringify(state.steps)); } catch {}
+      }
+
+      function renderSetupProgress() {
+        const doneCount = [1, 2, 3].filter(id => state.steps[id]).length;
+        const pct = Math.round((doneCount / 3) * 100);
+        const fill = document.getElementById("setup-progress-fill");
+        const pctEl = document.getElementById("setup-progress-pct");
+        if (fill) fill.style.width = pct + "%";
+        if (pctEl) {
+          pctEl.textContent = getLang() === "si"
+            ? `${pct}% · පියවර ${doneCount}/3${doneCount === 3 ? " ✓ සූදානම්!" : ""}`
+            : `${pct}% · ${doneCount}/3${doneCount === 3 ? " ✓ Ready!" : ""}`;
+        }
+        [1, 2, 3].forEach(id => {
+          const card = document.querySelector(`[data-step-card="${id}"]`);
+          const btn = document.querySelector(`[data-step-toggle="${id}"]`);
+          const checked = !!state.steps[id];
+          if (card) card.classList.toggle("completed", checked);
+          if (btn) btn.setAttribute("aria-checked", String(checked));
+        });
+      }
+
+      function renderOemTip() {
+        const box = document.getElementById("oem-tip-text");
+        if (box) box.textContent = oemTips[state.oem][getLang()];
+        document.querySelectorAll("[data-oem]").forEach(tab => {
+          tab.setAttribute("aria-selected", String(tab.dataset.oem === state.oem));
+        });
+      }
+
+      document.querySelectorAll("[data-step-toggle]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = Number(btn.dataset.stepToggle);
+          state.steps[id] = !state.steps[id];
+          saveSteps();
+          renderSetupProgress();
+        });
+      });
+
+      const resetBtn = document.getElementById("reset-setup-btn");
+      if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+          state.steps = { 1: false, 2: false, 3: false };
+          saveSteps();
+          renderSetupProgress();
+        });
+      }
+
+      document.querySelectorAll("[data-oem]").forEach(tab => {
+        tab.addEventListener("click", () => {
+          state.oem = tab.dataset.oem;
+          renderOemTip();
+        });
+      });
+
+      const copyBtn = document.getElementById("copy-checksum");
+      const checksumEl = document.getElementById("sha256-value");
+      const copyStatus = document.getElementById("copy-status");
+      if (copyBtn && checksumEl && copyStatus) {
+        copyBtn.addEventListener("click", async () => {
+          const hash = checksumEl.textContent.trim();
+          try {
+            await navigator.clipboard.writeText(hash);
+            copyStatus.textContent = getLang() === "si" ? "✓ Copy කළා" : "✓ Copied";
+            state.steps[1] = true;
+            saveSteps();
+            renderSetupProgress();
+          } catch {
+            copyStatus.textContent = getLang() === "si" ? "Select කර copy කරන්න" : "Select hash manually";
+          }
+        });
+      }
+
+      // 3. Live Keyboard Theme Studio (authentic themes from res/values/themes.xml)
+      const themes = [
+        { id: "dark", name: "KeyCraft Dark", cat: "dark", labelSi: "Dark", bg: "#171A21", grad: "linear-gradient(180deg,#101722,#253448)", key: "#252B36", action: "#303A4A", space: "#202734", active: "#163B52", text: "#F4F7FB", sub: "#B8C4D6", accent: "#67D5FF", border: "#303A49", radius: "7px", siteAccent: "#69e0c0", siteStrong: "#9af2d9" },
+        { id: "aurora_flow", name: "Aurora Flow", cat: "vibrant", labelSi: "Vibrant", bg: "#11162E", grad: "linear-gradient(160deg,#173D66,#34204F)", key: "#202B49", action: "#283452", space: "#1A2540", active: "#2F69C0", text: "#F2F5FF", sub: "#B8C7E8", accent: "#9FE8D4", border: "#3B5483", radius: "9px", siteAccent: "#69e0c0", siteStrong: "#9FE8D4" },
+        { id: "cyberpunk_neon", name: "Cyberpunk Neon", cat: "vibrant", labelSi: "Vibrant", bg: "#0B0C10", grad: "linear-gradient(180deg,#0B0C10,#171224)", key: "#1F2833", action: "#451B38", space: "#1F2833", active: "#00F0FF", text: "#66FCF1", sub: "#FF4393", accent: "#00F0FF", border: "#00F0FF", radius: "6px", siteAccent: "#66FCF1", siteStrong: "#9ffdf7" },
+        { id: "sinhala_sand", name: "Sinhala Sand", cat: "srilanka", labelSi: "Sri Lanka", bg: "#FFF4E6", grad: "linear-gradient(180deg,#EAC9A6,#FFF2DE)", key: "#FFFFFF", action: "#F2E0D0", space: "#F5E5D6", active: "#E8B78E", text: "#39271F", sub: "#795548", accent: "#8B4513", border: "#DCC5B2", radius: "7px", siteAccent: "#f5b971", siteStrong: "#ffd7a6" },
+        { id: "lanka_maroon", name: "Lanka Maroon", cat: "srilanka", labelSi: "Sri Lanka", bg: "#2A080E", grad: "linear-gradient(180deg,#3D0C14,#1A0509)", key: "#4A121D", action: "#801826", space: "#3E0E18", active: "#FFC107", text: "#FFFDF7", sub: "#FFC107", accent: "#FFD54F", border: "#6B1D2C", radius: "8px", siteAccent: "#FFD54F", siteStrong: "#ffe68c" },
+        { id: "lanka_blue", name: "Lanka Blue", cat: "srilanka", labelSi: "Sri Lanka", bg: "#0A1A2F", grad: "linear-gradient(180deg,#0B2040,#050C16)", key: "#112D55", action: "#173B70", space: "#0F2545", active: "#1F4F99", text: "#E8F1FF", sub: "#99C2FF", accent: "#A2C7FF", border: "#1C4685", radius: "8px", siteAccent: "#7cb4ff", siteStrong: "#b3d4ff" },
+        { id: "dracula", name: "Dracula", cat: "terminal", labelSi: "Terminal", bg: "#282A36", grad: "linear-gradient(180deg,#171522,#35204B)", key: "#343746", action: "#7446A8", space: "#343746", active: "#FF4FA3", text: "#F8F8F2", sub: "#96A1C2", accent: "#50FA7B", border: "#4B5068", radius: "10px", siteAccent: "#ff79c6", siteStrong: "#ffa7da" },
+        { id: "tokyo_night", name: "Tokyo Night", cat: "terminal", labelSi: "Terminal", bg: "#1A1B26", grad: "linear-gradient(180deg,#10162B,#1E2C54)", key: "#24283B", action: "#343B58", space: "#24283B", active: "#38BDF8", text: "#C0CAF5", sub: "#BB9AF7", accent: "#9ECE6A", border: "#343B59", radius: "6px", siteAccent: "#7dcfff", siteStrong: "#b4e5ff" },
+        { id: "ocean_breeze", name: "Ocean Breeze", cat: "light", labelSi: "Light", bg: "#E5FCF7", grad: "linear-gradient(180deg,#E5FCF7,#CCF5EC)", key: "#FFFFFF", action: "#C9F5E9", space: "#C0F0E2", active: "#9DE9D8", text: "#123F3B", sub: "#39736B", accent: "#006B61", border: "#A4DCCE", radius: "8px", siteAccent: "#69e0c0", siteStrong: "#9af2d9" },
+        { id: "royal_gold", name: "Royal Gold", cat: "vibrant", labelSi: "Vibrant", bg: "#211A08", grad: "linear-gradient(180deg,#4A3A0B,#171205)", key: "#382D0B", action: "#4B3B10", space: "#2D2409", active: "#B18A16", text: "#FFF8D8", sub: "#D8C783", accent: "#FFD54F", border: "#79611B", radius: "8px", siteAccent: "#ffd54f", siteStrong: "#ffe896" },
+        { id: "sunset_glow", name: "Sunset Glow", cat: "vibrant", labelSi: "Vibrant", bg: "#1A121E", grad: "linear-gradient(155deg,#B71C1C,#E65100)", key: "#2A1830", action: "#491D3D", space: "#251730", active: "#582B48", text: "#FFF8E1", sub: "#FFA726", accent: "#FFD54F", border: "#662844", radius: "9px", siteAccent: "#ffb74d", siteStrong: "#ffd591" },
+        { id: "oled_black", name: "OLED Black", cat: "dark", labelSi: "Dark", bg: "#000000", grad: "linear-gradient(180deg,#000000,#080D12)", key: "#090B0E", action: "#0D1A21", space: "#050709", active: "#003B46", text: "#FFFFFF", sub: "#C8C8C8", accent: "#55C7FF", border: "#292929", radius: "4px", siteAccent: "#55c7ff", siteStrong: "#99deff" }
+      ];
+
+      function applyTheme(themeId) {
+        const theme = themes.find(t => t.id === themeId) || themes[0];
+        state.themeId = theme.id;
+        const dev = document.getElementById("kbd-preview-stage");
+        if (dev) {
+          dev.style.setProperty("--kbd-bg", theme.bg);
+          dev.style.setProperty("--kbd-grad", theme.grad);
+          dev.style.setProperty("--kbd-key", theme.key);
+          dev.style.setProperty("--kbd-action", theme.action);
+          dev.style.setProperty("--kbd-space", theme.space);
+          dev.style.setProperty("--kbd-active", theme.active);
+          dev.style.setProperty("--kbd-text", theme.text);
+          dev.style.setProperty("--kbd-sub", theme.sub);
+          dev.style.setProperty("--kbd-accent", theme.accent);
+          dev.style.setProperty("--kbd-border", theme.border);
+          dev.style.setProperty("--kbd-radius", theme.radius);
+        }
+        const titleEl = document.getElementById("active-theme-title");
+        if (titleEl) titleEl.textContent = theme.name;
+        if (state.syncAccent) {
+          root.style.setProperty("--accent", theme.siteAccent);
+          root.style.setProperty("--accent-strong", theme.siteStrong);
+        } else {
+          root.style.setProperty("--accent", "#69e0c0");
+          root.style.setProperty("--accent-strong", "#9af2d9");
+        }
+        renderSwatches();
+      }
+
+      function renderSwatches() {
+        const grid = document.getElementById("theme-swatch-grid");
+        if (!grid) return;
+        const visible = state.themeCat === "all"
+          ? themes
+          : themes.filter(t => t.cat === state.themeCat);
+        grid.innerHTML = "";
+        visible.forEach(t => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "theme-swatch";
+          btn.setAttribute("aria-pressed", String(t.id === state.themeId));
+          btn.innerHTML = `
+            <div class="swatch-preview-strip" style="background:${t.bg}">
+              <span style="background:${t.key}"></span>
+              <span style="background:${t.action}"></span>
+              <span style="background:${t.accent}"></span>
+            </div>
+            <span class="swatch-name">${t.name}</span>
+            <span class="swatch-cat">${t.labelSi}</span>
+          `;
+          btn.addEventListener("click", () => applyTheme(t.id));
+          grid.appendChild(btn);
+        });
+      }
+
+      document.querySelectorAll("[data-theme-cat]").forEach(chip => {
+        chip.addEventListener("click", () => {
+          state.themeCat = chip.dataset.themeCat;
+          document.querySelectorAll("[data-theme-cat]").forEach(c => {
+            const active = c.dataset.themeCat === state.themeCat;
+            c.classList.toggle("active", active);
+            c.setAttribute("aria-pressed", String(active));
+          });
+          renderSwatches();
+        });
+      });
+
+      const syncCheckbox = document.getElementById("sync-page-accent");
+      if (syncCheckbox) {
+        syncCheckbox.addEventListener("change", () => {
+          state.syncAccent = syncCheckbox.checked;
+          applyTheme(state.themeId);
+        });
+      }
+
+      // Interactive mini-keyboard typing inside Theme Studio
+      const previewStream = document.getElementById("kbd-preview-stream");
+      const previewReset = document.getElementById("kbd-preview-reset");
+      if (previewReset && previewStream) {
+        previewReset.addEventListener("click", () => { previewStream.textContent = ""; });
+      }
+      document.querySelectorAll("[data-vkey]").forEach(keyEl => {
+        keyEl.addEventListener("click", () => {
+          if (!previewStream) return;
+          const k = keyEl.dataset.vkey;
+          if (k === "back") {
+            previewStream.textContent = previewStream.textContent.slice(0, -1);
+          } else if (k === "enter") {
+            previewStream.textContent = transliterateText(previewStream.textContent);
+          } else if (k === "shift" || k === "sym" || k === "si") {
+            previewStream.textContent = "සිංහල";
+          } else {
+            const raw = previewStream.textContent === "සමහර" ? "" : previewStream.textContent;
+            previewStream.textContent = transliterateText(raw + k);
+          }
+        });
+      });
+
+      // 4. Singlish Engine & Categorized Cheat Sheet
       const wordMap = {
         amma: "අම්මා", ammaa: "අම්මා", kohomada: "කොහොමද", kohomadha: "කොහොමද",
-        thaththa: "තාත්තා", thatha: "තාත්තා", ayubowan: "ආයුබෝවන්",
-        sinhala: "සිංහල", singlish: "සිංග්ලිෂ්", sthuthi: "ස්තූතියි",
-        sthuthiyi: "ස්තූතියි", oba: "ඔබ", akka: "අක්කා", aiyya: "අයියා",
-        aiya: "අයියා", malli: "මල්ලි", nangi: "නංගි", suba: "සුබ",
-        dawasak: "දවසක්", hoda: "හොඳ", lankawa: "ලංකාව",
-        karunakarala: "කරුණාකරලා", elakiri: "එළකිරි", jayawewa: "ජයවේවා",
-        parissamen: "පරිස්සමෙන්", budusaranai: "බුදුසරණයි", lakmal: "ලක්මාල්"
+        thaththa: "තාත්තා", thatha: "තාත්තා", ayubowan: "ආයුබෝවන්", aayubowan: "ආයුබෝවන්",
+        sinhala: "සිංහල", singlish: "සිංග්ලිෂ්", sthuthi: "ස්තූතියි", sthuthiyi: "ස්තූතියි",
+        oba: "ඔබ", akka: "අක්කා", aiyya: "අයියා", aiya: "අයියා", malli: "මල්ලි",
+        nangi: "නංගි", suba: "සුබ", dawasak: "දවසක්", hoda: "හොඳ", honda: "හොඳ",
+        lanka: "ලංකා", lankawa: "ලංකාව", sri: "ශ්‍රී", samahara: "සමහර",
+        welawata: "වෙලාවට", karunakarala: "කරුණාකරලා", elakiri: "එළකිරි",
+        jayawewa: "ජයවේවා", parissamen: "පරිස්සමෙන්", budusaranai: "බුදුසරණයි",
+        hamatama: "හැමෝටම", hamotama: "හැමෝටම", keycraft: "කීක්‍රාෆ්ට්"
       };
 
       const consonants = [
-        ["ksh","ක්‍ෂ"],["chch","ච්ච"],["nndh","ඳ"],["shh","ෂ්"],["chh","ඡ"],
+        ["ksh","ක්‍ෂ"],["chch","ච්ච"],["nndh","ඳ"],["shri","ශ්‍රී"],["shh","ෂ්"],["chh","ඡ"],
         ["nng","ඟ"],["mmb","ඹ"],["nnd","ඬ"],["nd","ඳ"],["kh","ඛ"],["gh","ඝ"],
         ["ch","ච"],["jh","ඣ"],["th","ත"],["dh","ධ"],["ph","ඵ"],["bh","භ"],
         ["sh","ශ"],["ny","ඤ"],["gn","ඤ"],["kn","ඤ"],["jn","ඥ"],["mb","ඹ"],["ng","ඟ"],
@@ -441,10 +1425,9 @@
       ];
       const dependentVowels = [
         ["aae","ෑ"],["aau","ෞ"],["ae","ැ"],["aa","ා"],["ii","ී"],["ee","ේ"],
-        ["uu","ූ"],["oo","ෝ"],["ai","ෛ"],["au","ෞ"],["ea","ේ"],["ei","ේ"],
+        ["uu","ූ"],["oo","ඕ".replace("ඕ","ෝ")],["ai","ෛ"],["au","ෞ"],["ea","ේ"],["ei","ේ"],
         ["oe","ෝ"],["a",""],["i","ි"],["u","ු"],["e","ෙ"],["o","ො"]
       ];
-      const virama = "්";
 
       function matchAt(input, index, table) {
         return table.find(([key]) => input.startsWith(key, index));
@@ -453,27 +1436,32 @@
       function transliterateWord(rawWord) {
         const lower = rawWord.toLowerCase();
         if (wordMap[lower]) return wordMap[lower];
-
         let output = "";
         let index = 0;
-        while (index < rawWord.length) {
-          const consonant = matchAt(rawWord, index, consonants);
-          if (consonant) {
-            output += consonant[1];
-            index += consonant[0].length;
-            const vowel = matchAt(rawWord, index, dependentVowels);
-            if (vowel) {
-              output += vowel[1];
-              index += vowel[0].length;
+        while (index < lower.length) {
+          const cMatch = matchAt(lower, index, consonants);
+          if (cMatch) {
+            output += cMatch[1];
+            index += cMatch[0].length;
+            if (cMatch[1].endsWith("්") || cMatch[0] === "shri") continue;
+            const vMatch = matchAt(lower, index, dependentVowels);
+            if (vMatch) {
+              output += vMatch[1];
+              index += vMatch[0].length;
+            } else if (lower[index] === "r" && index + 1 < lower.length) {
+              output += "\u0DCA\u200Dර";
+              index += 1;
+              const rv = matchAt(lower, index, dependentVowels);
+              if (rv) { output += rv[1]; index += rv[0].length; }
             } else {
-              output += virama;
+              output += "්";
             }
             continue;
           }
-          const vowel = matchAt(rawWord, index, independentVowels);
-          if (vowel) {
-            output += vowel[1];
-            index += vowel[0].length;
+          const ivMatch = matchAt(lower, index, independentVowels);
+          if (ivMatch) {
+            output += ivMatch[1];
+            index += ivMatch[0].length;
           } else {
             output += rawWord[index];
             index += 1;
@@ -486,40 +1474,279 @@
         return value.replace(/[A-Za-z]+/g, word => transliterateWord(word));
       }
 
-      const input = document.getElementById("singlish-input");
-      const output = document.getElementById("sinhala-output");
-      input.addEventListener("input", () => { output.textContent = transliterateText(input.value); });
-      document.querySelectorAll("[data-example]").forEach(button => {
-        button.addEventListener("click", () => {
-          input.value = button.dataset.example;
-          input.dispatchEvent(new Event("input", { bubbles: true }));
-          input.focus();
+      const singlishInput = document.getElementById("singlish-input");
+      const sinhalaOutput = document.getElementById("sinhala-output");
+      const candSim = document.getElementById("candidate-strip-sim");
+
+      function updateDemo() {
+        if (!singlishInput || !sinhalaOutput || !candSim) return;
+        const val = singlishInput.value;
+        sinhalaOutput.textContent = transliterateText(val);
+        const tokens = val.trim().split(/\s+/).filter(Boolean);
+        const lastRaw = tokens.length ? tokens[tokens.length - 1].replace(/[^A-Za-z]/g, "") : "amma";
+        const activeToken = lastRaw || "amma";
+        const primary = transliterateWord(activeToken);
+        const alt = primary.startsWith("ස") ? "ෂ" + primary.slice(1)
+          : primary.startsWith("ත") ? "ට" + primary.slice(1)
+          : primary + "්";
+
+        candSim.innerHTML = "";
+        [
+          { label: activeToken, isBest: false },
+          { label: primary, isBest: true },
+          { label: alt, isBest: false }
+        ].forEach(item => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "cand-pill" + (item.isBest ? " primary-cand" : "");
+          b.textContent = item.label;
+          b.addEventListener("click", () => {
+            if (item.label === activeToken) {
+              singlishInput.focus();
+            } else {
+              sinhalaOutput.textContent = transliterateText(val);
+            }
+          });
+          candSim.appendChild(b);
+        });
+      }
+
+      if (singlishInput) {
+        singlishInput.addEventListener("input", updateDemo);
+      }
+      document.querySelectorAll("[data-example]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (!singlishInput) return;
+          singlishInput.value = btn.dataset.example;
+          updateDemo();
+          singlishInput.focus();
         });
       });
-      input.dispatchEvent(new Event("input"));
 
+      const guideEntries = {
+        vowels: [
+          ["a", "අ"], ["aa", "ආ"], ["ae", "ඇ"], ["aae", "ඈ"],
+          ["i", "ඉ"], ["ii", "ඊ"], ["u", "උ"], ["uu", "ඌ"],
+          ["e", "එ"], ["ee", "ඒ"], ["o", "ඔ"], ["oo", "ඕ"]
+        ],
+        consonants: [
+          ["ka", "ක"], ["kha", "ඛ"], ["ga", "ග"], ["cha", "ච"],
+          ["tha", "ත"], ["dha", "ධ"], ["ta", "ට"], ["da", "ද"],
+          ["pha", "ඵ"], ["bha", "භ"], ["sha", "ශ"], ["shha", "ෂ"]
+        ],
+        pillam: [
+          ["kaa", "කා"], ["kae", "කැ"], ["kaae", "කෑ"], ["ki", "කි"],
+          ["kii", "කී"], ["ku", "කු"], ["kuu", "කූ"], ["ke", "කෙ"],
+          ["kee", "කේ"], ["ko", "කො"], ["koo", "කෝ"], ["k", "ක්"]
+        ],
+        conjuncts: [
+          ["shri", "ශ්‍රී"], ["ksh", "ක්‍ෂ"], ["nndh", "ඳ"], ["nng", "ඟ"],
+          ["mmb", "ඹ"], ["nnd", "ඬ"], ["nya", "ඤ"], ["jna", "ඥ"],
+          ["kra", "ක්‍ර"], ["kya", "ක්‍ය"], ["ayubowan", "ආයුබෝවන්"], ["lankawa", "ලංකාව"]
+        ]
+      };
+
+      function renderCheatSheet() {
+        const grid = document.getElementById("cheat-grid");
+        if (!grid) return;
+        const items = guideEntries[state.guideCat] || guideEntries.vowels;
+        grid.innerHTML = "";
+        items.forEach(([roman, siChar]) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "cheat-chip";
+          btn.innerHTML = `<span class="cheat-roman">${roman}</span><span class="cheat-sinhala">${siChar}</span>`;
+          btn.addEventListener("click", () => {
+            if (!singlishInput) return;
+            const cur = singlishInput.value.trim();
+            singlishInput.value = cur ? cur + " " + roman : roman;
+            updateDemo();
+            singlishInput.focus();
+          });
+          grid.appendChild(btn);
+        });
+      }
+
+      document.querySelectorAll("[data-guide-cat]").forEach(tab => {
+        tab.addEventListener("click", () => {
+          state.guideCat = tab.dataset.guideCat;
+          document.querySelectorAll("[data-guide-cat]").forEach(t => {
+            const active = t.dataset.guideCat === state.guideCat;
+            t.classList.toggle("active", active);
+            t.setAttribute("aria-selected", String(active));
+          });
+          renderCheatSheet();
+        });
+      });
+
+      // 5. Interactive Feature Quick Guides
+      const gestureOutputs = {
+        nw: { si: "ඉහළ-වම් කොන: අංකය '4' ඇතුළත් වේ", en: "Top-Left Swipe: types '4'" },
+        ne: { si: "ඉහළ-දකුණ කොන: '%' සංකේතය ඇතුළත් වේ", en: "Top-Right Swipe: types '%'" },
+        center: { si: "මැද Tap: ප්‍රධාන 't' / 'ත' අකුර ඇතුළත් වේ", en: "Center Tap: types primary 't' / 'ත'" },
+        sw: { si: "පහළ-වම් කොන: '[' වරහන ඇතුළත් වේ", en: "Bottom-Left Swipe: types '['" },
+        se: { si: "පහළ-දකුණ කොන: ']' වරහන ඇතුළත් වේ", en: "Bottom-Right Swipe: types ']'" }
+      };
+
+      function evalSafeCalc(expr) {
+        const clean = expr.replace(/\s+/g, "");
+        if (clean === "25*4+10") return "110";
+        if (clean === "sqrt(144)") return "12";
+        if (clean === "1500*0.15") return "225";
+        if (clean === "round(9.6)") return "10";
+        return "110";
+      }
+
+      function renderFeatureGuide() {
+        const panel = document.getElementById("guide-stage-panel");
+        if (!panel) return;
+        const lang = getLang();
+
+        if (state.guideTab === "gestures") {
+          const msg = gestureOutputs[state.gestureZone][lang];
+          panel.innerHTML = `
+            <div>
+              <span class="section-kicker">${lang === "si" ? "Interactive Key" : "Interactive Key Demo"}</span>
+              <h3>${lang === "si" ? "එක් Key එකකින් සංකේත 5ක්" : "5 actions from a single key"}</h3>
+              <p style="color:var(--muted)">${lang === "si"
+                ? "මැද tap කර ප්‍රධාන අකුරද, කොන් 4 දිශාවට swipe කර අංක සහ brackets ද ලබාගන්න. පහත කලාප ක්ලික් කර බලන්න:"
+                : "Tap the center for the primary letter, or swipe toward any corner for digits and symbols. Click a zone to preview:"}</p>
+              <div class="gesture-key-demo">
+                <button type="button" class="gz ${state.gestureZone === "nw" ? "selected" : ""}" data-gz="nw">4</button>
+                <div></div>
+                <button type="button" class="gz ${state.gestureZone === "ne" ? "selected" : ""}" data-gz="ne">%</button>
+                <div></div>
+                <button type="button" class="gz center ${state.gestureZone === "center" ? "selected" : ""}" data-gz="center">t</button>
+                <div></div>
+                <button type="button" class="gz ${state.gestureZone === "sw" ? "selected" : ""}" data-gz="sw">[</button>
+                <div></div>
+                <button type="button" class="gz ${state.gestureZone === "se" ? "selected" : ""}" data-gz="se">]</button>
+              </div>
+            </div>
+            <div class="calc-result-banner">
+              <strong>${msg}</strong>
+              <span class="badge-live">GESTURE</span>
+            </div>
+          `;
+          panel.querySelectorAll("[data-gz]").forEach(btn => {
+            btn.addEventListener("click", () => {
+              state.gestureZone = btn.dataset.gz;
+              renderFeatureGuide();
+            });
+          });
+        } else if (state.guideTab === "calculator") {
+          const res = evalSafeCalc(state.calcExpr);
+          panel.innerHTML = `
+            <div>
+              <span class="section-kicker">Quick Calculator</span>
+              <h3>${lang === "si" ? "ටයිප් කරන අතරතුරම ගණනය කරන්න" : "Calculate directly inside any chat"}</h3>
+              <p style="color:var(--muted)">${lang === "si"
+                ? "සාමාන්‍ය chat එකක ගණිත ප්‍රකාශනයක් ටයිප් කළ විට suggestion තීරුවේ පිළිතුර පෙන්වයි. Tap කළ විට එය replace වේ:"
+                : "Type any arithmetic formula or function like sqrt(). The answer appears live in the suggestion strip — tap it to insert:"}</p>
+              <div class="calc-sim-row">
+                ${["25*4+10", "sqrt(144)", "1500*0.15", "round(9.6)"].map(ex =>
+                  `<button type="button" class="m3-chip ${state.calcExpr === ex ? "active" : ""}" data-calc-ex="${ex}">${ex}</button>`
+                ).join("")}
+              </div>
+            </div>
+            <div class="calc-result-banner">
+              <span style="font-family:var(--font-mono);font-size:1.05rem">${state.calcExpr}</span>
+              <span class="calc-badge">= ${res}</span>
+            </div>
+          `;
+          panel.querySelectorAll("[data-calc-ex]").forEach(btn => {
+            btn.addEventListener("click", () => {
+              state.calcExpr = btn.dataset.calcEx;
+              renderFeatureGuide();
+            });
+          });
+        } else if (state.guideTab === "snippets") {
+          panel.innerHTML = `
+            <div>
+              <span class="section-kicker">Smart Snippets</span>
+              <h3>${lang === "si" ? "// හෝ .. කෙටි මගින් ඉක්මන් text" : "Instant expansion with // and .."}</h3>
+              <p style="color:var(--muted)">${lang === "si"
+                ? "දිනය, වේලාව හෝ නිතර භාවිත වන කෙටි පණිවිඩ // මගින් suggestion bar එකේදී එක් tap එකකින් ලබාගන්න:"
+                : "Skip repetitive typing. KeyCraft recognizes // and .. triggers locally and expands them when tapped:"}</p>
+              <div class="cheat-grid">
+                <div class="cheat-chip"><span class="cheat-roman">//date</span><span>${new Date().toISOString().slice(0, 10)}</span></div>
+                <div class="cheat-chip"><span class="cheat-roman">//time</span><span>${new Date().toTimeString().slice(0, 5)}</span></div>
+                <div class="cheat-chip"><span class="cheat-roman">..shrug</span><span>¯\\_(ツ)_/¯</span></div>
+                <div class="cheat-chip"><span class="cheat-roman">//ty</span><span>ස්තූතියි!</span></div>
+              </div>
+            </div>
+            <div class="calc-result-banner">
+              <span>${lang === "si" ? "Settings තුළින් සක්‍රිය/අක්‍රිය කළ හැක" : "Configurable anytime in Keyboard Settings"}</span>
+              <span class="badge-live">SNIPPETS</span>
+            </div>
+          `;
+        } else if (state.guideTab === "termux") {
+          panel.innerHTML = `
+            <div>
+              <span class="section-kicker">Termux Coding Layout</span>
+              <h3>${lang === "si" ? "Developers සහ Terminal සඳහා විශේෂයි" : "Engineered for Termux &amp; code editors"}</h3>
+              <p style="color:var(--muted)">${lang === "si"
+                ? "සෑම row එකකම zero-gap keys, Esc, Ctrl, Alt, Tab, brackets ({ } [ ] < >) සහ D-pad cursor slider එක පහසුවෙන් ලබා දෙයි."
+                : "Clean zero-gap rows place Esc, Ctrl, Tab, pipes, slashes and D-pad cursor navigation under your thumbs without hunting through secondary symbol pages."}</p>
+              <div class="cheat-grid">
+                <div class="cheat-chip"><span class="cheat-roman">Ctrl + C / D</span><span>Direct KeyEvent</span></div>
+                <div class="cheat-chip"><span class="cheat-roman">Esc / Tab</span><span>Top &amp; Left Rails</span></div>
+                <div class="cheat-chip"><span class="cheat-roman">{ } [ ] &lt; &gt;</span><span>Single-Swipe Pairs</span></div>
+                <div class="cheat-chip"><span class="cheat-roman">Space Slide</span><span>Precision Cursor</span></div>
+              </div>
+            </div>
+            <div class="calc-result-banner">
+              <span>${lang === "si" ? "Terminal වලදී suggestions ස්වයංක්‍රියව සඟවයි" : "Terminal-aware: keeps Termux prompt unobstructed"}</span>
+              <span class="badge-live">CODING</span>
+            </div>
+          `;
+        } else {
+          panel.innerHTML = `
+            <div>
+              <span class="section-kicker">Web Safe &amp; Privacy</span>
+              <h3>${lang === "si" ? "Chrome, Gemini සහ Password ආරක්ෂාව" : "Built for modern browsers, AI chats &amp; privacy"}</h3>
+              <p style="color:var(--muted)">${lang === "si"
+                ? "Chrome PWAs, WebViews සහ Gemini වැනි apps වල සිංහල අකුරු දෙගුණ නොවී type වීමට atomic commit-replace භාවිත කරයි. Password සහ Incognito වලදී learning නතර වේ."
+                : "Atomic cluster-safe replacement prevents composition glitches in Chrome and AI chats, while password and incognito fields strictly block learning and context reads."}</p>
+              <div class="cheat-grid">
+                <div class="cheat-chip"><span class="cheat-roman">Chrome / Gemini</span><span>Atomic Sinhala</span></div>
+                <div class="cheat-chip"><span class="cheat-roman">Split / Float</span><span>Tablet &amp; One-Hand</span></div>
+                <div class="cheat-chip"><span class="cheat-roman">Clipboard</span><span>Opt-In Only</span></div>
+                <div class="cheat-chip"><span class="cheat-roman">Password</span><span>Literal + Lock</span></div>
+              </div>
+            </div>
+            <div class="calc-result-banner">
+              <span>${lang === "si" ? "සම්පූර්ණයෙන්ම ඔබේ උපාංගය තුළ" : "Zero cloud keylogging · On-device rules"}</span>
+              <span class="badge-live">PRIVACY</span>
+            </div>
+          `;
+        }
+      }
+
+      document.querySelectorAll("[data-guide-tab]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.guideTab = btn.dataset.guideTab;
+          document.querySelectorAll("[data-guide-tab]").forEach(b => {
+            b.setAttribute("aria-selected", String(b.dataset.guideTab === state.guideTab));
+          });
+          renderFeatureGuide();
+        });
+      });
+
+      // 6. Gallery Controls
       const gallery = document.getElementById("screenshot-gallery");
       document.querySelectorAll("[data-gallery-dir]").forEach(button => {
         button.addEventListener("click", () => {
-          const firstShot = gallery.querySelector(".shot");
-          const distance = firstShot ? firstShot.getBoundingClientRect().width + 16 : 280;
+          if (!gallery) return;
+          const firstShot = gallery.querySelector(".showcase-card");
+          const distance = firstShot ? firstShot.getBoundingClientRect().width + 16 : 300;
           gallery.scrollBy({ left: distance * Number(button.dataset.galleryDir), behavior: "smooth" });
         });
       });
 
-      const copyButton = document.getElementById("copy-checksum");
-      const checksum = document.getElementById("sha256-value").textContent.trim();
-      const copyStatus = document.getElementById("copy-status");
-      copyButton.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(checksum);
-          copyStatus.textContent = body.dataset.lang === "si" ? "Checksum එක copy කළා." : "Checksum copied.";
-        } catch {
-          copyStatus.textContent = body.dataset.lang === "si"
-            ? "Copy කිරීමට නොහැකි වුණා. Hash එක select කර copy කරන්න."
-            : "Copy was unavailable. Select the hash and copy it manually.";
-        }
-      });
+      // Initial hydration
+      setLanguage(state.lang);
+      applyTheme(state.themeId);
     })();
   </script>
 </body>
