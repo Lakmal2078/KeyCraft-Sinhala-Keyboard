@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/sitemap.xml
+Sitemap: https://keycraft-sinhala-landing.lakmal-gamage.workers.dev/sitemap.xml

@@ -26,7 +26,7 @@ word-list source and both upstream license notices are retained in
 
 - Application ID: `com.lakmal.keycraftsinhala`
 - License: `GPL-3.0-only`
-- Website: <https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/>
+- Website: <https://keycraft-sinhala-landing.lakmal-gamage.workers.dev/>
 - Source: <https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard>
 - Issue tracker: <https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues>
 - Prepared app version: `1.2.0` (`versionCode` 4)
@@ -60,7 +60,7 @@ Categories:
   - System
 License: GPL-3.0-only
 AuthorName: Lakmal
-WebSite: https://lakmal2078.github.io/KeyCraft-Sinhala-Keyboard/
+WebSite: https://keycraft-sinhala-landing.lakmal-gamage.workers.dev/
 SourceCode: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard
 IssueTracker: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues
 Changelog: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases
