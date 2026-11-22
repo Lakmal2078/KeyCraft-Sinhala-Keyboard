@@ -47,16 +47,26 @@ public class InputPrivacyTest
   }
 
   @Test
-  public void hostOptOutHidesCandidatesWithEveryFeatureEnabled() throws Exception
+  public void sensitiveFlagsHideCandidatesWhileNoSuggestionsKeepsCandidatesVisible() throws Exception
   {
     for (int flags : new int[] { InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS,
         InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT })
     {
       refreshEditor(InputType.TYPE_CLASS_TEXT | flags, 0);
-      assertFalse(config.editor_config.should_show_candidates_view);
-      assertFalse((Boolean)invoke("should_show_candidates"));
+      assertFalse(config.editor_config.is_sensitive_input);
+      assertTrue(config.editor_config.is_no_suggestions);
+      assertTrue(config.editor_config.should_show_candidates_view);
+      assertTrue((Boolean)invoke("should_show_candidates"));
     }
+
+    refreshEditor(InputType.TYPE_CLASS_TEXT, EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING);
+    assertTrue(config.editor_config.is_sensitive_input);
+    assertFalse(config.editor_config.should_show_candidates_view);
+    assertFalse((Boolean)invoke("should_show_candidates"));
+
     refreshEditor(InputType.TYPE_CLASS_TEXT, 0);
+    assertFalse(config.editor_config.is_sensitive_input);
+    assertFalse(config.editor_config.is_no_suggestions);
     assertTrue(config.editor_config.should_show_candidates_view);
     assertTrue((Boolean)invoke("should_show_candidates"));
   }

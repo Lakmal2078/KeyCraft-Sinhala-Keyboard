@@ -56,7 +56,8 @@ public final class Suggestions
   void show_clipboard_suggestion()
   {
     // Older platforms cannot expose the clipboard sensitivity metadata.
-    if (_enabled && _config.clipboard_suggestion_enabled && VERSION.SDK_INT >= 24)
+    if (_enabled && _config.clipboard_suggestion_enabled
+        && !_config.editor_config.is_no_suggestions && VERSION.SDK_INT >= 24)
     {
       String clip = ClipboardHistoryService.get_current_clip();
       if (should_show_clipboard_suggestion(clip))

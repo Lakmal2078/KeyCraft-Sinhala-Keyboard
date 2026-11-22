@@ -45,6 +45,12 @@ public final class EditorConfig
       password fields but not for other sensitive contexts like incognito
       browsing. */
   public boolean is_password_input;
+  /** Whether the host set TYPE_TEXT_FLAG_NO_SUGGESTIONS (suppresses automatic
+      spacebar autocorrect and passive clipboard suggestions). */
+  public boolean is_no_suggestions = false;
+  /** Whether Sinhala composing updates should use atomic delete+commit instead
+      of setComposingText to avoid Blink/WebView/Compose DOM composition bugs. */
+  public boolean use_commit_replace_composing = false;
 
   /** The editor info of the focused field, used to commit content (GIF etc.).
       Set by [refresh]. */
@@ -105,6 +111,8 @@ public final class EditorConfig
     /* CurrentlyTypedWord */
     is_sensitive_input = SuggestionPolicy.is_sensitive_input(info.inputType, info.imeOptions);
     is_password_input = SuggestionPolicy.is_password_input(info.inputType);
+    is_no_suggestions = SuggestionPolicy.is_no_suggestions(info.inputType);
+    use_commit_replace_composing = _should_use_commit_replace_composing(info);
     initial_text_before_cursor = null;
     initial_text_after_cursor = null;
     if (!is_sensitive_input && VERSION.SDK_INT >= 30)
@@ -143,7 +151,35 @@ public final class EditorConfig
           InputType.TYPE_TEXT_VARIATION_PASSWORD) != 0)
       return true;
     // Godot editor: Doesn't handle setSelection() but returns true.
-    return info.packageName.startsWith("org.godotengine.editor");
+    return info.packageName != null && info.packageName.startsWith("org.godotengine.editor");
+  }
+
+  static boolean _should_use_commit_replace_composing(EditorInfo info)
+  {
+    if (info == null)
+      return false;
+    int inputClass = info.inputType & InputType.TYPE_MASK_CLASS;
+    int variation = info.inputType & InputType.TYPE_MASK_VARIATION;
+    if (inputClass == InputType.TYPE_CLASS_TEXT
+        && variation == InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT)
+      return true;
+    String pkg = info.packageName;
+    if (pkg == null)
+      return false;
+    return pkg.equals("com.android.chrome")
+        || pkg.startsWith("com.chrome.")
+        || pkg.equals("com.google.android.apps.bard")
+        || pkg.equals("com.google.android.googlequicksearchbox")
+        || pkg.equals("com.openai.chatgpt")
+        || pkg.equals("com.anthropic.claude")
+        || pkg.equals("com.sec.android.app.sbrowser")
+        || pkg.equals("com.microsoft.emmx")
+        || pkg.equals("com.brave.browser")
+        || pkg.startsWith("org.mozilla.")
+        || pkg.startsWith("com.opera.")
+        || pkg.startsWith("com.duckduckgo.")
+        || pkg.startsWith("com.vivaldi.")
+        || pkg.startsWith("org.chromium.");
   }
 
   /** Whether the caps state should be updated when input starts. [inputType]

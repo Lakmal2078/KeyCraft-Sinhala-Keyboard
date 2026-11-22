@@ -38,6 +38,10 @@ public final class KeyEventHandler
   StringBuilder _sinhala_buffer = new StringBuilder();
   SinhalaLearner _sinhala_learner;
   String _last_committed_sinhala = null;
+  String _sinhala_committed_text = "";
+  int _max_sinhala_composing_len = 0;
+  int _pending_commit_delta_sum = 0;
+  boolean _runtime_fallback_commit_replace = false;
 
   public KeyEventHandler(Config conf, IReceiver recv, Suggestions sg)
   {
@@ -67,17 +71,35 @@ public final class KeyEventHandler
     return _sinhala_learner;
   }
 
+  private boolean is_commit_replace_mode()
+  {
+    return _config.editor_config.use_commit_replace_composing
+        || _runtime_fallback_commit_replace;
+  }
+
+  private void reset_sinhala_composing_state()
+  {
+    _sinhala_committed_text = "";
+    _max_sinhala_composing_len = 0;
+    _pending_commit_delta_sum = 0;
+    _runtime_fallback_commit_replace = false;
+  }
+
   @Override
   public void finish_composing()
   {
     if (_sinhala_buffer.length() > 0)
     {
-      InputConnection conn = _recv.getCurrentInputConnection();
-      if (conn != null)
+      if (!is_commit_replace_mode())
       {
-        conn.finishComposingText();
+        InputConnection conn = _recv.getCurrentInputConnection();
+        if (conn != null)
+        {
+          conn.finishComposingText();
+        }
       }
       _sinhala_buffer.setLength(0);
+      reset_sinhala_composing_state();
       _suggestions.clear();
       _recv.set_suggestions(_suggestions);
     }
@@ -108,6 +130,7 @@ public final class KeyEventHandler
     _suggestions.started();
     _typedword.started(_config, ic);
     _sinhala_buffer.setLength(0);
+    reset_sinhala_composing_state();
     _move_cursor_force_fallback =
       _config.editor_config.should_move_cursor_force_fallback;
     _last_action = null;
@@ -126,13 +149,35 @@ public final class KeyEventHandler
       {
         finish_composing();
       }
+      else if (is_commit_replace_mode())
+      {
+        if (oldSelStart >= 0 && newSelStart >= 0)
+        {
+          int actualDelta = newSelStart - oldSelStart;
+          if (_pending_commit_delta_sum == 0)
+          {
+            if (actualDelta != 0 || newSelStart < _sinhala_committed_text.length())
+              finish_composing();
+          }
+          else
+          {
+            _pending_commit_delta_sum -= actualDelta;
+          }
+        }
+      }
       else if (candidatesStart != -1 && (newSelStart < candidatesStart || newSelStart > candidatesEnd))
       {
         finish_composing();
       }
+      else if (candidatesStart != -1 && candidatesEnd > candidatesStart
+          && (candidatesEnd - candidatesStart) > _max_sinhala_composing_len)
+      {
+        recover_from_composing_expansion(newSelStart, candidatesStart, candidatesEnd);
+      }
     }
     _autocap.selection_updated(oldSelStart, newSelStart);
-    _typedword.selection_updated(oldSelStart, newSelStart, newSelEnd);
+    if (_sinhala_buffer.length() == 0)
+      _typedword.selection_updated(oldSelStart, newSelStart, newSelEnd);
   }
 
   public void selection_updated(int oldSelStart, int newSelStart, int newSelEnd)
@@ -250,7 +295,7 @@ public final class KeyEventHandler
       String rawText = text.trim();
       if (add_space_after)
         text = text + " ";
-      commit_sinhala_text(conn, text);
+      commit_sinhala_replacement(conn, text);
       _sinhala_buffer.setLength(0);
       _typedword.typed(text);
       _suggestions.clear();
@@ -468,6 +513,156 @@ public final class KeyEventHandler
     finally { conn.endBatchEdit(); }
   }
 
+  private static boolean is_sinhala_cluster_continuation(char c)
+  {
+    return c == '\u200C' || c == '\u200D'
+        || (c >= '\u0D81' && c <= '\u0D83')
+        || (c >= '\u0DCA' && c <= '\u0DDF')
+        || (c >= '\u0DF2' && c <= '\u0DF3')
+        || Character.getType(c) == Character.NON_SPACING_MARK
+        || Character.getType(c) == Character.COMBINING_SPACING_MARK;
+  }
+
+  private static int safe_common_prefix_length(String prev, String next)
+  {
+    int max = Math.min(prev.length(), next.length());
+    int common = 0;
+    while (common < max && prev.charAt(common) == next.charAt(common))
+      common++;
+    if (common > 0 && Character.isHighSurrogate(next.charAt(common - 1)))
+      common--;
+    while (common > 0)
+    {
+      if (common < prev.length() && is_sinhala_cluster_continuation(prev.charAt(common)))
+      {
+        common--;
+        continue;
+      }
+      if (common < next.length() && is_sinhala_cluster_continuation(next.charAt(common)))
+      {
+        common--;
+        continue;
+      }
+      if (prev.charAt(common - 1) == '\u200D' || next.charAt(common - 1) == '\u200D')
+      {
+        common--;
+        continue;
+      }
+      if (Character.isHighSurrogate(next.charAt(common - 1)))
+      {
+        common--;
+        continue;
+      }
+      break;
+    }
+    return common;
+  }
+
+  private void replace_sinhala_with_commit(InputConnection conn, String newText, boolean finalizing)
+  {
+    if (conn == null) return;
+    String prev = (_sinhala_committed_text != null) ? _sinhala_committed_text : "";
+    String target = (newText != null) ? newText : "";
+    int common = safe_common_prefix_length(prev, target);
+    int deleteBefore = prev.length() - common;
+    String appendText = target.substring(common);
+
+    if (deleteBefore > 0 || !appendText.isEmpty())
+    {
+      if (!finalizing)
+      {
+        _pending_commit_delta_sum += (appendText.length() - deleteBefore);
+      }
+      conn.beginBatchEdit();
+      try
+      {
+        if (deleteBefore > 0)
+          conn.deleteSurroundingText(deleteBefore, 0);
+        if (!appendText.isEmpty())
+          conn.commitText(appendText, 1);
+      }
+      finally
+      {
+        conn.endBatchEdit();
+      }
+    }
+    _sinhala_committed_text = finalizing ? "" : target;
+  }
+
+  private void update_sinhala_composing(InputConnection conn, String text)
+  {
+    if (is_commit_replace_mode())
+    {
+      replace_sinhala_with_commit(conn, text, false);
+    }
+    else
+    {
+      if (text != null && text.length() > _max_sinhala_composing_len)
+        _max_sinhala_composing_len = text.length();
+      update_sinhala_composing_text(conn, text);
+    }
+  }
+
+  private void clear_sinhala_composing(InputConnection conn)
+  {
+    if (is_commit_replace_mode())
+    {
+      replace_sinhala_with_commit(conn, "", true);
+    }
+    else
+    {
+      update_sinhala_composing_text(conn, "");
+      if (conn != null)
+        conn.finishComposingText();
+    }
+    reset_sinhala_composing_state();
+  }
+
+  private void commit_sinhala_replacement(InputConnection conn, String text)
+  {
+    if (is_commit_replace_mode())
+    {
+      replace_sinhala_with_commit(conn, text, true);
+    }
+    else
+    {
+      commit_sinhala_text(conn, text);
+    }
+    reset_sinhala_composing_state();
+  }
+
+  private void recover_from_composing_expansion(int newSelStart, int candidatesStart, int candidatesEnd)
+  {
+    InputConnection conn = _recv.getCurrentInputConnection();
+    if (conn == null)
+      return;
+    String expected = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
+    _runtime_fallback_commit_replace = true;
+    int oldLen = candidatesEnd - candidatesStart;
+    conn.beginBatchEdit();
+    try
+    {
+      if (newSelStart == candidatesEnd)
+      {
+        conn.finishComposingText();
+        conn.deleteSurroundingText(oldLen, 0);
+        conn.commitText(expected, 1);
+      }
+      else
+      {
+        conn.setComposingText(expected, 1);
+        conn.finishComposingText();
+      }
+    }
+    finally
+    {
+      conn.endBatchEdit();
+    }
+    _sinhala_committed_text = expected;
+    _max_sinhala_composing_len = 0;
+    _pending_commit_delta_sum += (candidatesStart + expected.length()) - newSelStart;
+  }
+
   void send_text(String text)
   {
     InputConnection conn = _recv.getCurrentInputConnection();
@@ -487,7 +682,7 @@ public final class KeyEventHandler
         && QuickCalculator.isFunction(_sinhala_buffer.toString()))
     {
       String function = _sinhala_buffer.toString();
-      commit_sinhala_text(conn, function);
+      commit_sinhala_replacement(conn, function);
       _sinhala_buffer.setLength(0);
       _typedword.typed(function);
     }
@@ -496,7 +691,7 @@ public final class KeyEventHandler
     {
       _sinhala_buffer.append(text);
       String transliterated = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
-      update_sinhala_composing_text(conn, transliterated);
+      update_sinhala_composing(conn, transliterated);
       if (_config.suggestions_enabled)
         _suggestions.currently_typed_word(_sinhala_buffer.toString());
       _next_last_action = LastAction.OTHER;
@@ -826,7 +1021,7 @@ public final class KeyEventHandler
       // Space commits the transliteration, not an unselected suggestion.
       // Alternative candidates are committed only when the user taps one.
       String committedSinhala = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
-      commit_sinhala_text(conn, committedSinhala + " ");
+      commit_sinhala_replacement(conn, committedSinhala + " ");
       _sinhala_buffer.setLength(0);
       _typedword.typed(committedSinhala + " ");
       _suggestions.clear();
@@ -839,7 +1034,8 @@ public final class KeyEventHandler
         && _last_action == LastAction.OTHER)
     {
       String typed = _typedword.get();
-      if (_config.space_bar_auto_complete && _suggestions.count > 0
+      if (!_config.editor_config.is_no_suggestions
+          && _config.space_bar_auto_complete && _suggestions.count > 0
           && _suggestions.suggestions[0] != null
           && !_suggestions.suggestions[0].startsWith("📋 "))
       {
@@ -920,14 +1116,13 @@ public final class KeyEventHandler
       if (_sinhala_buffer.length() > 0)
       {
         String transliterated = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
-        update_sinhala_composing_text(conn, transliterated);
+        update_sinhala_composing(conn, transliterated);
         if (_config.suggestions_enabled)
           _suggestions.currently_typed_word(_sinhala_buffer.toString());
       }
       else
       {
-        update_sinhala_composing_text(conn, "");
-        conn.finishComposingText();
+        clear_sinhala_composing(conn);
         _suggestions.clear();
         _recv.set_suggestions(_suggestions);
       }

@@ -155,22 +155,34 @@ public class CandidatesView extends LinearLayout
   /** Whether the candidates view should be shown for a given editor. */
   public static boolean should_show(EditorInfo info)
   {
+    if (info == null)
+      return false;
     if (SuggestionPolicy.is_sensitive_input(info.inputType, info.imeOptions))
       return false;
     Config config = Config.globalConfig();
     if (config != null && !config.suggestions_enabled)
       return false;
-    int flags = info.inputType & InputType.TYPE_MASK_FLAGS;
     switch (info.inputType & InputType.TYPE_MASK_CLASS)
     {
       case InputType.TYPE_CLASS_TEXT:
-        // Host privacy settings take precedence over every suggestion source,
-        // including when AUTO_CORRECT is also set.
-        return (flags & InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS) == 0;
+        return true;
+      case InputType.TYPE_NULL:
+        return !is_terminal_package(info.packageName);
       case InputType.TYPE_CLASS_NUMBER:
         // Beware of TYPE_NUMBER_VARIATION_PASSWORD
         return false;
-      default: return false;
+      default:
+        return false;
     }
+  }
+
+  private static boolean is_terminal_package(String pkg)
+  {
+    if (pkg == null)
+      return false;
+    return pkg.startsWith("com.termux")
+        || pkg.equals("jackpal.androidterm")
+        || pkg.equals("org.connectbot")
+        || pkg.equals("com.sonelli.juicessh");
   }
 }
