@@ -23,6 +23,13 @@ public class EdgeCaseTest
   }
 
   @Test
+  public void preservesPastedSinhalaAndJoinerSequences()
+  {
+    String pasted = "\u0DC1\u0DCA\u200D\u0DBB\u0DD3 \u0DB1\u0DCA\u200D\u0DB0 \u0D9A\u0DCA\u200D\u0DC2";
+    assertEquals(pasted, SinhalaTransliterator.transliterate(pasted));
+  }
+
+  @Test
   public void anusvaraRuleDoesNotInsertAtWordStart()
   {
     String output = SinhalaTransliterator.parsePhonetic("nsb");

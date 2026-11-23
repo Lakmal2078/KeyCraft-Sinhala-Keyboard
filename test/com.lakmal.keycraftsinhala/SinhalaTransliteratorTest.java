@@ -16,6 +16,14 @@ public class SinhalaTransliteratorTest
   }
 
   @Test
+  public void testCorrectedDictionaryWordsAndPhrase()
+  {
+    assertEquals("\u0D86\u0DBB\u0DB8\u0DCA\u0DB7", SinhalaTransliterator.transliterate("Aaramba"));
+    assertEquals("\u0DB1\u0DB8\u0DC3\u0DCA\u0D9A\u0DCF\u0DBB", SinhalaTransliterator.transliterate("namaskara"));
+    assertEquals("\u0DC1\u0DCA\u200D\u0DBB\u0DD3\u0020\u0DBD\u0D82\u0D9A\u0DCF\u0DC0", SinhalaTransliterator.transliterate("Sri Lanka"));
+  }
+
+  @Test
   public void testMultipleSuggestions()
   {
     java.util.List<String> lakmalSug = SinhalaTransliterator.getSuggestions("lakmal");

@@ -83,6 +83,18 @@ public class KeyboardIntegrationTest
   }
 
   @Test
+  public void aarambaComposesAndCommitsCorrectDictionaryWord()
+  {
+    for (char c : "Aaramba".toCharArray())
+      handler.key_up(KeyValue.makeCharKey(c), Pointers.Modifiers.EMPTY);
+
+    verify(connection).setComposingText("\u0D86\u0DBB\u0DB8\u0DCA\u0DB7", 1);
+    handler.key_up(KeyValue.getKeyByName("space"), Pointers.Modifiers.EMPTY);
+    verify(connection).commitText("\u0D86\u0DBB\u0DB8\u0DCA\u0DB7 ", 1);
+    assertEquals(0, handler._sinhala_buffer.length());
+  }
+
+  @Test
   public void backspaceUpdatesAndClearsActiveSinhalaComposition()
   {
     handler.key_up(KeyValue.makeCharKey('k'), Pointers.Modifiers.EMPTY);

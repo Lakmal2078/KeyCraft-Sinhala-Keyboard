@@ -15,6 +15,17 @@ public class CompoundInputTest
   }
 
   @Test
+  public void mapsSpecialConsonantClustersWithExactUnicode()
+  {
+    assertEquals("\u0D9A\u0DCA\u200D\u0DC2\u0DBA", SinhalaTransliterator.transliterate("kshaya"));
+    assertEquals("\u0D9A\u0DCA\u200D\u0DBB", SinhalaTransliterator.transliterate("kra"));
+    assertEquals("\u0DC0\u0DCA\u200D\u0DBA", SinhalaTransliterator.transliterate("vya"));
+    assertEquals("\u0DB1\u0DCA\u200D\u0DB0", SinhalaTransliterator.transliterate("ndha"));
+    assertEquals("\u0DB8\u0DCA\u0DB7", SinhalaTransliterator.transliterate("mbha"));
+    assertEquals("අඹ", SinhalaTransliterator.transliterate("amba"));
+  }
+
+  @Test
   public void keepsPunctuationAndSpacesAroundTranslatedWords()
   {
     assertEquals("අම්මා, කොහොමද?", SinhalaTransliterator.transliterate("amma, kohomada?"));

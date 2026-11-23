@@ -67,6 +67,7 @@ public final class PhoneticParser
     {"Ksh", "\u0D9A\u0DCA\u200D\u0DC2"},
     {"chch", "\u0DA0\u0DCA\u200D\u0DA0"}, // ච්ච
     {"nndh", "\u0DB3"}, // ඳ
+    {"ndh", "\u0DB1\u0DCA\u200D\u0DB0"}, // න්‍ධ
     {"shh", "\u0DC2\u0DCA"}, // ෂ්
     {"chh", "\u0DA1"}, // ඡ
     {"nng", "\u0D9F"},  // ඟ
@@ -96,6 +97,7 @@ public final class PhoneticParser
     {"kn", "\u0DA4"},  // ඤ
     {"jn", "\u0DA5"},  // ඥ
     {"nD", "\u0DAC"},  // ඬ
+    {"mbh", "\u0DB8\u0DCA\u0DB7"}, // ම්භ
     {"mb", "\u0DB9"},  // ඹ
     {"ng", "\u0D9F"},  // ඟ
     {"k", "\u0D9A"},   // ක

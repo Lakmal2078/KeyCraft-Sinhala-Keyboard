@@ -29,6 +29,7 @@ public final class SinhalaTransliterator
   static
   {
     COMMON_PHRASES.put("arugam bay", "ආරුගම්බේ");
+    COMMON_PHRASES.put("sri lanka", "ශ්‍රී ලංකාව");
     COMMON_PHRASES.put("de silva", "ද සිල්වා");
     COMMON_PHRASES.put("ja-ela", "ජාඇල");
     COMMON_PHRASES.put("mount lavinia", "ගල්කිස්ස");
@@ -546,7 +547,9 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("aadhyaathmika", "ආධ්‍යාත්මික");
     COMMON_WORDS.put("aakhyanaya", "ආඛ්‍යානය");
     COMMON_WORDS.put("aapu", "ආපු");
+    COMMON_WORDS.put("aaramba", "ආරම්භ");
     COMMON_WORDS.put("aarambhawe", "ආරම්භවේ");
+    COMMON_WORDS.put("namaskara", "නමස්කාර");
     COMMON_WORDS.put("aarjava", "ආර්‍ජව");
     COMMON_WORDS.put("aarthawa", "ආර්‍තව");
     COMMON_WORDS.put("aarya", "ආර්‍ය");
