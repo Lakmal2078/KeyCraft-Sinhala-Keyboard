@@ -50,6 +50,10 @@ build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk
 
 The exact Settings labels can vary by Android version and device manufacturer.
 
+## Privacy and backups
+
+Android Backup and device-to-device transfer include only keyboard configuration settings stored in `com.lakmal.keycraftsinhala_preferences.xml`. Learned Sinhala predictions, downloaded dictionaries, recent emojis, cached files, and in-memory clipboard history are excluded.
+
 ## Screenshots
 
 The following screenshots are stored in this repository:
