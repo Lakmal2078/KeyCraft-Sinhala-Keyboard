@@ -24,6 +24,17 @@ public class SinhalaLearnerTest
   }
 
   @Test
+  public void testCorrectionRejectsNonSinglishKeys()
+  {
+    learner.recordCorrection("amma test", "අම්මා");
+    learner.recordCorrection("amma1", "අම්මා");
+    learner.recordCorrection("a", "අම්මා");
+    assertNull(learner.getLearnedCorrection("amma test"));
+    assertNull(learner.getLearnedCorrection("amma1"));
+    assertNull(learner.getLearnedCorrection("a"));
+  }
+
+  @Test
   public void testRecordTransitionAndFrequencyOrdering()
   {
     learner.recordTransition("මම", "යනවා");
@@ -182,6 +193,32 @@ public class SinhalaLearnerTest
   }
 
   @Test
+  public void testOneTimeCleanupRemovesOnlyObsoleteCorrections()
+  {
+    fakePrefs.edit()
+        .remove("migration|clear_obsolete_transliteration_corrections_v1")
+        .putString("corr|nathi", "නති")
+        .putString("corr|galapenawa", "ගලපෙනවා")
+        .putString("corr|amma", "අම්මා")
+        .putInt("මම|යනවා", 3)
+        .commit();
+
+    SinhalaLearner migrated = new SinhalaLearner(fakePrefs);
+
+    assertNull(migrated.getLearnedCorrection("nathi"));
+    assertNull(migrated.getLearnedCorrection("galapenawa"));
+    assertEquals("අම්මා", migrated.getLearnedCorrection("amma"));
+    assertEquals(3, fakePrefs.getInt("මම|යනවා", 0));
+    assertTrue(fakePrefs.getBoolean(
+        "migration|clear_obsolete_transliteration_corrections_v1", false));
+
+    // A correction learned after migration must survive subsequent instances.
+    migrated.recordCorrection("nathi", "නැති");
+    SinhalaLearner nextInstance = new SinhalaLearner(fakePrefs);
+    assertEquals("නැති", nextInstance.getLearnedCorrection("nathi"));
+  }
+
+  @Test
   public void testRecordCorrectionAndRetrieval()
   {
     assertNull(learner.getLearnedCorrection("amma"));
@@ -226,6 +263,13 @@ public class SinhalaLearnerTest
     }
 
     @Override
+    public boolean getBoolean(String key, boolean defValue)
+    {
+      Object val = map.get(key);
+      return val instanceof Boolean ? (Boolean) val : defValue;
+    }
+
+    @Override
     public int getInt(String key, int defValue)
     {
       Object val = map.get(key);
@@ -244,13 +288,6 @@ public class SinhalaLearnerTest
     {
       Object val = map.get(key);
       return val instanceof Float ? (Float) val : defValue;
-    }
-
-    @Override
-    public boolean getBoolean(String key, boolean defValue)
-    {
-      Object val = map.get(key);
-      return val instanceof Boolean ? (Boolean) val : defValue;
     }
 
     @Override

@@ -36,10 +36,46 @@ public class SinhalaTransliteratorTest
     assertEquals("අයියා", SinhalaTransliterator.transliterate("aiyya"));
     assertEquals("මල්ලි", SinhalaTransliterator.transliterate("malli"));
     assertEquals("නංගි", SinhalaTransliterator.transliterate("nangi"));
+    assertEquals("නැති", SinhalaTransliterator.transliterate("nathi"));
+    assertEquals("නැති", SinhalaTransliterator.transliterate("Nathi"));
+    assertEquals("නැති", SinhalaTransliterator.transliterate("naethi"));
     assertEquals("මොකද", SinhalaTransliterator.transliterate("mokada"));
     assertEquals("ලංකා", SinhalaTransliterator.transliterate("lanka"));
     assertEquals("ආයුබෝවන්", SinhalaTransliterator.transliterate("ayubowan"));
     assertEquals("ස්තූතියි", SinhalaTransliterator.transliterate("sthuthi"));
+  }
+
+  @Test
+  public void testPhaseFourVowelCombinationsAndDictionaryAccuracy()
+  {
+    assertEquals("නැති", SinhalaTransliterator.transliterate("nathi"));
+    assertEquals("නැති", SinhalaTransliterator.transliterate("Nathi"));
+    assertEquals("නැති", SinhalaTransliterator.transliterate("naethi"));
+
+    assertEquals("ඇ", SinhalaTransliterator.transliterate("ae"));
+    assertEquals("ඇ", SinhalaTransliterator.transliterate("æ"));
+    assertEquals("කැ", SinhalaTransliterator.transliterate("kae"));
+    assertEquals("කැ", SinhalaTransliterator.transliterate("kæ"));
+    assertEquals("ආ", SinhalaTransliterator.transliterate("aa"));
+    assertEquals("කා", SinhalaTransliterator.transliterate("kaa"));
+    assertEquals("ඒ", SinhalaTransliterator.transliterate("ee"));
+    assertEquals("කේ", SinhalaTransliterator.transliterate("kee"));
+  }
+
+  @Test
+  public void testPhaseFourDictionaryOutranksConflictingLearnedCorrection()
+  {
+    SinhalaLearner learner = new SinhalaLearner((android.content.SharedPreferences) null);
+    learner.recordCorrection("nathi", "නති");
+
+    assertEquals("නැති", SinhalaTransliterator.transliterateWord("nathi", learner));
+    assertEquals("නැති", SinhalaTransliterator.analyze("nathi", learner)
+        .candidates.get(0).text);
+    assertEquals("නැති", SinhalaTransliterator.getSuggestions("nathi", learner).get(0));
+
+    learner.recordCorrection("qwerty", "සිංහල");
+    assertEquals("සිංහල", SinhalaTransliterator.transliterateWord("qwerty", learner));
+    learner.clearLearnedData();
   }
 
   @Test
@@ -271,6 +307,107 @@ public class SinhalaTransliteratorTest
     assertEquals("සුබ", SinhalaTransliterator.transliterate("suba"));
     assertEquals("දවසක්", SinhalaTransliterator.transliterate("dhavasak"));
     assertEquals("කොහොමද", SinhalaTransliterator.transliterate("kohomadha"));
+  }
+
+  @Test
+  public void testCapitalDMapsToRetroflexDa()
+  {
+    assertEquals("ද", SinhalaTransliterator.transliterate("da"));
+    assertEquals("දි", SinhalaTransliterator.transliterate("di"));
+    assertEquals("දු", SinhalaTransliterator.transliterate("du"));
+    assertEquals("ඩ", SinhalaTransliterator.transliterate("Da"));
+    assertEquals("ඩි", SinhalaTransliterator.transliterate("Di"));
+    assertEquals("ඩු", SinhalaTransliterator.transliterate("Du"));
+    assertEquals("දවසක්", SinhalaTransliterator.transliterate("Dawasak"));
+  }
+
+  @Test
+  public void testStrictPhonemicCapitalization()
+  {
+    assertEquals("ද", SinhalaTransliterator.transliterate("da"));
+    assertEquals("ඩ", SinhalaTransliterator.transliterate("Da"));
+    assertEquals("ට", SinhalaTransliterator.transliterate("ta"));
+    assertEquals("ඨ", SinhalaTransliterator.transliterate("Ta"));
+    assertEquals("නි", SinhalaTransliterator.transliterate("ni"));
+    assertEquals("ණි", SinhalaTransliterator.transliterate("Ni"));
+
+    // Ordinary sentence-initial capitals retain their familiar behavior.
+    assertEquals("සුබ", SinhalaTransliterator.transliterate("Suba"));
+    assertEquals("කොහොමද", SinhalaTransliterator.transliterate("Kohomada"));
+    assertEquals("දවසක්", SinhalaTransliterator.transliterate("Dawasak"));
+  }
+
+  @Test
+  public void testInternalAnalysisReturnsBoundedSinhalaCandidates()
+  {
+    com.lakmal.keycraftsinhala.transliteration.TransliterationResult result =
+        SinhalaTransliterator.analyze("kohomada");
+    assertEquals("kohomada", result.input);
+    assertEquals("කොහොමද", result.getBestCandidate());
+    assertEquals(SinhalaTransliterator.transliterateWord("kohomada"), result.getBestCandidate());
+    assertTrue(result.candidates.size() <=
+        com.lakmal.keycraftsinhala.transliteration.TransliterationConfig.MAX_CANDIDATES);
+    for (com.lakmal.keycraftsinhala.transliteration.TransliterationCandidate candidate : result.candidates)
+    {
+      assertFalse("Raw English must not be exposed as a transliteration candidate",
+          "kohomada".equals(candidate.text));
+      assertNotNull(candidate.ruleId);
+    }
+    assertTrue(SinhalaTransliterator.analyze("").candidates.isEmpty());
+    assertTrue(SinhalaTransliterator.analyze(null).candidates.isEmpty());
+
+    com.lakmal.keycraftsinhala.transliteration.TransliterationResult retroflex =
+        SinhalaTransliterator.analyze("Da");
+    assertEquals("ඩ", retroflex.getBestCandidate());
+    assertEquals("phonetic-primary", retroflex.candidates.get(0).ruleId);
+
+    com.lakmal.keycraftsinhala.transliteration.TransliterationResult lexical =
+        SinhalaTransliterator.analyze("sinhala");
+    assertEquals("සිංහල", lexical.getBestCandidate());
+    assertEquals("dictionary-exact", lexical.candidates.get(0).ruleId);
+  }
+
+  @Test
+  public void testPhaseThreeLexicalVowelInference()
+  {
+    assertEquals("ගැලපෙනවා", SinhalaTransliterator.transliterate("galapenawa"));
+    com.lakmal.keycraftsinhala.transliteration.TransliterationResult result =
+        SinhalaTransliterator.analyze("galapenawa");
+    assertEquals("ගැලපෙනවා", result.getBestCandidate());
+    assertEquals("dictionary-exact", result.candidates.get(0).ruleId);
+  }
+
+  @Test
+  public void testPhaseThreeLearnedCorrectionAndContextRanking()
+  {
+    SinhalaLearner learner = new SinhalaLearner((android.content.SharedPreferences) null);
+    learner.recordCorrection("qwerty", "සිංහල");
+    com.lakmal.keycraftsinhala.transliteration.TransliterationResult corrected =
+        SinhalaTransliterator.analyze("qwerty", learner);
+    assertEquals("සිංහල", corrected.getBestCandidate());
+    assertEquals("learned-correction", corrected.candidates.get(0).ruleId);
+
+    learner.recordCorrection("amma", "අම්ම");
+    com.lakmal.keycraftsinhala.transliteration.TransliterationResult canonical =
+        SinhalaTransliterator.analyze("amma", learner);
+    assertEquals("අම්මා", canonical.getBestCandidate());
+    assertEquals("dictionary-exact", canonical.candidates.get(0).ruleId);
+
+    learner.clearLearnedData();
+    learner.recordTransition("මම", "අඬ");
+    com.lakmal.keycraftsinhala.transliteration.TransliterationResult contextual =
+        SinhalaTransliterator.analyze("anda", "මම", learner);
+    assertEquals("අඬ", contextual.getBestCandidate());
+    assertTrue(contextual.candidates.get(0).ruleId.contains("+context"));
+  }
+
+  @Test
+  public void testLongestMatchPhoneticSequences()
+  {
+    assertEquals("ඈ", SinhalaTransliterator.parsePhonetic("aae"));
+    assertEquals("ඡ්", SinhalaTransliterator.parsePhonetic("chh"));
+    assertEquals("ක්‍ෂ්", SinhalaTransliterator.parsePhonetic("ksh"));
+    assertEquals("කැ", SinhalaTransliterator.parsePhonetic("kae"));
   }
 
   @Test

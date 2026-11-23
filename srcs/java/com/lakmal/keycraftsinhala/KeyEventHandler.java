@@ -618,6 +618,12 @@ public final class KeyEventHandler
     reset_sinhala_composing_state();
   }
 
+  private String transliterate_sinhala_buffer()
+  {
+    SinhalaLearner learner = _config.editor_config.is_sensitive_input ? null : _sinhala_learner;
+    return SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString(), learner);
+  }
+
   private void commit_sinhala_replacement(InputConnection conn, String text)
   {
     if (is_commit_replace_mode())
@@ -636,7 +642,7 @@ public final class KeyEventHandler
     InputConnection conn = _recv.getCurrentInputConnection();
     if (conn == null)
       return;
-    String expected = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
+    String expected = transliterate_sinhala_buffer();
     _runtime_fallback_commit_replace = true;
     int oldLen = candidatesEnd - candidatesStart;
     conn.beginBatchEdit();
@@ -690,7 +696,7 @@ public final class KeyEventHandler
     if (is_sinhala && !snippet && is_ascii_letters(text))
     {
       _sinhala_buffer.append(text);
-      String transliterated = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
+      String transliterated = transliterate_sinhala_buffer();
       update_sinhala_composing(conn, transliterated);
       if (_config.suggestions_enabled)
         _suggestions.currently_typed_word(_sinhala_buffer.toString());
@@ -1020,7 +1026,7 @@ public final class KeyEventHandler
     {
       // Space commits the transliteration, not an unselected suggestion.
       // Alternative candidates are committed only when the user taps one.
-      String committedSinhala = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
+      String committedSinhala = transliterate_sinhala_buffer();
       commit_sinhala_replacement(conn, committedSinhala + " ");
       _sinhala_buffer.setLength(0);
       _typedword.typed(committedSinhala + " ");
@@ -1115,7 +1121,7 @@ public final class KeyEventHandler
       _sinhala_buffer.deleteCharAt(_sinhala_buffer.length() - 1);
       if (_sinhala_buffer.length() > 0)
       {
-        String transliterated = SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString());
+        String transliterated = transliterate_sinhala_buffer();
         update_sinhala_composing(conn, transliterated);
         if (_config.suggestions_enabled)
           _suggestions.currently_typed_word(_sinhala_buffer.toString());

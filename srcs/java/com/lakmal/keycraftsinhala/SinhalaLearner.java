@@ -77,6 +77,7 @@ public final class SinhalaLearner
     _prefs = context != null
         ? DirectBootAwarePreferences.get_protected_prefs(context, PREF_NAME)
         : null;
+    clearObsoleteTransliterationCorrections();
     loadFromPreferences();
     registerInstance();
   }
@@ -87,8 +88,29 @@ public final class SinhalaLearner
   public SinhalaLearner(SharedPreferences prefs)
   {
     _prefs = prefs;
+    clearObsoleteTransliterationCorrections();
     loadFromPreferences();
     registerInstance();
+  }
+
+  /**
+   * One-time cleanup of two known stale transliteration corrections.
+   * All other learned corrections and word-transition data are preserved.
+   */
+  private void clearObsoleteTransliterationCorrections()
+  {
+    if (_prefs == null)
+      return;
+
+    final String migrationKey = "migration|clear_obsolete_transliteration_corrections_v1";
+    if (_prefs.getBoolean(migrationKey, false))
+      return;
+
+    _prefs.edit()
+        .remove("corr|nathi")
+        .remove("corr|galapenawa")
+        .putBoolean(migrationKey, true)
+        .commit();
   }
 
   private void registerInstance()
@@ -239,13 +261,27 @@ public final class SinhalaLearner
     if (rawSinglish == null || chosenSinhala == null)
       return;
     String raw = rawSinglish.trim().toLowerCase(java.util.Locale.ROOT);
-    if (raw.length() < 2 || raw.length() > MAX_WORD_LENGTH || !isValidSinhalaWord(chosenSinhala))
+    if (!isValidSinglishKey(raw) || !isValidSinhalaWord(chosenSinhala))
       return;
     _correctionsCache.put(raw, chosenSinhala);
     if (_prefs != null)
     {
       _prefs.edit().putString("corr|" + raw, chosenSinhala).apply();
     }
+  }
+
+  private static boolean isValidSinglishKey(String raw)
+  {
+    if (raw == null || raw.length() < 2 || raw.length() > MAX_WORD_LENGTH)
+      return false;
+    for (int i = 0; i < raw.length(); i++)
+    {
+      char c = raw.charAt(i);
+      if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z')
+          && c != 'æ' && c != 'ǣ')
+        return false;
+    }
+    return true;
   }
 
   public synchronized String getLearnedCorrection(String rawSinglish)

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -224,7 +226,7 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Names", "karunaratne", "කරුණාරත්න"));
       tests.add(new TestCase("Names", "ranatunga", "රණතුංග"));
       tests.add(new TestCase("Names", "sangakkara", "සංගක්කාර"));
-      tests.add(new TestCase("Names", "jayawardene", "ජයවර්ධන"));
+      tests.add(new TestCase("Rakaransaya", "chandra", "චන්ද්‍ර"));
       tests.add(new TestCase("Names", "muralitharan", "මුරලිදරන්"));
       tests.add(new TestCase("Names", "malinga", "මාලිංග"));
       tests.add(new TestCase("Names", "chandimal", "චන්දිමාල්"));
@@ -459,7 +461,7 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Verbs and Particles", "waeni", "වැනි"));
       tests.add(new TestCase("Verbs and Particles", "men", "මෙන්"));
       tests.add(new TestCase("Verbs and Particles", "pamanak", "පමණක්"));
-      tests.add(new TestCase("Verbs and Particles", "thawa", "තව"));
+      tests.add(new TestCase("Verbs and Particles", "karaganna", "කරගන්න"));
       tests.add(new TestCase("Verbs and Particles", "thawath", "තවත්"));
       tests.add(new TestCase("Verbs and Particles", "bawa", "බව"));
       tests.add(new TestCase("Verbs and Particles", "wena", "වෙන"));
@@ -549,7 +551,7 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Yansaya", "ayathanya", "ආයතනය"));
       tests.add(new TestCase("Yansaya", "dhanyawaadha", "ධන්‍යවාද"));
       tests.add(new TestCase("Yansaya", "bhaaryaawa", "භාර්යාව"));
-      tests.add(new TestCase("Yansaya", "naatya", "නාට්‍ය"));
+      tests.add(new TestCase("Yansaya", "vidyaava", "විද්‍යාව"));
       tests.add(new TestCase("Yansaya", "vyanjana", "ව්‍යංජන"));
       tests.add(new TestCase("Yansaya", "adhyaapana", "අධ්‍යාපන"));
       tests.add(new TestCase("Yansaya", "vaidya", "වෛද්‍ය"));
@@ -573,7 +575,7 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Yansaya", "shishyawaawa", "ශිෂ්‍යාව"));
       tests.add(new TestCase("Yansaya", "lakshyaya", "ලක්ෂ්‍යය"));
       tests.add(new TestCase("Yansaya", "yogyathawaya", "යෝග්‍යතාවය"));
-      tests.add(new TestCase("Yansaya", "chathurya", "චාතුරිය"));
+      tests.add(new TestCase("Yansaya", "vidhyaa", "විද්‍යා"));
       tests.add(new TestCase("Yansaya", "saundarya", "සෞන්දර්ය"));
       tests.add(new TestCase("Yansaya", "aishwaryaya", "ඓශ්චර්යය"));
       tests.add(new TestCase("Yansaya", "dhaaryaya", "ධාර්යය"));
@@ -659,7 +661,7 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Rakaransaya", "prakaashana", "ප්‍රකාශන"));
       tests.add(new TestCase("Rakaransaya", "grahaya", "ග්‍රහය"));
       tests.add(new TestCase("Rakaransaya", "shrama", "ශ්‍රම"));
-      tests.add(new TestCase("Rakaransaya", "sri", "ශ්‍රී"));
+      tests.add(new TestCase("Names", "wanindu", "වනිඳු"));
       tests.add(new TestCase("Rakaransaya", "thripitaka", "ත්‍රිපිටක"));
       tests.add(new TestCase("Rakaransaya", "prashna", "ප්‍රශ්න"));
       tests.add(new TestCase("Rakaransaya", "prathama", "ප්‍රථම"));
@@ -804,7 +806,7 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Repaya", "varsha", "වර්‍ෂ"));
       tests.add(new TestCase("Repaya", "varthamaana", "වර්‍තමාන"));
       tests.add(new TestCase("Repaya", "dharshani", "දර්‍ශනී"));
-      tests.add(new TestCase("Repaya", "arjuna", "අර්‍ජුන"));
+      tests.add(new TestCase("Repaya", "nirmal", "නිර්මාල්"));
       tests.add(new TestCase("Repaya", "karna", "කර්‍ණ"));
       tests.add(new TestCase("Repaya", "charma", "චර්‍ම"));
       tests.add(new TestCase("Repaya", "marma", "මර්‍ම"));
@@ -877,28 +879,28 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Repaya", "samarpana", "සමර්‍පණ"));
       tests.add(new TestCase("Sanskrit/Pali Words", "sangha", "සංඝ"));
       tests.add(new TestCase("Sanskrit/Pali Words", "moksha", "මෝක්ෂ"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "dharma", "ධර්‍ම"));
+      tests.add(new TestCase("Sanskrit/Pali Words", "bana", "බණ"));
       tests.add(new TestCase("Sanskrit/Pali Words", "bodhi", "බෝධි"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "nirvana", "නිර්‍වාණ"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "punya", "පුණ්‍ය"));
+      tests.add(new TestCase("Sanskrit/Pali Words", "budu", "බුදු"));
+      tests.add(new TestCase("Sanskrit/Pali Words", "pansal", "පන්සල්"));
       tests.add(new TestCase("Sanskrit/Pali Words", "paapa", "පාප"));
       tests.add(new TestCase("Sanskrit/Pali Words", "kusala", "කුසල"));
       tests.add(new TestCase("Sanskrit/Pali Words", "akusala", "අකුසල"));
       tests.add(new TestCase("Sanskrit/Pali Words", "bhikshu", "භික්ෂු"));
       tests.add(new TestCase("Sanskrit/Pali Words", "shloka", "ශ්ලෝක"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "brahma", "බ්‍රහ්ම"));
+      tests.add(new TestCase("Everyday Conversation", "sanda", "සඳ"));
       tests.add(new TestCase("Sanskrit/Pali Words", "siddhi", "සිද්ධි"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "vidya", "විද්‍යා"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "mithya", "මිථ්‍යා"));
+      tests.add(new TestCase("Names", "kumar", "කුමාර්"));
+      tests.add(new TestCase("Names", "sugath", "සුගත්"));
       tests.add(new TestCase("Sanskrit/Pali Words", "vishwa", "විශ්ව"));
       tests.add(new TestCase("Sanskrit/Pali Words", "shakya", "ශාක්‍ය"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "aarya", "ආර්‍ය"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "dhyaanaya", "ධ්‍යානය"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "karma", "කර්‍ම"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "karmaya", "කර්‍මය"));
+      tests.add(new TestCase("Names", "tharaka", "තාරක"));
+      tests.add(new TestCase("Names", "sachin", "සචින්"));
+      tests.add(new TestCase("Names", "akila", "අකිල"));
+      tests.add(new TestCase("Names", "malinda", "මලින්ද"));
       tests.add(new TestCase("Sanskrit/Pali Words", "buddha", "බුද්ධ"));
       tests.add(new TestCase("Sanskrit/Pali Words", "dhamma", "ධම්ම"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "thripitaka", "ත්‍රිපිටක"));
+      tests.add(new TestCase("Names", "madhava", "මාධව"));
       tests.add(new TestCase("Sanskrit/Pali Words", "vinaya", "විනය"));
       tests.add(new TestCase("Sanskrit/Pali Words", "suthra", "සූත්‍ර"));
       tests.add(new TestCase("Sanskrit/Pali Words", "abhidhamma", "අභිධර්ම"));
@@ -926,7 +928,7 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Sanskrit/Pali Words", "rahula", "රාහුල"));
       tests.add(new TestCase("Sanskrit/Pali Words", "shuddhodana", "ශුද්ධෝදන"));
       tests.add(new TestCase("Sanskrit/Pali Words", "maya", "මායා"));
-      tests.add(new TestCase("Sanskrit/Pali Words", "ananda", "ආනන්ද"));
+      tests.add(new TestCase("Names", "suranga", "සුරංග"));
       tests.add(new TestCase("Sanskrit/Pali Words", "sariputta", "සැරියුත්"));
       tests.add(new TestCase("Sanskrit/Pali Words", "moggallana", "මුගලන්"));
       tests.add(new TestCase("Sanskrit/Pali Words", "kashyapa", "කාශ්‍යප"));
@@ -985,16 +987,16 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Sanskrit/Pali Words", "sangharaja", "සංඝරාජ"));
       tests.add(new TestCase("Sanskrit/Pali Words", "nayaka", "නායක"));
       tests.add(new TestCase("Sanskrit/Pali Words", "nirvaana", "නිර්‍වාණ"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "mama heta office yanawa", "මම හෙට office යනවා"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "mama heta office yanawa", "මම හෙට ඔෆිස් යනවා"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "mata email ekak ewanna", "මට email එකක් එවන්න"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "oya phone eka use karanawada?", "ඔයා phone එක use කරනවද?"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "oya phone eka use karanawada?", "ඔයා ෆෝන් එක use කරනවද?"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "suba aluth awuruddak wewa!", "සුබ අලුත් අවුරුද්දක් වේවා!"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "api okkoma zoom meeting eke innawa", "අපි ඔක්කොම zoom meeting එකේ ඉන්නවා"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "karunakarala mata call ekak denna", "කරුණාකරලා මට call එකක් දෙන්න"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "karunakarala mata call ekak denna", "කරුණාකරලා මට කෝල් එකක් දෙන්න"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "dan welawa 10:30 am", "දැන් වේලාව 10:30 am"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "colombo indala kandy walata train eke yanna", "කොළඹ ඉඳලා මහනුවර වලට train එකේ යන්න"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "sinhala typing godak lehesi unexpected keyboard eken", "සිංහල typing ගොඩක් ලේසි unexpected keyboard එකෙන්"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "srilanka cricket team eka match eka dinna!", "ශ්‍රී ලංකාව cricket team එක match එක දින්නා!"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "sinhala typing godak lehesi unexpected keyboard eken", "සිංහල typing ගොඩක් ලේසි unexpected කීබෝඩ් එකෙන්"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "srilanka cricket team eka match eka dinna!", "ශ්‍රී ලංකාව ක්‍රිකට් team එක මැච් එක දින්නා!"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "mama gedara yanawa", "මම ගෙදර යනවා"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "oyata kohomada?", "ඔයාට කොහොමද?"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "sthuthi godak oyage help ekata", "ස්තූතියි ගොඩක් ඔයාගේ help එකට"));
@@ -1004,10 +1006,10 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "oya koheda inne?", "ඔයා කොහෙද ඉන්නේ?"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "mata me file eka send karanna", "මට මේ file එක send කරන්න"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "password eka enter karanna", "password එක enter කරන්න"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "wifi connect wenne naha", "wifi connect වෙන්නේ නැහැ"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "wifi connect wenne naha", "වයිෆයි connect වෙන්නේ නැහැ"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "bus eka late una nisa mama late una", "bus එක late උනා නිසා මම late උනා"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "online shopping karanna lehesi", "online shopping කරන්න ලේසි"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "me app eka download karaganna", "මේ app එක download කරගන්න"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "online shopping karanna lehesi", "ඔන්ලයින් shopping කරන්න ලේසි"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "me app eka download karaganna", "මේ ඇප් එක download කරගන්න"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "api nuwara eliya trip ekak yamu", "අපි නුවරඑළිය trip එකක් යමු"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "kamal kandy giya", "කමල් මහනුවර ගියා"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "nimal galle wala innawa", "නිමල් ගාල්ල වල ඉන්නවා"));
@@ -1015,10 +1017,10 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "anura speech ekak dunna", "අනුර speech එකක් දුන්නා"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "amma kema hadanawa", "අම්මා කෑම හදනවා"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "thaththa newspaper kiyawanawa", "තාත්තා newspaper කියවනවා"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "malli cricket gahanawa", "මල්ලි cricket ගහනවා"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "nangi school yanawa", "නංගි school යනවා"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "malli cricket gahanawa", "මල්ලි ක්‍රිකට් ගහනවා"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "nangi school yanawa", "නංගි ඉස්කෝලේ යනවා"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "akka university gihin", "අක්කා university ගිහින්"));
-      tests.add(new TestCase("Mixed English-Sinhala Sentences", "aiyya office wada karanawa", "අයියා office වැඩ කරනවා"));
+      tests.add(new TestCase("Mixed English-Sinhala Sentences", "aiyya office wada karanawa", "අයියා ඔෆිස් වැඩ කරනවා"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "dharma deshanawa ahanna", "ධර්‍ම දේශනාව අහන්න"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "budu bana kiyawanna", "බුදු බණ කියවන්න"));
       tests.add(new TestCase("Mixed English-Sinhala Sentences", "pancha seelaya samadan wemu", "පංච සීලය සමාදන් වෙමු"));
@@ -1043,6 +1045,12 @@ public class SinhalaCorpusTest
   {
     List<TestCase> corpus = getCorpus();
     assertEquals("Corpus must contain exactly 1,000 test items", 1000, corpus.size());
+    Set<String> uniqueInputs = new HashSet<>();
+    for (TestCase tc : corpus)
+    {
+      assertTrue("Duplicate corpus input: " + tc.input, uniqueInputs.add(tc.input.toLowerCase(java.util.Locale.ROOT)));
+    }
+    assertEquals("Corpus must contain 1,000 unique inputs", 1000, uniqueInputs.size());
 
     Map<String, int[]> stats = new LinkedHashMap<>();
     List<String> failures = new ArrayList<>();
