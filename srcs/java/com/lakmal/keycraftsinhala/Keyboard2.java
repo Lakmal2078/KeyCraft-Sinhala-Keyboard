@@ -321,8 +321,7 @@ public class Keyboard2 extends InputMethodService
       _keyboard_window_container.setLayoutParams(flp);
     }
 
-    if (VERSION.SDK_INT >= 21)
-      _keyboard_window_container.setElevation(floating ? 10f * dm.density : 0f);
+    _keyboard_window_container.setElevation(floating ? 10f * dm.density : 0f);
 
     if (floating)
     {

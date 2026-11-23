@@ -55,7 +55,7 @@ public final class Dictionaries
     }
     catch (Throwable t)
     {
-      android.util.Log.e(Logs.TAG, "Dictionaries: failed to load " + name, t);
+      Logs.exn("Dictionaries: failed to load " + name, t);
     }
   }
 
@@ -83,7 +83,7 @@ public final class Dictionaries
     }
     catch (Throwable t)
     {
-      android.util.Log.e(Logs.TAG, "Dictionaries: load failed for " + dict_name, t);
+      Logs.exn("Dictionaries: load failed for " + dict_name, t);
       return null;
     }
   }

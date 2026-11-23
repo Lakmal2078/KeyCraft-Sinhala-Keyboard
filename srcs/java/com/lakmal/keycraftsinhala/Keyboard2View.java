@@ -644,163 +644,195 @@ public class Keyboard2View extends View
 
   static String accessibilityLabelForKey(KeyboardData.Key key)
   {
-    return accessibilityLabelForKey(key, null);
+    return accessibilityLabelForKey(null, key, null);
   }
 
   static String accessibilityLabelForKey(KeyboardData.Key key, Pointers.Modifiers mods)
   {
+    return accessibilityLabelForKey(null, key, mods);
+  }
+
+  static String accessibilityLabelForKey(Context ctx, KeyboardData.Key key, Pointers.Modifiers mods)
+  {
     if (key == null)
-      return "Keyboard key";
-    KeyValue value = key.keys[0];
+      return a11yString(ctx, R.string.a11y_key_keyboard_key, "Keyboard key");
+    KeyValue value = firstKeyValue(key);
     if (value == null)
-    {
-      for (int i = 1; i < key.keys.length; i++)
-      {
-        if (key.keys[i] != null)
-        {
-          value = key.keys[i];
-          break;
-        }
-      }
-    }
-    if (value == null)
-      return "Empty key";
+      return a11yString(ctx, R.string.a11y_key_empty, "Empty key");
     if (mods != null)
     {
       KeyValue modified = KeyModifier.modify(value, mods);
       if (modified != null)
         value = modified;
     }
-    return accessibilityLabelForKeyValue(value);
+    return accessibilityLabelForKeyValue(ctx, value);
+  }
+
+  private static KeyValue firstKeyValue(KeyboardData.Key key)
+  {
+    if (key == null || key.keys == null)
+      return null;
+    for (int i = 0; i < key.keys.length; i++)
+    {
+      if (key.keys[i] != null)
+        return key.keys[i];
+    }
+    return null;
+  }
+
+  static boolean hasAccessibleKeyValue(KeyboardData.Key key)
+  {
+    return firstKeyValue(key) != null;
   }
 
   static String accessibilityLabelForKeyValue(KeyValue value)
   {
+    return accessibilityLabelForKeyValue(null, value);
+  }
+
+  static String accessibilityLabelForKeyValue(Context ctx, KeyValue value)
+  {
     if (value == null)
-      return "Empty key";
+      return a11yString(ctx, R.string.a11y_key_empty, "Empty key");
     switch (value.getKind())
     {
       case Editing:
         switch (value.getEditing())
         {
-          case BACKSPACE: return "Backspace";
-          case FORWARD_DELETE_WORD: return "Forward delete word";
-          case DELETE_WORD: return "Delete word";
-          case SPACE_BAR: return "Space";
-          case COPY: return "Copy";
-          case CUT: return "Cut";
-          case PASTE: return "Paste";
-          case PASTE_PLAIN: return "Paste as plain text";
-          case SELECT_ALL: return "Select all";
-          case UNDO: return "Undo";
-          case REDO: return "Redo";
-          default: return humanize(value.getEditing().name());
+          case BACKSPACE: return a11yString(ctx, R.string.a11y_key_backspace, "Backspace");
+          case FORWARD_DELETE_WORD: return a11yString(ctx, R.string.a11y_key_forward_delete_word, "Forward delete word");
+          case DELETE_WORD: return a11yString(ctx, R.string.a11y_key_delete_word, "Delete word");
+          case SPACE_BAR: return a11yString(ctx, R.string.a11y_key_space, "Space");
+          case COPY: return a11yString(ctx, R.string.a11y_key_copy, "Copy");
+          case CUT: return a11yString(ctx, R.string.a11y_key_cut, "Cut");
+          case PASTE: return a11yString(ctx, R.string.a11y_key_paste, "Paste");
+          case PASTE_PLAIN: return a11yString(ctx, R.string.a11y_key_paste_plain, "Paste as plain text");
+          case SELECT_ALL: return a11yString(ctx, R.string.a11y_key_select_all, "Select all");
+          case UNDO: return a11yString(ctx, R.string.a11y_key_undo, "Undo");
+          case REDO: return a11yString(ctx, R.string.a11y_key_redo, "Redo");
+          default: return humanize(ctx, value.getEditing().name());
         }
       case Modifier:
         switch (value.getModifier())
         {
-          case SHIFT: return "Shift";
-          case CTRL: return "Control";
-          case ALT: return "Alt";
-          case META: return "Meta";
-          case FN: return "Function";
-          default: return humanize(value.getModifier().name());
+          case SHIFT: return a11yString(ctx, R.string.a11y_key_shift, "Shift");
+          case CTRL: return a11yString(ctx, R.string.a11y_key_ctrl, "Control");
+          case ALT: return a11yString(ctx, R.string.a11y_key_alt, "Alt");
+          case META: return a11yString(ctx, R.string.a11y_key_meta, "Meta");
+          case FN: return a11yString(ctx, R.string.a11y_key_fn, "Function");
+          default: return humanize(ctx, value.getModifier().name());
         }
       case Event:
         switch (value.getEvent())
         {
-          case CONFIG: return "Settings";
-          case ACTION: return value.getString().isEmpty() ? "Action" : value.getString();
-          case HIDE_SELF: return "Hide keyboard";
+          case CONFIG: return a11yString(ctx, R.string.a11y_key_settings, "Settings");
+          case ACTION: return value.getString().isEmpty()
+              ? a11yString(ctx, R.string.a11y_key_action, "Action") : value.getString();
+          case HIDE_SELF: return a11yString(ctx, R.string.a11y_key_hide_keyboard, "Hide keyboard");
           case CHANGE_METHOD_PICKER:
           case CHANGE_METHOD_PREV:
           case CHANGE_METHOD_NEXT:
-            return "Change keyboard";
+            return a11yString(ctx, R.string.a11y_key_change_keyboard, "Change keyboard");
           case SWITCH_TEXT:
           case SWITCH_BACK_EMOJI:
-            return "Switch to text layout";
+            return a11yString(ctx, R.string.a11y_key_switch_text, "Switch to text layout");
           case SWITCH_BACK_CLIPBOARD:
-            return "Switch back clipboard";
-          case SWITCH_NUMERIC: return "Switch to numeric layout";
-          case SWITCH_EMOJI: return "Open emoji keyboard";
-          case SWITCH_CLIPBOARD: return "Open clipboard history";
-          case SWITCH_FORWARD: return "Next layout";
-          case SWITCH_BACKWARD: return "Previous layout";
-          case SWITCH_GREEKMATH: return "Greek and math symbols";
-          case CAPS_LOCK: return "Caps lock";
+            return a11yString(ctx, R.string.a11y_key_switch_back_clipboard, "Switch back clipboard");
+          case SWITCH_NUMERIC: return a11yString(ctx, R.string.a11y_key_switch_numeric, "Switch to numeric layout");
+          case SWITCH_EMOJI: return a11yString(ctx, R.string.a11y_key_open_emoji, "Open emoji keyboard");
+          case SWITCH_CLIPBOARD: return a11yString(ctx, R.string.a11y_key_open_clipboard, "Open clipboard history");
+          case SWITCH_FORWARD: return a11yString(ctx, R.string.a11y_key_next_layout, "Next layout");
+          case SWITCH_BACKWARD: return a11yString(ctx, R.string.a11y_key_previous_layout, "Previous layout");
+          case SWITCH_GREEKMATH: return a11yString(ctx, R.string.a11y_key_greek_math, "Greek and math symbols");
+          case CAPS_LOCK: return a11yString(ctx, R.string.a11y_key_caps_lock, "Caps lock");
           case SWITCH_VOICE_TYPING:
-            return "Voice typing";
+            return a11yString(ctx, R.string.a11y_key_voice_typing, "Voice typing");
           case SWITCH_VOICE_TYPING_CHOOSER:
-            return "Switch voice typing chooser";
-          case CHANGE_DICTIONARY: return "Change language dictionary";
-          default: return humanize(value.getEvent().name());
+            return a11yString(ctx, R.string.a11y_key_voice_typing_chooser, "Switch voice typing chooser");
+          case CHANGE_DICTIONARY: return a11yString(ctx, R.string.a11y_key_change_dictionary, "Change language dictionary");
+          default: return humanize(ctx, value.getEvent().name());
         }
       case Keyevent:
         switch (value.getKeyevent())
         {
-          case KeyEvent.KEYCODE_ENTER: return "Enter";
-          case KeyEvent.KEYCODE_DPAD_UP: return "Arrow up";
-          case KeyEvent.KEYCODE_DPAD_DOWN: return "Arrow down";
-          case KeyEvent.KEYCODE_DPAD_LEFT: return "Arrow left";
-          case KeyEvent.KEYCODE_DPAD_RIGHT: return "Arrow right";
-          case KeyEvent.KEYCODE_PAGE_UP: return "Page up";
-          case KeyEvent.KEYCODE_PAGE_DOWN: return "Page down";
-          case KeyEvent.KEYCODE_MOVE_HOME: return "Home";
-          case KeyEvent.KEYCODE_MOVE_END: return "End";
-          case KeyEvent.KEYCODE_FORWARD_DEL: return "Forward delete";
-          case KeyEvent.KEYCODE_TAB: return "Tab";
-          case KeyEvent.KEYCODE_ESCAPE: return "Escape";
-          case KeyEvent.KEYCODE_INSERT: return "Insert";
+          case KeyEvent.KEYCODE_ENTER: return a11yString(ctx, R.string.a11y_key_enter, "Enter");
+          case KeyEvent.KEYCODE_DPAD_UP: return a11yString(ctx, R.string.a11y_key_arrow_up, "Arrow up");
+          case KeyEvent.KEYCODE_DPAD_DOWN: return a11yString(ctx, R.string.a11y_key_arrow_down, "Arrow down");
+          case KeyEvent.KEYCODE_DPAD_LEFT: return a11yString(ctx, R.string.a11y_key_arrow_left, "Arrow left");
+          case KeyEvent.KEYCODE_DPAD_RIGHT: return a11yString(ctx, R.string.a11y_key_arrow_right, "Arrow right");
+          case KeyEvent.KEYCODE_PAGE_UP: return a11yString(ctx, R.string.a11y_key_page_up, "Page up");
+          case KeyEvent.KEYCODE_PAGE_DOWN: return a11yString(ctx, R.string.a11y_key_page_down, "Page down");
+          case KeyEvent.KEYCODE_MOVE_HOME: return a11yString(ctx, R.string.a11y_key_home, "Home");
+          case KeyEvent.KEYCODE_MOVE_END: return a11yString(ctx, R.string.a11y_key_end, "End");
+          case KeyEvent.KEYCODE_FORWARD_DEL: return a11yString(ctx, R.string.a11y_key_forward_delete, "Forward delete");
+          case KeyEvent.KEYCODE_TAB: return a11yString(ctx, R.string.a11y_key_tab, "Tab");
+          case KeyEvent.KEYCODE_ESCAPE: return a11yString(ctx, R.string.a11y_key_escape, "Escape");
+          case KeyEvent.KEYCODE_INSERT: return a11yString(ctx, R.string.a11y_key_insert, "Insert");
           default:
             String evLabel = value.getString();
             if (evLabel != null && !evLabel.isEmpty() && !value.hasFlagsAny(KeyValue.FLAG_KEY_FONT))
               return evLabel;
-            return humanize(KeyEvent.keyCodeToString(value.getKeyevent()).replace("KEYCODE_", ""));
+            return humanize(ctx, KeyEvent.keyCodeToString(value.getKeyevent()).replace("KEYCODE_", ""));
         }
       case Slider:
         switch (value.getSlider())
         {
-          case Cursor_left: return "Move cursor left";
-          case Cursor_right: return "Move cursor right";
-          case Cursor_up: return "Move cursor up";
-          case Cursor_down: return "Move cursor down";
-          case Selection_cursor_left: return "Expand selection left";
-          case Selection_cursor_right: return "Expand selection right";
-          default: return humanize(value.getSlider().name());
+          case Cursor_left: return a11yString(ctx, R.string.a11y_key_cursor_left, "Move cursor left");
+          case Cursor_right: return a11yString(ctx, R.string.a11y_key_cursor_right, "Move cursor right");
+          case Cursor_up: return a11yString(ctx, R.string.a11y_key_cursor_up, "Move cursor up");
+          case Cursor_down: return a11yString(ctx, R.string.a11y_key_cursor_down, "Move cursor down");
+          case Selection_cursor_left: return a11yString(ctx, R.string.a11y_key_selection_left, "Expand selection left");
+          case Selection_cursor_right: return a11yString(ctx, R.string.a11y_key_selection_right, "Expand selection right");
+          default: return humanize(ctx, value.getSlider().name());
         }
       case Compose_pending:
-        return "Compose pending";
+        return a11yString(ctx, R.string.a11y_key_compose_pending, "Compose pending");
       case Placeholder:
         switch (value.getPlaceholder())
         {
-          case COMPOSE_CANCEL: return "Cancel compose";
-          case REMOVED: return "Placeholder";
-          default: return humanize(value.getPlaceholder().name());
+          case COMPOSE_CANCEL: return a11yString(ctx, R.string.a11y_key_cancel_compose, "Cancel compose");
+          case REMOVED: return a11yString(ctx, R.string.a11y_key_placeholder, "Placeholder");
+          default: return humanize(ctx, value.getPlaceholder().name());
         }
       case Char:
         switch (value.getChar())
         {
-          case '\t': return "Tab";
-          case '\n': return "New line";
-          case '\u00A0': return "Non-breaking space";
-          case '\u202F': return "Narrow non-breaking space";
-          case '\u200D': return "Zero width joiner";
-          case '\u200C': return "Zero width non-joiner";
+          case '\t': return a11yString(ctx, R.string.a11y_key_tab, "Tab");
+          case '\n': return a11yString(ctx, R.string.a11y_key_new_line, "New line");
+          case '\u00A0': return a11yString(ctx, R.string.a11y_key_nbsp, "Non-breaking space");
+          case '\u202F': return a11yString(ctx, R.string.a11y_key_nnbsp, "Narrow non-breaking space");
+          case '\u200D': return a11yString(ctx, R.string.a11y_key_zwj, "Zero width joiner");
+          case '\u200C': return a11yString(ctx, R.string.a11y_key_zwnj, "Zero width non-joiner");
           default: break;
         }
         // fall through
       default:
         String label = value.getString();
         return (label == null || label.length() == 0)
-            ? humanize(value.getKind().name()) : label;
+            ? humanize(ctx, value.getKind().name()) : label;
     }
   }
 
-  private static String humanize(String value)
+  private static String a11yString(Context ctx, int resId, String fallback)
+  {
+    if (ctx == null)
+      return fallback;
+    try
+    {
+      String localized = ctx.getString(resId);
+      return (localized != null && !localized.isEmpty()) ? localized : fallback;
+    }
+    catch (Exception ignored)
+    {
+      return fallback;
+    }
+  }
+
+  private static String humanize(Context ctx, String value)
   {
     String lower = value.replace('_', ' ').toLowerCase(java.util.Locale.ROOT);
     if (lower.length() == 0)
-      return "Keyboard key";
+      return a11yString(ctx, R.string.a11y_key_keyboard_key, "Keyboard key");
     return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
   }
 
@@ -930,8 +962,7 @@ public class Keyboard2View extends View
     bg.setCornerRadius(Math.max(10f * dm.density, _tc.key.border_radius * 1.2f));
     bg.setStroke(Math.max(1, (int) (1.5f * dm.density)), borderColor);
     _previewText.setBackground(bg);
-    if (VERSION.SDK_INT >= 21)
-      _previewText.setElevation(6f * dm.density);
+    _previewText.setElevation(6f * dm.density);
     _previewText.setTextColor(fgColor);
     _previewText.setTextSize(TypedValue.COMPLEX_UNIT_PX, Math.max(_mainLabelSize * 1.35f, 22f * dm.density));
     _previewText.setTypeface(preview.value.hasFlagsAny(KeyValue.FLAG_KEY_FONT)
@@ -1187,13 +1218,14 @@ public class Keyboard2View extends View
         AccessibilityNodeInfoCompat node)
     {
       KeyboardData.Key key = _host.accessibilityKeyAt(virtualViewId);
+      Context ctx = _host.getContext();
       _host.accessibilityBounds(virtualViewId, _bounds);
       node.setBoundsInParent(_bounds);
       node.setClassName("android.widget.Button");
-      String primaryLabel = Keyboard2View.accessibilityLabelForKey(key, _host._mods);
+      String primaryLabel = Keyboard2View.accessibilityLabelForKey(ctx, key, _host._mods);
       node.setText(primaryLabel);
       node.setContentDescription(primaryLabel);
-      boolean enabled = key != null && !"Empty key".equals(primaryLabel);
+      boolean enabled = Keyboard2View.hasAccessibleKeyValue(key);
       node.setClickable(enabled);
       node.setFocusable(enabled);
       node.setEnabled(enabled);
@@ -1203,9 +1235,11 @@ public class Keyboard2View extends View
         if (supportsAccessibilityLongClick(key))
         {
           node.setLongClickable(true);
-          node.addAction(AccessibilityNodeInfoCompat.ACTION_LONG_CLICK);
+          String longPressLabel = Keyboard2View.a11yString(
+              ctx, R.string.a11y_long_press_action, "Alternative character");
+          node.addAction(new AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+              AccessibilityNodeInfoCompat.ACTION_LONG_CLICK, longPressLabel));
         }
-        Context ctx = _host.getContext();
         for (int sub = 1; sub <= 8; sub++)
         {
           if (key.keys[sub] != null)
@@ -1213,7 +1247,7 @@ public class Keyboard2View extends View
             KeyValue subVal = _host.modifyKey(key.keys[sub], _host._mods);
             if (subVal == null)
               subVal = key.keys[sub];
-            String subLabel = Keyboard2View.accessibilityLabelForKeyValue(subVal);
+            String subLabel = Keyboard2View.accessibilityLabelForKeyValue(ctx, subVal);
             String dirLabel = getDirectionLabel(ctx, sub);
             String actionLabel = ctx.getString(R.string.a11y_swipe_action_fmt, dirLabel, subLabel);
             node.addAction(new AccessibilityNodeInfoCompat.AccessibilityActionCompat(

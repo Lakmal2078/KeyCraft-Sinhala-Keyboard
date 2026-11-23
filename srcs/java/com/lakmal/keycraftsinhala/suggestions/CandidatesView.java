@@ -67,13 +67,56 @@ public class CandidatesView extends LinearLayout
       if (_items[i] != null)
       {
         v.setText(_items[i]);
+        v.setContentDescription(accessibleDescriptionForItem(
+            getContext(), i, _items[i], s.clipboard_full_text));
         v.setVisibility(View.VISIBLE);
       }
       else
       {
+        v.setContentDescription(null);
         v.setVisibility(View.GONE);
       }
     }
+  }
+
+  public static String accessibleDescriptionForItem(Context ctx, int itemIndex,
+      String itemText, String clipboardFullText)
+  {
+    if (itemText == null || itemText.isEmpty())
+      return null;
+    if (itemIndex == 3)
+    {
+      if (ctx != null)
+      {
+        try
+        {
+          String formatted = ctx.getString(R.string.a11y_candidate_emoji_fmt, itemText);
+          if (formatted != null && !formatted.isEmpty())
+            return formatted;
+        }
+        catch (Exception ignored) {}
+      }
+      return "Emoji suggestion: " + itemText;
+    }
+    if (itemIndex == 0 && clipboardFullText != null && itemText.startsWith("📋"))
+    {
+      String preview = itemText.substring(itemText.indexOf(' ') >= 0
+          ? itemText.indexOf(' ') + 1 : 0).trim();
+      if (preview.isEmpty())
+        preview = itemText;
+      if (ctx != null)
+      {
+        try
+        {
+          String formatted = ctx.getString(R.string.a11y_candidate_clipboard_fmt, preview);
+          if (formatted != null && !formatted.isEmpty())
+            return formatted;
+        }
+        catch (Exception ignored) {}
+      }
+      return "Paste from clipboard: " + preview;
+    }
+    return null;
   }
 
   void clear_candidates()
@@ -81,6 +124,7 @@ public class CandidatesView extends LinearLayout
     for (int i = 0; i < _item_views.length; i++)
     {
       _items[i] = null;
+      _item_views[i].setContentDescription(null);
       _item_views[i].setVisibility(View.GONE);
     }
   }

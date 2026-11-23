@@ -356,7 +356,7 @@ final class StickerGifHelper
     b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f);
     b.setTextColor(textColor);
     b.setBackgroundResource(R.drawable.bg_toolbar_button);
-    b.setMinHeight(Math.round(36 * density));
+    b.setMinHeight(Math.round(48 * density));
     b.setMinWidth(Math.round(48 * density));
     int hPad = Math.round(10 * density);
     b.setPadding(hPad, 0, hPad, 0);
@@ -366,7 +366,7 @@ final class StickerGifHelper
   private static LinearLayout.LayoutParams chipLayoutParams(float density)
   {
     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-        ViewGroup.LayoutParams.WRAP_CONTENT, Math.round(36 * density));
+        ViewGroup.LayoutParams.WRAP_CONTENT, Math.round(48 * density));
     lp.setMargins(Math.round(2 * density), 0, Math.round(2 * density), 0);
     return lp;
   }

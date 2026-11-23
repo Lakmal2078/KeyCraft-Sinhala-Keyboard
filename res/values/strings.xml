@@ -426,9 +426,75 @@
   <string name="a11y_swipe_dir_s">down</string>
   <string name="a11y_swipe_dir_se">down-right</string>
   <string name="a11y_long_press_action">Alternative character</string>
+  <string name="a11y_key_keyboard_key">Keyboard key</string>
+  <string name="a11y_key_empty">Empty key</string>
+  <string name="a11y_key_backspace">Backspace</string>
+  <string name="a11y_key_forward_delete_word">Forward delete word</string>
+  <string name="a11y_key_delete_word">Delete word</string>
+  <string name="a11y_key_space">Space</string>
+  <string name="a11y_key_copy">Copy</string>
+  <string name="a11y_key_cut">Cut</string>
+  <string name="a11y_key_paste">Paste</string>
+  <string name="a11y_key_paste_plain">Paste as plain text</string>
+  <string name="a11y_key_select_all">Select all</string>
+  <string name="a11y_key_undo">Undo</string>
+  <string name="a11y_key_redo">Redo</string>
+  <string name="a11y_key_shift">Shift</string>
+  <string name="a11y_key_ctrl">Control</string>
+  <string name="a11y_key_alt">Alt</string>
+  <string name="a11y_key_meta">Meta</string>
+  <string name="a11y_key_fn">Function</string>
+  <string name="a11y_key_settings">Settings</string>
+  <string name="a11y_key_action">Action</string>
+  <string name="a11y_key_hide_keyboard">Hide keyboard</string>
+  <string name="a11y_key_change_keyboard">Change keyboard</string>
+  <string name="a11y_key_switch_text">Switch to text layout</string>
+  <string name="a11y_key_switch_back_clipboard">Switch back clipboard</string>
+  <string name="a11y_key_switch_numeric">Switch to numeric layout</string>
+  <string name="a11y_key_open_emoji">Open emoji keyboard</string>
+  <string name="a11y_key_open_clipboard">Open clipboard history</string>
+  <string name="a11y_key_next_layout">Next layout</string>
+  <string name="a11y_key_previous_layout">Previous layout</string>
+  <string name="a11y_key_greek_math">Greek and math symbols</string>
+  <string name="a11y_key_caps_lock">Caps lock</string>
+  <string name="a11y_key_voice_typing">Voice typing</string>
+  <string name="a11y_key_voice_typing_chooser">Switch voice typing chooser</string>
+  <string name="a11y_key_change_dictionary">Change language dictionary</string>
+  <string name="a11y_key_enter">Enter</string>
+  <string name="a11y_key_arrow_up">Arrow up</string>
+  <string name="a11y_key_arrow_down">Arrow down</string>
+  <string name="a11y_key_arrow_left">Arrow left</string>
+  <string name="a11y_key_arrow_right">Arrow right</string>
+  <string name="a11y_key_page_up">Page up</string>
+  <string name="a11y_key_page_down">Page down</string>
+  <string name="a11y_key_home">Home</string>
+  <string name="a11y_key_end">End</string>
+  <string name="a11y_key_forward_delete">Forward delete</string>
+  <string name="a11y_key_tab">Tab</string>
+  <string name="a11y_key_escape">Escape</string>
+  <string name="a11y_key_insert">Insert</string>
+  <string name="a11y_key_cursor_left">Move cursor left</string>
+  <string name="a11y_key_cursor_right">Move cursor right</string>
+  <string name="a11y_key_cursor_up">Move cursor up</string>
+  <string name="a11y_key_cursor_down">Move cursor down</string>
+  <string name="a11y_key_selection_left">Expand selection left</string>
+  <string name="a11y_key_selection_right">Expand selection right</string>
+  <string name="a11y_key_compose_pending">Compose pending</string>
+  <string name="a11y_key_cancel_compose">Cancel compose</string>
+  <string name="a11y_key_placeholder">Placeholder</string>
+  <string name="a11y_key_new_line">New line</string>
+  <string name="a11y_key_nbsp">Non-breaking space</string>
+  <string name="a11y_key_nnbsp">Narrow non-breaking space</string>
+  <string name="a11y_key_zwj">Zero width joiner</string>
+  <string name="a11y_key_zwnj">Zero width non-joiner</string>
+  <string name="a11y_candidate_emoji_fmt">Emoji suggestion: %1$s</string>
+  <string name="a11y_candidate_clipboard_fmt">Paste from clipboard: %1$s</string>
   <string name="translate_confirm_title">Open Google Translate?</string>
   <string name="translate_confirm_message">Your selected text will be sent to Google Translate in your browser.</string>
   <string name="translate_confirm_action">Continue</string>
+  <string name="text_edit_arrow_left_symbol" translatable="false">◀</string>
+  <string name="text_edit_arrow_right_symbol" translatable="false">▶</string>
+  <string name="text_edit_backspace_symbol" translatable="false">⌫</string>
 </resources>
 
 

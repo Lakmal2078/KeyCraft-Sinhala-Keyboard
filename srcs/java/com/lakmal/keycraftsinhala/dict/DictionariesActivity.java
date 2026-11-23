@@ -15,6 +15,8 @@ public class DictionariesActivity extends Activity
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.dictionaries_activity);
+    com.lakmal.keycraftsinhala.Utils.applySafeSystemBarInsets(
+        findViewById(R.id.dictionaries_scroll_view), true, true);
 
     EditText searchInput = findViewById(R.id.dictionaries_search_input);
     DictionaryListView deviceList = findViewById(R.id.dictionaries_device_list);

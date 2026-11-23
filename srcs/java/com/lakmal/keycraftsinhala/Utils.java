@@ -1,15 +1,15 @@
 package com.lakmal.keycraftsinhala;
 
 import android.app.AlertDialog;
-import android.content.res.Resources;
-import android.graphics.Insets;
 import android.inputmethodservice.InputMethodService;
-import android.os.Build.VERSION;
 import android.os.IBinder;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowInsets;
 import android.view.WindowManager;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,5 +79,58 @@ public final class Utils
     while ((l = inp.read(buff)) != -1)
       out.write(buff, 0, l);
     return out.toByteArray();
+  }
+
+  /**
+   * Apply WindowInsetsCompat padding for system bars and display cutouts while preserving the
+   * view's initial XML padding across repeated inset dispatches.
+   */
+  public static void applySafeSystemBarInsets(View target, boolean clipToPaddingFalse)
+  {
+    applySafeSystemBarInsets(target, clipToPaddingFalse, false);
+  }
+
+  public static void applySafeSystemBarInsets(
+      View target, boolean clipToPaddingFalse, boolean includeIme)
+  {
+    if (target == null)
+      return;
+    if (clipToPaddingFalse && target instanceof ViewGroup)
+      ((ViewGroup)target).setClipToPadding(false);
+    final int baseLeft = target.getPaddingLeft();
+    final int baseTop = target.getPaddingTop();
+    final int baseRight = target.getPaddingRight();
+    final int baseBottom = target.getPaddingBottom();
+    final int mask = WindowInsetsCompat.Type.systemBars()
+        | WindowInsetsCompat.Type.displayCutout()
+        | (includeIme ? WindowInsetsCompat.Type.ime() : 0);
+    ViewCompat.setOnApplyWindowInsetsListener(target, (v, windowInsets) -> {
+      Insets insets = windowInsets.getInsets(mask);
+      v.setPadding(
+          baseLeft + insets.left,
+          baseTop + insets.top,
+          baseRight + insets.right,
+          baseBottom + insets.bottom);
+      return windowInsets;
+    });
+    if (target.isAttachedToWindow())
+    {
+      ViewCompat.requestApplyInsets(target);
+    }
+    else
+    {
+      target.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener()
+      {
+        @Override
+        public void onViewAttachedToWindow(View v)
+        {
+          v.removeOnAttachStateChangeListener(this);
+          ViewCompat.requestApplyInsets(v);
+        }
+
+        @Override
+        public void onViewDetachedFromWindow(View v) {}
+      });
+    }
   }
 }

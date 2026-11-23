@@ -33,7 +33,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: platform-tools platforms;android-36 build-tools;35.0.0
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -48,6 +48,9 @@ jobs:
 
       - name: Check keyboard theme contrast
         run: python3 check_theme_contrast.py
+
+      - name: Validate keyboard layouts
+        run: python3 check_layout.py
 
       - name: Install build tools (fontforge)
         run: |

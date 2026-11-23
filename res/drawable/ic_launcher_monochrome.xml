@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+  <!-- Outer keyboard frame inside the 66dp adaptive safe zone (x: 24..84, y: 31..77) -->
+  <path
+      android:fillColor="#00000000"
+      android:strokeColor="#FF000000"
+      android:strokeWidth="3.2"
+      android:strokeLineJoin="round"
+      android:pathData="M31,32 L77,32 A6,6 0 0 1 83,38 L83,70 A6,6 0 0 1 77,76 L31,76 A6,6 0 0 1 25,70 L25,38 A6,6 0 0 1 31,32 Z" />
+  <!-- Top key row (with raised center key badge) -->
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M31,41 A2,2 0 0 1 33,39 L37,39 A2,2 0 0 1 39,41 L39,45 A2,2 0 0 1 37,47 L33,47 A2,2 0 0 1 31,45 Z
+                        M41,41 A2,2 0 0 1 43,39 L45,39 A2,2 0 0 1 47,41 L47,45 A2,2 0 0 1 45,47 L43,47 A2,2 0 0 1 41,45 Z
+                        M49,38.5 A3,3 0 0 1 52,35.5 L56,35.5 A3,3 0 0 1 59,38.5 L59,46.5 A3,3 0 0 1 56,49.5 L52,49.5 A3,3 0 0 1 49,46.5 Z
+                        M61,41 A2,2 0 0 1 63,39 L65,39 A2,2 0 0 1 67,41 L67,45 A2,2 0 0 1 65,47 L63,47 A2,2 0 0 1 61,45 Z
+                        M69,41 A2,2 0 0 1 71,39 L75,39 A2,2 0 0 1 77,41 L77,45 A2,2 0 0 1 75,47 L71,47 A2,2 0 0 1 69,45 Z" />
+  <!-- Middle key row -->
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M30,53 A2,2 0 0 1 32,51 L35,51 A2,2 0 0 1 37,53 L37,57 A2,2 0 0 1 35,59 L32,59 A2,2 0 0 1 30,57 Z
+                        M39,53 A2,2 0 0 1 41,51 L44,51 A2,2 0 0 1 46,53 L46,57 A2,2 0 0 1 44,59 L41,59 A2,2 0 0 1 39,57 Z
+                        M48,53 A2,2 0 0 1 50,51 L53,51 A2,2 0 0 1 55,53 L55,57 A2,2 0 0 1 53,59 L50,59 A2,2 0 0 1 48,57 Z
+                        M57,53 A2,2 0 0 1 59,51 L62,51 A2,2 0 0 1 64,53 L64,57 A2,2 0 0 1 62,59 L59,59 A2,2 0 0 1 57,57 Z
+                        M66,53 A2,2 0 0 1 68,51 L71,51 A2,2 0 0 1 73,53 L73,57 A2,2 0 0 1 71,59 L68,59 A2,2 0 0 1 66,57 Z" />
+  <!-- Spacebar -->
+  <path
+      android:fillColor="#FF000000"
+      android:pathData="M38,63 L70,63 A3,3 0 0 1 73,66 L73,67 A3,3 0 0 1 70,70 L38,70 A3,3 0 0 1 35,67 L35,66 A3,3 0 0 1 38,63 Z" />
+</vector>

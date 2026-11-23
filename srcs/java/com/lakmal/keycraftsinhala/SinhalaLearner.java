@@ -110,7 +110,7 @@ public final class SinhalaLearner
         .remove("corr|nathi")
         .remove("corr|galapenawa")
         .putBoolean(migrationKey, true)
-        .commit();
+        .apply();
   }
 
   private void registerInstance()

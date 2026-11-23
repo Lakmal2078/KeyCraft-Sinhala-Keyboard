@@ -256,8 +256,7 @@ public final class ClipboardHistoryView extends NonScrollListView
       {
         if (entry.uri != null)
         {
-          if (android.os.Build.VERSION.SDK_INT >= 21)
-            thumb.setClipToOutline(true);
+          thumb.setClipToOutline(true);
           int px = Math.round(40 * getResources().getDisplayMetrics().density);
           ThumbnailLoader.loadInto(getContext(), thumb, entry.uri, px, R.drawable.ic_toolbar_grid);
           thumb.setVisibility(View.VISIBLE);

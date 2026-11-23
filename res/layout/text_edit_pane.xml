@@ -81,6 +81,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="horizontal"
+      android:baselineAligned="false"
       android:gravity="center_vertical">
 
     <!-- Left column: Undo / Redo / Home -->
@@ -164,7 +165,7 @@
             android:layout_weight="1"
             android:layout_margin="2dp"
             android:background="@drawable/suggestions_item_background"
-            android:text="◀"
+            android:text="@string/text_edit_arrow_left_symbol"
             android:textColor="?attr/colorLabel"
             android:textSize="16sp"
             android:contentDescription="@string/text_edit_cursor_left"/>
@@ -187,7 +188,7 @@
             android:layout_weight="1"
             android:layout_margin="2dp"
             android:background="@drawable/suggestions_item_background"
-            android:text="▶"
+            android:text="@string/text_edit_arrow_right_symbol"
             android:textColor="?attr/colorLabel"
             android:textSize="16sp"
             android:contentDescription="@string/text_edit_cursor_right"/>
@@ -227,7 +228,7 @@
           android:layout_height="52dp"
           android:layout_margin="2dp"
           android:background="@drawable/suggestions_item_background"
-          android:text="⌫"
+          android:text="@string/text_edit_backspace_symbol"
           android:textColor="?attr/colorLabel"
           android:textSize="18sp"
           android:contentDescription="@string/key_descr_backspace"/>

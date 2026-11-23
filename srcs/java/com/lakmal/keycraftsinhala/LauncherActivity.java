@@ -53,6 +53,7 @@ public class LauncherActivity extends Activity implements Handler.Callback
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.launcher_activity);
+    Utils.applySafeSystemBarInsets(findViewById(R.id.launcher_scroll_view), true, true);
     _tryhere_text = (TextView)findViewById(R.id.launcher_tryhere_text);
     _tryhere_area = (EditText)findViewById(R.id.launcher_tryhere_area);
     _enabled_status = (TextView)findViewById(R.id.launcher_enabled_status);

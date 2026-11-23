@@ -29,7 +29,7 @@ word-list source and both upstream license notices are retained in
 - Website: <https://keycraft-sinhala-landing.lakmal-gamage.workers.dev/>
 - Source: <https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard>
 - Issue tracker: <https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues>
-- Prepared app version: `1.2.0` (`versionCode` 4)
+- Prepared app version: `1.3.0` (`versionCode` 5)
 
 ## Review notes
 
@@ -44,9 +44,8 @@ word-list source and both upstream license notices are retained in
   audit; verify it again with the current `fdroiddata` repository before PR.
 - A successful local Gradle build does not guarantee acceptance. Run the
   official `fdroid lint` and `fdroid build` checks and address maintainer review.
-- The `v1.2.0` release is published. The prepared F-Droid build entry below
-  pins the full source commit hash (`419e3d68d29eed6730b18102c1df6e5a5e9b6da4`),
-  rather than using the tag name as the build revision.
+- The `v1.3.0` release is prepared alongside `docs/fdroiddata/com.lakmal.keycraftsinhala.yml`.
+  The F-Droid build entry below pins a full source commit hash rather than a mutable tag or branch name.
 
 ## Metadata template
 
@@ -64,14 +63,14 @@ WebSite: https://keycraft-sinhala-landing.lakmal-gamage.workers.dev/
 SourceCode: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard
 IssueTracker: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/issues
 Changelog: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases
-CurrentVersion: 1.2.0
-CurrentVersionCode: 4
+CurrentVersion: 1.3.0
+CurrentVersionCode: 5
 RepoType: git
 Repo: https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard.git
 Builds:
-  - versionName: 1.2.0
-    versionCode: 4
-    commit: 419e3d68d29eed6730b18102c1df6e5a5e9b6da4
+  - versionName: 1.3.0
+    versionCode: 5
+    commit: 5e2674809add9b554a1ad80cb4e0c3d66fbfcc24
     gradle:
       - yes
 AutoUpdateMode: Version

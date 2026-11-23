@@ -33,6 +33,7 @@ public class EmojiGridView extends GridView
   private static final String[] SKIN_TONE_MODIFIERS = {
     "\uD83C\uDFFB", "\uD83C\uDFFC", "\uD83C\uDFFD", "\uD83C\uDFFE", "\uD83C\uDFFF"
   };
+  private static final Paint SKIN_TONE_PAINT = new Paint();
 
   private List<Emoji> _emojiArray;
   private HashMap<Emoji, Integer> _lastUsed;
@@ -164,9 +165,8 @@ public class EmojiGridView extends GridView
     if (!isSkinToneBase(firstCp))
       return null;
 
-    Paint paint = new Paint();
     String testVariant = applySkinTone(emojiStr, SKIN_TONE_MODIFIERS[2]);
-    if (VERSION.SDK_INT >= 23 && !paint.hasGlyph(testVariant))
+    if (VERSION.SDK_INT >= 23 && !SKIN_TONE_PAINT.hasGlyph(testVariant))
       return null;
 
     List<String> variants = new ArrayList<>(SKIN_TONE_MODIFIERS.length + 1);
@@ -373,6 +373,9 @@ public class EmojiGridView extends GridView
     public EmojiView(Context context)
     {
       super(context);
+      int minTouchPx = Math.round(48 * context.getResources().getDisplayMetrics().density);
+      setMinimumWidth(minTouchPx);
+      setMinimumHeight(minTouchPx);
     }
 
     public void setEmoji(Emoji emoji)

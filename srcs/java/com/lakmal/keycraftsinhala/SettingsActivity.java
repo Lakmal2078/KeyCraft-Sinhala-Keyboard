@@ -1,11 +1,14 @@
 package com.lakmal.keycraftsinhala;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceScreen;
+import android.view.View;
 import android.widget.Toast;
 
 public class SettingsActivity extends PreferenceActivity
@@ -24,6 +27,7 @@ public class SettingsActivity extends PreferenceActivity
     }
     catch (Exception _e) { fallbackEncrypted(); return; }
     addPreferencesFromResource(R.xml.settings);
+    Utils.applySafeSystemBarInsets(findViewById(android.R.id.list), true);
 
     boolean foldableDevice = FoldStateTracker.isFoldableDevice(this);
     String[] foldableKeys = new String[] {
@@ -128,6 +132,25 @@ public class SettingsActivity extends PreferenceActivity
       return false;
     Config.migrate(prefs);
     return true;
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference)
+  {
+    boolean handled = super.onPreferenceTreeClick(preferenceScreen, preference);
+    if (preference instanceof PreferenceScreen)
+    {
+      Dialog dialog = ((PreferenceScreen)preference).getDialog();
+      if (dialog != null && dialog.getWindow() != null)
+      {
+        View list = dialog.findViewById(android.R.id.list);
+        Utils.applySafeSystemBarInsets(
+            list != null ? list : dialog.getWindow().getDecorView(),
+            list != null);
+      }
+    }
+    return handled;
   }
 
   void fallbackEncrypted()

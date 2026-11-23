@@ -41,9 +41,15 @@ public final class Logs
       _debug_logs.println(s);
   }
 
+  public static boolean isDebugEnabled()
+  {
+    return _debug_logs != null;
+  }
+
   public static void exn(String msg, Throwable e)
   {
-    Log.e(TAG, msg, e);
+    if (_debug_logs != null)
+      Log.e(TAG, msg, e);
   }
 
   public static void trace()
