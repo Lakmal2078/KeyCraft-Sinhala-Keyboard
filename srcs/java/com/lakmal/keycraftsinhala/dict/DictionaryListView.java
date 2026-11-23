@@ -51,13 +51,19 @@ public class DictionaryListView extends LinearLayout
     refresh();
   }
 
+  private boolean shouldShowDictionary(String dict_name)
+  {
+    return SupportedDictionaries.hasPinnedSha256(dict_name)
+        || _dictionaries.get_installed().contains(dict_name);
+  }
+
   void inflate_views_device_locales(Context ctx)
   {
     SupportedDictionaries ds = SupportedDictionaries.get(ctx.getResources());
     DeviceLocales locales = DeviceLocales.load(ctx);
     for (DeviceLocales.Loc loc : locales.installed)
     {
-      if (loc.dictionary != null)
+      if (loc.dictionary != null && shouldShowDictionary(loc.dictionary))
       {
         int idx = ds.find(loc.dictionary);
         if (idx >= 0)
@@ -70,7 +76,10 @@ public class DictionaryListView extends LinearLayout
   {
     SupportedDictionaries ds = SupportedDictionaries.get(ctx.getResources());
     for (int i = 0; i < ds.length(); i++)
-      inflate_item(ctx, ds, i);
+    {
+      if (shouldShowDictionary(ds.dict_name(i)))
+        inflate_item(ctx, ds, i);
+    }
   }
 
   void inflate_item(Context ctx, SupportedDictionaries ds, int i)
@@ -107,6 +116,13 @@ public class DictionaryListView extends LinearLayout
       d.refresh(installed);
   }
 
+  enum DownloadStatus
+  {
+    SUCCESS,
+    UNVERIFIED,
+    NETWORK_ERROR
+  }
+
   void toggle_installed(String dict_name)
   {
     run_dictionary_action(dict_name, new Runnable()
@@ -115,10 +131,16 @@ public class DictionaryListView extends LinearLayout
           {
             if (_dictionaries.get_installed().contains(dict_name))
               _dictionaries.uninstall(dict_name);
-            else if (install_dictionary_from_internet(dict_name))
-              post_toast(R.string.dictionaries_download_success);
             else
-              post_toast(R.string.dictionaries_download_failed);
+            {
+              DownloadStatus status = install_dictionary_with_status(dict_name);
+              if (status == DownloadStatus.SUCCESS)
+                post_toast(R.string.dictionaries_download_success);
+              else if (status == DownloadStatus.UNVERIFIED)
+                post_toast(R.string.dictionaries_download_unverified);
+              else
+                post_toast(R.string.dictionaries_download_failed);
+            }
           }
         });
   }
@@ -225,6 +247,11 @@ public class DictionaryListView extends LinearLayout
   /** Returns [true] on success. Fails closed unless the dictionary SHA-256 matches a pinned digest. */
   boolean install_dictionary_from_internet(String dict_name)
   {
+    return install_dictionary_with_status(dict_name) == DownloadStatus.SUCCESS;
+  }
+
+  DownloadStatus install_dictionary_with_status(String dict_name)
+  {
     String expectedSha256 = SupportedDictionaries.getPinnedSha256(dict_name);
     try
     {
@@ -244,7 +271,7 @@ public class DictionaryListView extends LinearLayout
       verifyDictionaryIntegrity(dict_name, data, expectedSha256);
       Cdict.of_bytes(data); // Structural and cyclic safety validation
       _dictionaries.install(dict_name, data);
-      return true;
+      return DownloadStatus.SUCCESS;
     }
     catch (Exception e)
     {
@@ -258,11 +285,13 @@ public class DictionaryListView extends LinearLayout
         verifyDictionaryIntegrity(dict_name, data, expectedSha256);
         Cdict.of_bytes(data);
         _dictionaries.install(dict_name, data);
-        return true;
+        return DownloadStatus.SUCCESS;
       }
       catch (Exception ignored) {}
       Logs.exn("", e);
-      return false;
+      return (e instanceof SecurityException)
+          ? DownloadStatus.UNVERIFIED
+          : DownloadStatus.NETWORK_ERROR;
     }
   }
 

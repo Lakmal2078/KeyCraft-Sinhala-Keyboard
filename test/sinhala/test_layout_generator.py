@@ -39,6 +39,19 @@ class SinhalaLayoutGeneratorTest(unittest.TestCase):
         self.assertEqual("sinhala", root.attrib.get("script"))
         self.assertEqual("සිංහල", root.attrib.get("name"))
 
+    def test_shift_modmap_has_no_ka_ja_collision(self):
+        command = [sys.executable, str(SCRIPT), "--output", "-"]
+        generated = subprocess.run(command, check=True, capture_output=True, text=True, encoding="utf-8").stdout
+        root = ET.fromstring(generated)
+        shift_pairs = [
+            (elem.attrib.get("a"), elem.attrib.get("b"))
+            for elem in root.findall("./modmap/shift")
+        ]
+        self.assertIn(("ජ", "ඦ"), shift_pairs)
+        self.assertNotIn(("ක", "ඦ"), shift_pairs)
+        on_disk = (REPO_ROOT / "srcs/layouts/sinhala_phonetic.xml").read_text(encoding="utf-8")
+        self.assertEqual(on_disk.rstrip("\n"), generated.rstrip("\n"))
+
 
 if __name__ == "__main__":
     unittest.main()

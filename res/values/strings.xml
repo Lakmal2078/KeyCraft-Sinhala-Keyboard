@@ -256,6 +256,7 @@
     <string name="dictionaries_from_internet">Download a dictionary from the Internet</string>
     <string name="dictionaries_download_success">Dictionary installed</string>
     <string name="dictionaries_download_failed">Download failed: Please allow internet access</string>
+    <string name="dictionaries_download_unverified">Download blocked: dictionary verification is not available for this language</string>
     <string name="dictionaries_download_button">Download dictionary</string>
     <string name="dictionary_download_size_format" translatable="false">%1$s MB</string>
     <string name="dictionaries_delete_button">Delete dictionary</string>
@@ -425,6 +426,9 @@
   <string name="a11y_swipe_dir_s">down</string>
   <string name="a11y_swipe_dir_se">down-right</string>
   <string name="a11y_long_press_action">Alternative character</string>
+  <string name="translate_confirm_title">Open Google Translate?</string>
+  <string name="translate_confirm_message">Your selected text will be sent to Google Translate in your browser.</string>
+  <string name="translate_confirm_action">Continue</string>
 </resources>
 
 

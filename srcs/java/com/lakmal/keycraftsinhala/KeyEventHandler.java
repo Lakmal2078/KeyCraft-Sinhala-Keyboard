@@ -59,11 +59,15 @@ public final class KeyEventHandler
     _suggestions = sg;
     _typedword = new CurrentlyTypedWord(handler, this);
     _sinhala_learner = new SinhalaLearner(context);
+    if (_suggestions != null)
+      _suggestions.setSinhalaLearner(_sinhala_learner);
   }
 
   public void setSinhalaLearner(SinhalaLearner learner)
   {
     _sinhala_learner = learner;
+    if (_suggestions != null)
+      _suggestions.setSinhalaLearner(learner);
   }
 
   public SinhalaLearner getSinhalaLearner()

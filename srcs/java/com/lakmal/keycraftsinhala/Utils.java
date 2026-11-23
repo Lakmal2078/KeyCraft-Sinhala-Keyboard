@@ -33,13 +33,24 @@ public final class Utils
   public static void show_dialog_on_ime(AlertDialog dialog,
       InputMethodService ims)
   {
-    show_dialog_on_ime(dialog,
-        ims.getWindow().getWindow().getDecorView().getWindowToken());
+    if (dialog == null || ims == null)
+      return;
+    android.app.Dialog imeDialog = ims.getWindow();
+    Window imeWin = (imeDialog != null) ? imeDialog.getWindow() : null;
+    View decor = (imeWin != null) ? imeWin.getDecorView() : null;
+    IBinder token = (decor != null) ? decor.getWindowToken() : null;
+    if (token == null)
+      return;
+    show_dialog_on_ime(dialog, token);
   }
 
   public static void show_dialog_on_ime(AlertDialog dialog, IBinder token)
   {
+    if (dialog == null || token == null)
+      return;
     Window win = dialog.getWindow();
+    if (win == null)
+      return;
     WindowManager.LayoutParams lp = win.getAttributes();
     lp.token = token;
     lp.type = WindowManager.LayoutParams.TYPE_APPLICATION_ATTACHED_DIALOG;

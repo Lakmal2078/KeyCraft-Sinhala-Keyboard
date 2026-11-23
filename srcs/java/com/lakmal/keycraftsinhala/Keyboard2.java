@@ -110,8 +110,10 @@ public class Keyboard2 extends InputMethodService
 
   void incrTextLayout(int delta)
   {
+    if (_config == null || _config.layouts == null || _config.layouts.isEmpty())
+      return;
     int s = _config.layouts.size();
-    setTextLayout((_config.get_current_layout() + delta + s) % s);
+    setTextLayout(((_config.get_current_layout() + delta) % s + s) % s);
   }
 
   void setSpecialLayout(KeyboardData l)
@@ -427,7 +429,11 @@ public class Keyboard2 extends InputMethodService
     View btnKeyboard = _quick_toolbar.findViewById(R.id.toolbar_btn_keyboard);
     if (btnKeyboard != null)
     {
-      btnKeyboard.setOnClickListener(v -> get_imm().showInputMethodPicker());
+      btnKeyboard.setOnClickListener(v -> {
+        InputMethodManager imm = get_imm();
+        if (imm != null)
+          imm.showInputMethodPicker();
+      });
       btnKeyboard.setOnLongClickListener(v -> {
         incrTextLayout(1);
         return true;
@@ -699,6 +705,27 @@ public class Keyboard2 extends InputMethodService
           : "https://translate.google.com/?sl=auto&tl=si&text=" + query + "&op=translate";
       Intent webIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url));
       webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      if (!query.isEmpty() && shouldConfirmExternalTranslate())
+      {
+        IBinder token = getConnectionToken();
+        if (token == null)
+          return;
+        AlertDialog dialog = new AlertDialog.Builder(this)
+            .setTitle(R.string.translate_confirm_title)
+            .setMessage(R.string.translate_confirm_message)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.translate_confirm_action, (d, w) -> {
+              markExternalTranslateConfirmed();
+              try { startActivity(webIntent); }
+              catch (ActivityNotFoundException | SecurityException | IllegalArgumentException ex)
+              {
+                Log.w(Logs.TAG, "Unable to launch translation: " + ex.getClass().getSimpleName());
+              }
+            })
+            .create();
+        Utils.show_dialog_on_ime(dialog, token);
+        return;
+      }
       startActivity(webIntent);
     }
     catch (ActivityNotFoundException | SecurityException | IllegalArgumentException e)
@@ -706,6 +733,23 @@ public class Keyboard2 extends InputMethodService
       // Exception messages can include the URL and selected text.
       Log.w(Logs.TAG, "Unable to launch translation: " + e.getClass().getSimpleName());
     }
+  }
+
+  private boolean shouldConfirmExternalTranslate()
+  {
+    if (getBaseContext() == null)
+      return false;
+    SharedPreferences prefs = DirectBootAwarePreferences.get_shared_preferences(this);
+    return prefs == null || !prefs.getBoolean("translate_external_confirmed", false);
+  }
+
+  private void markExternalTranslateConfirmed()
+  {
+    if (getBaseContext() == null)
+      return;
+    SharedPreferences prefs = DirectBootAwarePreferences.get_shared_preferences(this);
+    if (prefs != null)
+      prefs.edit().putBoolean("translate_external_confirmed", true).apply();
   }
 
   private void show_theme_picker()
@@ -1217,19 +1261,31 @@ public class Keyboard2 extends InputMethodService
           break;
 
         case CHANGE_METHOD_PICKER:
-          get_imm().showInputMethodPicker();
+        {
+          InputMethodManager imm = get_imm();
+          if (imm != null)
+            imm.showInputMethodPicker();
           break;
+        }
 
         case CHANGE_METHOD_PREV:
           if (VERSION.SDK_INT < 28)
-            get_imm().switchToLastInputMethod(getConnectionToken());
+          {
+            InputMethodManager imm = get_imm();
+            if (imm != null)
+              imm.switchToLastInputMethod(getConnectionToken());
+          }
           else
             switchToPreviousInputMethod();
           break;
 
         case CHANGE_METHOD_NEXT:
           if (VERSION.SDK_INT < 28)
-            get_imm().switchToNextInputMethod(getConnectionToken(), false);
+          {
+            InputMethodManager imm = get_imm();
+            if (imm != null)
+              imm.switchToNextInputMethod(getConnectionToken(), false);
+          }
           else
             switchToNextInputMethod(false);
           break;
@@ -1257,15 +1313,22 @@ public class Keyboard2 extends InputMethodService
           break;
 
         case SWITCH_VOICE_TYPING:
-          if (!VoiceImeSwitcher.switch_to_voice_ime(Keyboard2.this, get_imm(),
+        {
+          InputMethodManager imm = get_imm();
+          if (imm == null || !VoiceImeSwitcher.switch_to_voice_ime(Keyboard2.this, imm,
                 Config.globalPrefs()))
             _config.shouldOfferVoiceTyping = false;
           break;
+        }
 
         case SWITCH_VOICE_TYPING_CHOOSER:
-          VoiceImeSwitcher.choose_voice_ime(Keyboard2.this, get_imm(),
-              Config.globalPrefs());
+        {
+          InputMethodManager imm = get_imm();
+          if (imm != null)
+            VoiceImeSwitcher.choose_voice_ime(Keyboard2.this, imm,
+                Config.globalPrefs());
           break;
+        }
 
         case HIDE_SELF:
           Keyboard2.this.requestHideSelf(0);

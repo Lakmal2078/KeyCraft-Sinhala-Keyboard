@@ -134,6 +134,8 @@ public class LauncherActivity extends Activity implements Handler.Callback
 
   public void clear_typing_test(View v)
   {
+    if (_tryhere_area == null)
+      return;
     _restoring_text = true;
     _tryhere_area.setText("");
     _restoring_text = false;
@@ -142,34 +144,52 @@ public class LauncherActivity extends Activity implements Handler.Callback
     _tryhere_area.requestFocus();
   }
 
+  private void addAnimationIfPresent(int id)
+  {
+    Animatable anim = find_anim(id);
+    if (anim != null)
+      _animations.add(anim);
+  }
+
   @Override
   public void onStart()
   {
     super.onStart();
     _animations = new ArrayList<Animatable>();
-    _animations.add(find_anim(R.id.launcher_anim_swipe));
-    _animations.add(find_anim(R.id.launcher_anim_round_trip));
-    _animations.add(find_anim(R.id.launcher_anim_circle));
-    _handler.removeMessages(0);
-    _handler.sendEmptyMessageDelayed(0, 500);
+    addAnimationIfPresent(R.id.launcher_anim_swipe);
+    addAnimationIfPresent(R.id.launcher_anim_round_trip);
+    addAnimationIfPresent(R.id.launcher_anim_circle);
+    if (_handler != null)
+    {
+      _handler.removeMessages(0);
+      _handler.sendEmptyMessageDelayed(0, 500);
+    }
   }
 
   @Override
   public void onStop()
   {
-    _handler.removeMessages(0);
-    for (Animatable anim : _animations)
-      anim.stop();
-    _animations.clear();
+    if (_handler != null)
+      _handler.removeMessages(0);
+    if (_animations != null)
+    {
+      for (Animatable anim : _animations)
+        anim.stop();
+      _animations.clear();
+    }
     super.onStop();
   }
 
   @Override
   public boolean handleMessage(Message _msg)
   {
-    for (Animatable anim : _animations)
-      anim.start();
-    _handler.sendEmptyMessageDelayed(0, 3000);
+    if (_animations != null)
+    {
+      for (Animatable anim : _animations)
+        anim.start();
+    }
+    if (_handler != null)
+      _handler.sendEmptyMessageDelayed(0, 3000);
     return true;
   }
 
@@ -201,7 +221,8 @@ public class LauncherActivity extends Activity implements Handler.Callback
   {
     InputMethodManager imm =
       (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-    imm.showInputMethodPicker();
+    if (imm != null)
+      imm.showInputMethodPicker();
   }
 
   public void launch_dictionaries_activity(View v)
@@ -223,8 +244,11 @@ public class LauncherActivity extends Activity implements Handler.Callback
 
   Animatable find_anim(int id)
   {
-    ImageView img = (ImageView)findViewById(id);
-    return (Animatable)img.getDrawable();
+    View view = findViewById(id);
+    if (!(view instanceof ImageView))
+      return null;
+    android.graphics.drawable.Drawable drawable = ((ImageView)view).getDrawable();
+    return (drawable instanceof Animatable) ? (Animatable)drawable : null;
   }
 
   @androidx.annotation.RequiresApi(28)
@@ -246,7 +270,8 @@ public class LauncherActivity extends Activity implements Handler.Callback
       // s.append(ev.getDisplayLabel());
       String kc = KeyEvent.keyCodeToString(ev.getKeyCode());
       s.append(kc.replaceFirst("^KEYCODE_", ""));
-      _tryhere_text.setText(s.toString());
+      if (_tryhere_text != null)
+        _tryhere_text.setText(s.toString());
       return false;
     }
   }

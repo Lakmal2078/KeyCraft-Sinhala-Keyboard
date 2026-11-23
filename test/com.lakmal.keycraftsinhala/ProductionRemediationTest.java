@@ -139,4 +139,43 @@ public class ProductionRemediationTest
     assertFalse("README.md must not falsely claim preferences do not backup",
         readme.contains("Keyboard preferences සහ app data cloud backup හෝ device-to-device transfer වෙත backup නොවේ"));
   }
+
+  @Test
+  public void phase1_incrTextLayoutHandlesEmptyLayoutsSafely() throws Exception
+  {
+    Keyboard2 keyboard = mock(Keyboard2.class, CALLS_REAL_METHODS);
+    Config cfg = new Config();
+    cfg.layouts = new java.util.ArrayList<>();
+    java.lang.reflect.Field configField = Keyboard2.class.getDeclaredField("_config");
+    configField.setAccessible(true);
+    configField.set(keyboard, cfg);
+
+    // Must not throw ArithmeticException: / by zero
+    keyboard.incrTextLayout(1);
+    keyboard.incrTextLayout(-1);
+
+    cfg.layouts = null;
+    keyboard.incrTextLayout(1);
+  }
+
+  @Test
+  public void phase1_showDialogOnImeHandlesNullInputsSafely()
+  {
+    Utils.show_dialog_on_ime(null, (android.os.IBinder) null);
+    Utils.show_dialog_on_ime(null, (InputMethodService) null);
+
+    InputMethodService ims = mock(InputMethodService.class);
+    when(ims.getWindow()).thenReturn(null);
+    Utils.show_dialog_on_ime(mock(android.app.AlertDialog.class), ims);
+  }
+
+  @Test
+  public void phase1_privacyDocsDiscloseOptionalTranslateShortcut() throws Exception
+  {
+    String privacyHtml = new String(
+        Files.readAllBytes(new File("docs/privacy.html").toPath()),
+        StandardCharsets.UTF_8);
+    assertTrue("docs/privacy.html must disclose Google Translate handoff",
+        privacyHtml.contains("translate.google.com"));
+  }
 }

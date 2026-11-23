@@ -2,9 +2,31 @@
   public protected private *;
 }
 
-# Keep the declared input method service entry point and its lifecycle callbacks.
-# Android manifest components are normally retained by R8; this explicit rule
-# makes the IME entry-point requirement resilient to future build-rule changes.
+# Keep manifest components and XML-instantiated custom views/preferences under R8.
 -keep class com.lakmal.keycraftsinhala.Keyboard2 {
   *;
 }
+
+-keep class com.lakmal.keycraftsinhala.LauncherActivity {
+  public void *(android.view.View);
+}
+
+-keep class com.lakmal.keycraftsinhala.SettingsActivity {
+  *;
+}
+
+-keep class com.lakmal.keycraftsinhala.dict.DictionariesActivity {
+  *;
+}
+
+-keep class * extends android.preference.Preference {
+  public <init>(android.content.Context, android.util.AttributeSet);
+  public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+
+-keep class com.lakmal.keycraftsinhala.** extends android.view.View {
+  public <init>(android.content.Context);
+  public <init>(android.content.Context, android.util.AttributeSet);
+  public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+

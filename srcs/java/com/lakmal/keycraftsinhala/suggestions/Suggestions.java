@@ -10,6 +10,7 @@ import com.lakmal.keycraftsinhala.ComposeKey;
 import com.lakmal.keycraftsinhala.ComposeKeyData;
 import com.lakmal.keycraftsinhala.ClipboardHistoryService;
 import com.lakmal.keycraftsinhala.QuickCalculator;
+import com.lakmal.keycraftsinhala.SinhalaLearner;
 import com.lakmal.keycraftsinhala.SmartSnippets;
 import com.lakmal.keycraftsinhala.SinhalaTransliterator;
 
@@ -20,6 +21,7 @@ public final class Suggestions
   Callback _callback;
   Config _config;
   boolean _enabled;
+  private SinhalaLearner _sinhala_learner = null;
 
   /** Current suggestions. The best suggestion is at index [0]. */
   public String[] suggestions = new String[MAX_COUNT];
@@ -39,6 +41,11 @@ public final class Suggestions
   {
     _callback = c;
     _config = conf;
+  }
+
+  public void setSinhalaLearner(SinhalaLearner learner)
+  {
+    _sinhala_learner = learner;
   }
 
   public void started()
@@ -120,7 +127,9 @@ public final class Suggestions
     }
     if (_config.sinhala_transliteration && is_ascii_letters(word))
     {
-      java.util.List<String> list = SinhalaTransliterator.getSuggestions(word);
+      SinhalaLearner learner = (_config.editor_config != null
+          && _config.editor_config.is_sensitive_input) ? null : _sinhala_learner;
+      java.util.List<String> list = SinhalaTransliterator.getSuggestions(word, learner);
       if (!list.isEmpty())
       {
         clear();

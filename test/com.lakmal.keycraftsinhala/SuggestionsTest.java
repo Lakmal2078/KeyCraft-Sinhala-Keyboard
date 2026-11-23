@@ -104,4 +104,35 @@ public class SuggestionsTest
     assertNull(suggestions.suggestions[0]);
     verifyNoInteractions(callback);
   }
+
+  @Test
+  public void wiredSinhalaLearnerSurfacesLearnedCorrectionForUnknownWord()
+  {
+    config.sinhala_transliteration = true;
+    SinhalaLearner learner = new SinhalaLearner((android.content.SharedPreferences) null);
+    learner.recordCorrection("keycraftword", "සිංහලවචනය");
+    suggestions.setSinhalaLearner(learner);
+    suggestions.started();
+
+    suggestions.currently_typed_word("keycraftword");
+
+    assertTrue("Expected learned correction in suggestions",
+        Arrays.asList(suggestions.suggestions).contains("සිංහලවචනය"));
+  }
+
+  @Test
+  public void sensitiveInputSuppressesSinhalaLearnerSuggestions()
+  {
+    config.sinhala_transliteration = true;
+    SinhalaLearner learner = new SinhalaLearner((android.content.SharedPreferences) null);
+    learner.recordCorrection("keycraftword", "සිංහලවචනය");
+    suggestions.setSinhalaLearner(learner);
+    config.editor_config.is_sensitive_input = true;
+    suggestions.started();
+
+    suggestions.currently_typed_word("keycraftword");
+
+    assertEquals(0, suggestions.count);
+    assertFalse(Arrays.asList(suggestions.suggestions).contains("සිංහලවචනය"));
+  }
 }

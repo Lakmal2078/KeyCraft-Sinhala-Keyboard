@@ -39,11 +39,13 @@
     <a class="back" href="./">← Back to KeyCraft</a>
     <h1>Privacy &amp; Open Source</h1>
     <p class="intro">KeyCraft is built to make Sinhala typing useful without ads. This page describes the app behaviour documented in the project and its source code.</p>
-    <div class="panel"><strong>At a glance</strong><ul><li>Free and open source under GNU GPL-3.0.</li><li>No advertisements are included in the app.</li><li>Sinhala transliteration is performed on your device.</li><li>Internet access is used to download optional dictionaries when you request them.</li></ul></div>
+    <div class="panel"><strong>At a glance</strong><ul><li>Free and open source under GNU GPL-3.0.</li><li>No advertisements are included in the app.</li><li>Sinhala transliteration is performed on your device.</li><li>Internet access is used to download optional verified dictionaries when you request them.</li><li>Optional translation opens Google Translate only when you tap Translate.</li></ul></div>
     <h2>Keyboard input and transliteration</h2>
-    <p>Singlish-to-Sinhala transliteration is processed locally on your Android device. The project does not describe sending the text you type to a remote transliteration service.</p>
+    <p>Singlish-to-Sinhala transliteration is processed locally on your Android device. KeyCraft does not send your typing to a remote transliteration service.</p>
     <h2>Network access and dictionaries</h2>
-    <p>KeyCraft requests internet access so you can download optional dictionaries. A dictionary download contacts the configured dictionary source. You can choose whether to use this optional feature.</p>
+    <p>KeyCraft requests internet access so you can download optional verified dictionaries. A dictionary download contacts the configured dictionary source and verifies its SHA-256 digest before installation.</p>
+    <h2>Optional translation shortcut</h2>
+    <p>Tapping the Quick-Action Toolbar Translate button is entirely optional. When no text is selected, it opens the Google Translate app or website without sending typed text. When non-sensitive text is selected, KeyCraft asks for confirmation and then opens <code>https://translate.google.com/</code> in your browser with the selected text. Translation is automatically disabled in password and private/incognito input fields.</p>
     <h2>Clipboard features</h2>
     <p>Clipboard History and clipboard previews are optional features controlled through the app's settings. Review those settings and Android clipboard permissions before enabling clipboard-related features. Do not paste sensitive information into apps unless you intend to share it.</p>
     <h2>Ads, analytics and tracking</h2>

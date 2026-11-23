@@ -65,4 +65,13 @@ public class LayoutVerificationTest
     for (String glyph : essentialGlyphs)
       Assert.assertNotNull("Glyph definition must not be null for " + glyph, glyph);
   }
+
+  @Test
+  public void testSinhalaPhoneticModmapHasNoKaJaCollision() throws Exception
+  {
+    File sinhalaLayout = new File("srcs/layouts/sinhala_phonetic.xml");
+    String xml = new String(Files.readAllBytes(sinhalaLayout.toPath()), StandardCharsets.UTF_8);
+    Assert.assertTrue("Shift+ජ must map to ඦ", xml.contains("a=\"ජ\" b=\"ඦ\""));
+    Assert.assertFalse("Shift+ක must not collide on ඦ", xml.contains("a=\"ක\" b=\"ඦ\""));
+  }
 }

@@ -81,4 +81,14 @@ public class DictionaryDownloadSafetyTest
       }
     }
   }
+
+  @Test
+  public void hasPinnedSha256MatchesSupportedLocales()
+  {
+    assertTrue(SupportedDictionaries.hasPinnedSha256("en_US"));
+    assertTrue(SupportedDictionaries.hasPinnedSha256("si"));
+    assertFalse(SupportedDictionaries.hasPinnedSha256("fr"));
+    assertFalse(SupportedDictionaries.hasPinnedSha256(""));
+    assertFalse(SupportedDictionaries.hasPinnedSha256(null));
+  }
 }

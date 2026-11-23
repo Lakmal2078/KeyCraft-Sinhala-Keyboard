@@ -68,4 +68,11 @@ public class SupportedDictionaries
   {
     return (dict_name == null) ? null : PINNED_SHA256.get(dict_name);
   }
+
+  /** Returns true when a trusted SHA-256 digest is configured for [dict_name]. */
+  public static boolean hasPinnedSha256(String dict_name)
+  {
+    String digest = getPinnedSha256(dict_name);
+    return digest != null && !digest.trim().isEmpty();
+  }
 }
