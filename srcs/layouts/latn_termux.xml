@@ -1,6 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- QWERTY layout with terminal-friendly modifiers and raw navigation keys. -->
 <keyboard name="Termux Coding" bottom_row="false" script="latin">
+  <modmap>
+    <fn a="q" b="f1"/>
+    <fn a="w" b="f2"/>
+    <fn a="e" b="f3"/>
+    <fn a="r" b="f4"/>
+    <fn a="t" b="f5"/>
+    <fn a="y" b="f6"/>
+    <fn a="u" b="f7"/>
+    <fn a="i" b="f8"/>
+    <fn a="o" b="f9"/>
+    <fn a="p" b="f10"/>
+    <fn a="a" b="f11"/>
+    <fn a="s" b="f12"/>
+  </modmap>
+
+  <!-- Termux navigation row -->
+  <row scale="7.0" height="1.0">
+    <key c="ESC:esc"/>
+    <key c="/:'/'"/>
+    <key c="-:'-'"/>
+    <key c="HOME:home"/>
+    <key c="↑:up"/>
+    <key c="END:end"/>
+    <key c="PGUP:page_up"/>
+  </row>
+
+  <!-- Termux control row -->
+  <row scale="7.0" height="1.0">
+    <key c="TAB:tab"/>
+    <key c="CTRL:ctrl"/>
+    <key c="ALT:alt"/>
+    <key c="←:left"/>
+    <key c="↓:down"/>
+    <key c="→:right"/>
+    <key c="PGDN:page_down"/>
+  </row>
+
+  <!-- Termux programming symbols row -->
+  <row scale="10.0" height="1.0">
+    <key c="!:'!'"/>
+    <key c="@:'@'"/>
+    <key c="#:'#'"/>
+    <key c="$:'$'"/>
+    <key c="%:'%'"/>
+    <key c="^:'^'"/>
+    <key c="&amp;:'&amp;'"/>
+    <key c="*:'*'"/>
+    <key c="(:'('"/>
+    <key c="):')'"/>
+  </row>
+
   <row>
     <key c="q" ne="1" se="!" nw="loc esc"/>
     <key c="w" ne="2" sw="@"/>
