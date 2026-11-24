@@ -328,7 +328,7 @@ public class ProductionRemediationTest
     Logs.exn("release error", new RuntimeException("sensitive detail"));
 
     Logs.set_debug_logs(true);
-    assertTrue(Logs.isDebugEnabled());
+    assertFalse("Non-debuggable contexts must not enable logging", Logs.isDebugEnabled());
     Logs.set_debug_logs(false);
     assertFalse(Logs.isDebugEnabled());
 

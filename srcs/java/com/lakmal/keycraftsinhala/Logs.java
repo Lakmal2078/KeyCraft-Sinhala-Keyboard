@@ -3,6 +3,7 @@ package com.lakmal.keycraftsinhala;
 import android.text.InputType;
 import android.util.Log;
 import android.util.LogPrinter;
+import android.content.pm.ApplicationInfo;
 import android.view.inputmethod.EditorInfo;
 import org.json.JSONException;
 
@@ -12,10 +13,17 @@ public final class Logs
   public static final String TAG = "KeyCraftSinhala";
 
   static LogPrinter _debug_logs = null;
+  private static volatile boolean debugBuild = false;
+
+  public static void configure(android.content.Context context, boolean enabled)
+  {
+    debugBuild = (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    set_debug_logs(enabled);
+  }
 
   public static void set_debug_logs(boolean d)
   {
-    _debug_logs = d ? new LogPrinter(Log.DEBUG, TAG) : null;
+    _debug_logs = d && debugBuild ? new LogPrinter(Log.DEBUG, TAG) : null;
   }
 
   public static void debug_startup_input_view(EditorInfo info, Config conf)

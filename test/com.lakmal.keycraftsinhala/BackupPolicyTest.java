@@ -19,12 +19,12 @@ public class BackupPolicyTest
   }
 
   @Test
-  public void backupIncludesOnlyUserConfigurationAndExcludesLearnedAndTransientStores()
+  public void backupExcludesAllKeyboardUserData()
       throws Exception
   {
     Document manifest = parse("AndroidManifest.xml");
     Element application = (Element) manifest.getElementsByTagName("application").item(0);
-    assertEquals("true", application.getAttribute("android:allowBackup"));
+    assertEquals("false", application.getAttribute("android:allowBackup"));
     assertEquals("@xml/backup_rules", application.getAttribute("android:fullBackupContent"));
     assertEquals("@xml/data_extraction_rules", application.getAttribute("android:dataExtractionRules"));
     Element service = (Element) manifest.getElementsByTagName("service").item(0);
@@ -35,32 +35,13 @@ public class BackupPolicyTest
     assertEquals("android.view.InputMethod", ((Element) actions.item(0)).getAttribute("android:name"));
 
     Document legacy = parse("res/xml/backup_rules.xml");
-    NodeList legacyIncludes = legacy.getDocumentElement().getElementsByTagName("include");
-    assertEquals(2, legacyIncludes.getLength());
-    boolean credentialPreferencesIncluded = false;
-    boolean devicePreferencesIncluded = false;
-    for (int i = 0; i < legacyIncludes.getLength(); i++)
-    {
-      Element include = (Element) legacyIncludes.item(i);
-      assertEquals("com.lakmal.keycraftsinhala_preferences.xml",
-          include.getAttribute("path"));
-      credentialPreferencesIncluded |= "sharedpref".equals(include.getAttribute("domain"));
-      devicePreferencesIncluded |= "device_sharedpref".equals(include.getAttribute("domain"));
-    }
-    assertTrue(credentialPreferencesIncluded);
-    assertTrue(devicePreferencesIncluded);
-
+    assertEquals(0, legacy.getElementsByTagName("include").getLength());
+    assertEquals(2, legacy.getElementsByTagName("exclude").getLength());
     Document modern = parse("res/xml/data_extraction_rules.xml");
-    NodeList modernIncludes = modern.getElementsByTagName("include");
-    assertEquals(2, modernIncludes.getLength());
-    for (int i = 0; i < modernIncludes.getLength(); i++)
-    {
-      Element include = (Element) modernIncludes.item(i);
-      assertEquals("device_sharedpref", include.getAttribute("domain"));
-      assertEquals("com.lakmal.keycraftsinhala_preferences.xml",
-          include.getAttribute("path"));
-    }
-    assertEquals("No other app-data domains may be backed up",
-        0, modern.getElementsByTagName("exclude").getLength());
+    assertEquals(0, modern.getElementsByTagName("include").getLength());
+    assertEquals(4, modern.getElementsByTagName("exclude").getLength());
+    NodeList excludes = modern.getElementsByTagName("exclude");
+    for (int i = 0; i < excludes.getLength(); i++)
+      assertEquals(".", ((Element) excludes.item(i)).getAttribute("path"));
   }
 }

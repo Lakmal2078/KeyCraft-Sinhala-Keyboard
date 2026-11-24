@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Only the direct-boot settings store is portable; transient and private app data is excluded. -->
+<!-- Exclude IME preferences, learned words, dictionary and pinned clipboard content from cloud and D2D transfers. -->
 <data-extraction-rules>
     <cloud-backup>
-        <include domain="device_sharedpref" path="com.lakmal.keycraftsinhala_preferences.xml"/>
+        <exclude domain="root" path="."/>
+        <exclude domain="device_root" path="."/>
     </cloud-backup>
     <device-transfer>
-        <include domain="device_sharedpref" path="com.lakmal.keycraftsinhala_preferences.xml"/>
+        <exclude domain="root" path="."/>
+        <exclude domain="device_root" path="."/>
     </device-transfer>
 </data-extraction-rules>

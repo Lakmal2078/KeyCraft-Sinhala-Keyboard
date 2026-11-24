@@ -166,7 +166,7 @@ public class Keyboard2 extends InputMethodService
     KeyValue.Stateful._handler = recvr;
     _config.handler = _keyeventhandler;
     prefs.registerOnSharedPreferenceChangeListener(this);
-    Logs.set_debug_logs(getResources().getBoolean(R.bool.debug_logs));
+    Logs.configure(this, getResources().getBoolean(R.bool.debug_logs));
     refreshSubtypeImm();
     create_keyboard_view();
     ClipboardHistoryService.on_startup(this, _keyeventhandler);
@@ -706,7 +706,7 @@ public class Keyboard2 extends InputMethodService
           : "https://translate.google.com/?sl=auto&tl=si&text=" + query + "&op=translate";
       Intent webIntent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url));
       webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      if (!query.isEmpty() && shouldConfirmExternalTranslate())
+      if (!query.isEmpty())
       {
         IBinder token = getConnectionToken();
         if (token == null)
@@ -716,7 +716,6 @@ public class Keyboard2 extends InputMethodService
             .setMessage(R.string.translate_confirm_message)
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(R.string.translate_confirm_action, (d, w) -> {
-              markExternalTranslateConfirmed();
               try { startActivity(webIntent); }
               catch (ActivityNotFoundException | SecurityException | IllegalArgumentException ex)
               {

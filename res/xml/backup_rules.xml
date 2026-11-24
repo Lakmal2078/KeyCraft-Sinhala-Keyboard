@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Back up only the user configuration. Temporary files, dictionaries, clipboard data and databases stay local. -->
+<!-- No application data is eligible for legacy backups. -->
 <full-backup-content>
-    <include domain="sharedpref" path="com.lakmal.keycraftsinhala_preferences.xml"/>
-    <include domain="device_sharedpref" path="com.lakmal.keycraftsinhala_preferences.xml"/>
+    <exclude domain="root" path="."/>
+    <exclude domain="device_root" path="."/>
 </full-backup-content>

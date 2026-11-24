@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import javax.net.ssl.HttpsURLConnection;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -260,6 +261,9 @@ public class DictionaryListView extends LinearLayout
       // Remote files are compressed with gzip at rest. Do not use server side
       // compression and force decompression.
       URLConnection con = url_of_dictionary(dict_name).openConnection();
+      if (!(con instanceof HttpsURLConnection))
+        throw new SecurityException("Dictionary download requires HTTPS");
+      ((HttpsURLConnection)con).setInstanceFollowRedirects(false);
       con.setConnectTimeout(15000);
       con.setReadTimeout(30000);
       con.setRequestProperty("Accept-Encoding", "identity");
