@@ -102,8 +102,8 @@ public class KeyboardIntegrationTest
     handler.key_up(KeyValue.makeCharKey('a'), Pointers.Modifiers.EMPTY);
     handler.key_up(KeyValue.getKeyByName("backspace"), Pointers.Modifiers.EMPTY);
 
-    verify(connection, times(2)).setComposingText("ක්", 1);
-    assertEquals("k", handler._sinhala_buffer.toString());
+    verify(connection).setComposingText("ක්", 1);
+    assertEquals(0, handler._sinhala_buffer.length());
 
     handler.key_up(KeyValue.getKeyByName("backspace"), Pointers.Modifiers.EMPTY);
     verify(connection).setComposingText("", 1);
@@ -268,12 +268,10 @@ public class KeyboardIntegrationTest
     webHandler.selection_updated(2, cursor[0], cursor[0], -1, -1);
     assertEquals("ස", doc.toString());
 
-    // Backspace back to "S" -> "ෂ්", then backspace to empty ""
+    // Backspace removes the displayed independent consonant, not the Latin suffix.
     webHandler.key_up(KeyValue.getKeyByName("backspace"), Pointers.Modifiers.EMPTY);
     webHandler.selection_updated(1, cursor[0], cursor[0], -1, -1);
-    assertEquals("ෂ්", doc.toString());
-
-    webHandler.key_up(KeyValue.getKeyByName("backspace"), Pointers.Modifiers.EMPTY);
+    assertEquals("", doc.toString());
     assertEquals("", doc.toString());
     assertEquals(0, webHandler._sinhala_buffer.length());
 

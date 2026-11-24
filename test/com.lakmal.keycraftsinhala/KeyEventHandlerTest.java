@@ -292,4 +292,97 @@ public class KeyEventHandlerTest
     assertEquals(0, suggestions.count);
     assertEquals(0, handler._sinhala_buffer.length());
   }
+
+  private void liveComposition()
+  {
+    config.sinhala_transliteration = true;
+    config.editor_config.use_commit_replace_composing = true;
+  }
+
+  @Test public void liveAmmaBackspaceRemovesVisibleUnits()
+  {
+    liveComposition();
+    type("amma");
+    assertEquals("අම්මා", document.toString());
+    handler.handle_backspace();
+    assertEquals("අම්ම", document.toString());
+    handler.handle_backspace();
+    assertEquals("අම", document.toString());
+    handler.handle_backspace();
+    assertEquals("අ", document.toString());
+    handler.handle_backspace();
+    assertEquals("", document.toString());
+  }
+
+  @Test public void liveOtherVowelAndViramaDeletion()
+  {
+    liveComposition();
+    type("kaa");
+    assertEquals("කා", document.toString());
+    handler.handle_backspace();
+    assertEquals("ක", document.toString());
+    handler.handle_backspace();
+    type("amm");
+    assertEquals("අම්ම්", document.toString());
+    handler.handle_backspace();
+    assertEquals("අම්ම", document.toString());
+  }
+
+  @Test public void liveEditedSuggestionPreservesPrefix()
+  {
+    type("x, ");
+    liveComposition();
+    type("amma");
+    handler.handle_backspace();
+    handler.suggestion_entered("අම්මා", false);
+    assertEquals("x, අම්මා", document.toString());
+  }
+
+  @Test public void liveEditedCompositionDoesNotRestoreDeletedSign()
+  {
+    liveComposition();
+    type("amma");
+    handler.handle_backspace();
+    type("ka");
+    assertEquals("අම්මක", document.toString());
+    handler.handle_space_bar();
+    assertEquals("අම්මක ", document.toString());
+  }
+
+  @Test public void liveCursorAndSelectionFinishComposition()
+  {
+    config.sinhala_transliteration = true;
+    type("amma");
+    handler.handle_backspace();
+    verify(connection).setComposingText("අම්ම", 1);
+    handler.selection_updated(4, 2, 2, 0, 4);
+    verify(connection).finishComposingText();
+    type("amma");
+    handler.selection_updated(5, 1, 3, 0, 5);
+    verify(connection, times(2)).finishComposingText();
+  }
+
+  @Test public void liveModeRefreshFinishesEditedComposition()
+  {
+    config.sinhala_transliteration = true;
+    type("amma");
+    handler.handle_backspace();
+    config.sinhala_transliteration = false;
+    handler.started();
+    verify(connection).finishComposingText();
+    type("ක");
+    config.sinhala_transliteration = true;
+    handler.started();
+    type("amma");
+    verify(connection, atLeastOnce()).setComposingText("අම්මා", 1);
+  }
+
+  @Test public void literalBackspaceStillRemovesLatinCharacter()
+  {
+    liveComposition();
+    config.literal_singlish = true;
+    type("amma");
+    handler.handle_backspace();
+    assertEquals("amm", document.toString());
+  }
 }

@@ -36,6 +36,14 @@ public final class KeyEventHandler
   LastAction _last_action = null;
   LastAction _next_last_action = null;
   StringBuilder _sinhala_buffer = new StringBuilder();
+  // After a rendered edit, the surviving Sinhala prefix is authoritative.
+  // Only newly typed Latin characters may be transliterated.
+  private String _edited_sinhala_prefix = "";
+
+  private boolean has_sinhala_composition()
+  {
+    return _sinhala_buffer.length() > 0 || !_edited_sinhala_prefix.isEmpty();
+  }
   SinhalaLearner _sinhala_learner;
   final PersonalWords personalWords;
   String _last_committed_sinhala = null;
@@ -90,6 +98,7 @@ public final class KeyEventHandler
 
   private void reset_sinhala_composing_state()
   {
+    _edited_sinhala_prefix = "";
     _sinhala_committed_text = "";
     _max_sinhala_composing_len = 0;
     _pending_commit_delta_sum = 0;
@@ -99,7 +108,7 @@ public final class KeyEventHandler
   @Override
   public void finish_composing()
   {
-    if (_sinhala_buffer.length() > 0)
+    if (has_sinhala_composition())
     {
       if (!is_commit_replace_mode())
       {
@@ -155,7 +164,7 @@ public final class KeyEventHandler
   /** Selection has been updated. */
   public void selection_updated(int oldSelStart, int newSelStart, int newSelEnd, int candidatesStart, int candidatesEnd)
   {
-    if (_sinhala_buffer.length() > 0)
+    if (has_sinhala_composition())
     {
       if (newSelStart != newSelEnd)
       {
@@ -177,7 +186,7 @@ public final class KeyEventHandler
           }
         }
       }
-      else if (candidatesStart != -1 && (newSelStart < candidatesStart || newSelStart > candidatesEnd))
+      else if (candidatesStart != -1 && (newSelStart != candidatesEnd))
       {
         finish_composing();
       }
@@ -188,7 +197,7 @@ public final class KeyEventHandler
       }
     }
     _autocap.selection_updated(oldSelStart, newSelStart);
-    if (_sinhala_buffer.length() == 0)
+    if (!has_sinhala_composition())
       _typedword.selection_updated(oldSelStart, newSelStart, newSelEnd);
   }
 
@@ -310,9 +319,9 @@ public final class KeyEventHandler
       _recv.set_suggestions(_suggestions);
       return;
     }
-    if (_sinhala_buffer.length() > 0 && conn != null)
+    if (has_sinhala_composition() && conn != null)
     {
-      String typedSinglish = _sinhala_buffer.toString();
+      String typedSinglish = _edited_sinhala_prefix.isEmpty() ? _sinhala_buffer.toString() : composingPreview();
       String rawText = text.trim();
       if (add_space_after)
         text = text + " ";
@@ -322,7 +331,7 @@ public final class KeyEventHandler
       _sinhala_buffer.setLength(0);
       _typedword.typed(text);
       _suggestions.clear();
-      if (!_config.editor_config.is_sensitive_input && _sinhala_learner != null)
+      if (!_config.editor_config.is_sensitive_input && _sinhala_learner != null && is_ascii_letters(typedSinglish))
       {
         _sinhala_learner.recordCorrection(typedSinglish, rawText);
       }
@@ -435,7 +444,7 @@ public final class KeyEventHandler
   @Override
   public void currently_typed_word(String word)
   {
-    if (_config.sinhala_transliteration && _sinhala_buffer.length() > 0)
+    if (_config.sinhala_transliteration && has_sinhala_composition())
     {
       return;
     }
@@ -667,7 +676,7 @@ public final class KeyEventHandler
 
   private String composingPreview()
   {
-    return _config.literal_singlish ? _sinhala_buffer.toString() : transliterate_sinhala_buffer();
+    return _edited_sinhala_prefix + (_config.literal_singlish ? _sinhala_buffer.toString() : transliterate_sinhala_buffer());
   }
 
   private String transliterate_sinhala_buffer()
@@ -739,7 +748,7 @@ public final class KeyEventHandler
     // A function name is composed as Sinhala until the opening bracket makes
     // its calculator intent explicit. Restore its literal spelling then.
     if (is_sinhala && _config.quick_calculator_enabled && text.equals("(")
-        && QuickCalculator.isFunction(_sinhala_buffer.toString()))
+        && _edited_sinhala_prefix.isEmpty() && QuickCalculator.isFunction(_sinhala_buffer.toString()))
     {
       String function = _sinhala_buffer.toString();
       commit_sinhala_replacement(conn, function);
@@ -753,7 +762,7 @@ public final class KeyEventHandler
       String transliterated = composingPreview();
       update_sinhala_composing(conn, transliterated);
       if (_config.suggestions_enabled)
-        _suggestions.currently_typed_word(_sinhala_buffer.toString());
+        _suggestions.currently_typed_word(_edited_sinhala_prefix.isEmpty() ? _sinhala_buffer.toString() : composingPreview());
       _next_last_action = LastAction.OTHER;
       return;
     }
@@ -1115,7 +1124,7 @@ public final class KeyEventHandler
     boolean secondSpace = previousSpaceNanos != 0 && now - previousSpaceNanos <= 500000000L;
     previousSpaceNanos = now;
     InputConnection conn = _recv.getCurrentInputConnection();
-    if (_sinhala_buffer.length() > 0 && conn != null)
+    if (has_sinhala_composition() && conn != null)
     {
       // The literal-preview mode commits the original spelling on space.
       // Alternative candidates are committed only when the user taps one.
@@ -1235,15 +1244,41 @@ public final class KeyEventHandler
   void handle_backspace()
   {
     InputConnection conn = _recv.getCurrentInputConnection();
-    if (_sinhala_buffer.length() > 0 && conn != null)
+    if (has_sinhala_composition() && conn != null)
     {
+      if (!_config.literal_singlish || !_edited_sinhala_prefix.isEmpty())
+      {
+        String visible = composingPreview();
+        int count = SinhalaText.backspaceLength(visible);
+        if (count == 0 && !visible.isEmpty())
+          count = Character.charCount(visible.codePointBefore(visible.length()));
+        String remaining = visible.substring(0, visible.length() - count);
+        // Discard the obsolete phonetic spelling; it cannot represent every
+        // intermediate Sinhala editing state (e.g. a bare final consonant).
+        _sinhala_buffer.setLength(0);
+        _edited_sinhala_prefix = remaining;
+        if (remaining.isEmpty())
+        {
+          clear_sinhala_composing(conn);
+          _suggestions.clear();
+          _recv.set_suggestions(_suggestions);
+        }
+        else
+        {
+          update_sinhala_composing(conn, remaining);
+          if (_config.suggestions_enabled)
+            _suggestions.currently_typed_word(remaining);
+        }
+        _next_last_action = LastAction.OTHER;
+        return;
+      }
       _sinhala_buffer.deleteCharAt(_sinhala_buffer.length() - 1);
-      if (_sinhala_buffer.length() > 0)
+      if (has_sinhala_composition())
       {
         String transliterated = composingPreview();
         update_sinhala_composing(conn, transliterated);
         if (_config.suggestions_enabled)
-          _suggestions.currently_typed_word(_sinhala_buffer.toString());
+          _suggestions.currently_typed_word(_edited_sinhala_prefix.isEmpty() ? _sinhala_buffer.toString() : composingPreview());
       }
       else
       {
