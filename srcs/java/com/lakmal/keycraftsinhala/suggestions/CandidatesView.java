@@ -173,7 +173,7 @@ public class CandidatesView extends LinearLayout
         v.setTextSize(TypedValue.COMPLEX_UNIT_PX, text_size);
       else
         v.setAutoSizeTextTypeUniformWithConfiguration(
-            (int)(text_size / 2.), (int)text_size, 1, TypedValue.COMPLEX_UNIT_PX);
+            Math.max(1, (int)(text_size / 2.)), Math.max(2, (int)text_size), 1, TypedValue.COMPLEX_UNIT_PX);
     }
   }
 
@@ -185,6 +185,9 @@ public class CandidatesView extends LinearLayout
       v.setBackgroundResource(R.drawable.suggestions_pill_background);
       v.setTypeface(v.getTypeface(), android.graphics.Typeface.BOLD);
     }
+    v.setSingleLine(true);
+    v.setEllipsize(android.text.TextUtils.TruncateAt.END);
+    v.setFocusable(true);
     v.setOnClickListener(new View.OnClickListener()
         {
           @Override

@@ -63,6 +63,7 @@ Based on XKB Sinhala (phonetic) layout.
     <shift a="හ" b="&#x0DDE;" />
     <shift a="&#x0D83;" b="ඖ" />
     <shift a="ජ" b="ඦ" />
+    <shift a="ක" b="ඏ" />
     <shift a="ඛ" b="ඐ" />
     <shift a="ල" b="&#x0DDF;" />
     <shift a="ළ" b="ෳ" />

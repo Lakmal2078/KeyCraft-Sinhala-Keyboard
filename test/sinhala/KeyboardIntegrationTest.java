@@ -23,6 +23,7 @@ public class KeyboardIntegrationTest
   public void setUp()
   {
     config = new Config();
+    config.literal_singlish = false; // Exercise legacy live composition unless a test opts into literal preview.
     config.editor_config = new EditorConfig();
     config.editor_config.initial_text_before_cursor = "";
     config.suggestions_enabled = false;

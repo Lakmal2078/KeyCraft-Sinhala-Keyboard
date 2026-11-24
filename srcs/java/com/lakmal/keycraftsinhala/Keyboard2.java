@@ -87,6 +87,8 @@ public class Keyboard2 extends InputMethodService
       layout = _config.layouts.get(layout_i);
     if (layout == null)
       layout = _localeTextLayout;
+    if (layout != null && "sinhala".equals(layout.script) && !_config.sinhala_transliteration)
+      return loadLayout(R.xml.latn_qwerty_us);
     return layout;
   }
 
@@ -1387,12 +1389,18 @@ public class Keyboard2 extends InputMethodService
       return "";
     }
 
+    @Override public boolean isSinhalaLayout()
+    {
+      KeyboardData layout = current_layout_unmodified();
+      return layout != null && "sinhala".equals(layout.script);
+    }
+
     public void language_changed()
     {
       refresh_current_dictionary();
       refresh_candidates_view();
       if (_keyboard_layout_view != null)
-        _keyboard_layout_view.invalidate();
+        _keyboard_layout_view.setKeyboard(current_layout());
     }
 
     public void on_change_dictionary(String dict_name)

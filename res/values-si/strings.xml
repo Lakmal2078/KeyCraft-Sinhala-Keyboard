@@ -477,4 +477,11 @@
   <string name="translate_confirm_title">Google Translate විවෘත කරන්නද?</string>
   <string name="translate_confirm_message">තෝරාගත් පෙළ ඔබගේ browser හරහා Google Translate වෙත යවනු ලැබේ.</string>
   <string name="translate_confirm_action">ඉදිරියට යන්න</string>
+    <string name="personal_words">පෞද්ගලික සිංහල ශබ්දකෝෂය</string>
+    <string name="literal_singlish">යෝජනාවක් තෝරන තුරු Singlish තබා ගන්න</string>
+    <string name="double_space_period">හිස්තැන් දෙකකින් තිතක් යොදන්න</string>
+    <string name="enable_swipes">යතුරු මත ස්වයිප් කිරීම සක්‍රිය කරන්න</string>
+    <string name="remove_word">වචනය ඉවත් කරන්න</string>
+    <string name="add_word">වචනය එක් කරන්න</string>
+    <string name="sinhala_word">සිංහල වචනයක් ඇතුළත් කරන්න</string>
 </resources>

@@ -11,6 +11,16 @@ KeyCraft is an open-source Sinhala keyboard for Android. It supports Sinhala typ
 - **Haptic feedback:** Enable or adjust vibration feedback while typing.
 - **Optional dictionary downloads:** Download additional dictionaries when wanted.
 
+## Typing Sinhala
+
+Select the Sinhala layout in Settings for direct letter input. Shift selects vowel signs and additional letters. Use the number key for digits and symbols. On the Sinhala layout, **EN** switches to Latin keys and **සි** restores the Sinhala layer. On a Latin layout, the **සි / EN** key switches Singlish suggestions on or off and remembers the choice. By default Latin spelling stays in the editor until you tap a candidate. Space keeps the literal spelling, including English and abbreviations. Turn off **Keep Singlish until a suggestion is selected** to use the older live Sinhala preview and space-to-commit behavior.
+
+Enter consonants before dependent vowels, including visually leading signs such as ෙ. For example ක followed by ෙ produces කෙ. A second vowel sign replaces the first. Type a virama followed by another consonant for ක්ක or ත්ත. The layout offers explicit joiner keys for joined forms. Backspace removes a final sign first, then unwinds the last consonant of a cluster and its connector. Clipboard paste inserts the original text.
+
+The candidate strip shows up to three words. For example, `niwaradhi` suggests නිවරදි, and `aayuboovan` suggests ආයුබෝවන්. Spellings can be ambiguous. The bundled Sinhala dictionary at `assets/dict/si.dict` is a compiled Cdict trie. Its generator combines Sinhala words with integer frequency weights. The next-word engine uses one- and two-word contexts and locally learned transitions.
+
+**Personal Sinhala dictionary** in Settings lists saved words. Tap **Add word** to save one or tap an entry to remove it. The keyboard counts accepted Sinhala words and direct entries completed with Space, up to 256 words. The app stores these counts locally, outside Android backup. Sensitive fields skip learning. Swipe gestures and double-space punctuation have separate switches. Double-space punctuation is off by default.
+
 ## Requirements
 
 To build the Android app, install:
@@ -41,6 +51,10 @@ The APK is written to:
 ```text
 build/outputs/apk/debug/KeyCraft-Sinhala-Keyboard-debug.apk
 ```
+
+## Tests and limitations
+
+Run `./gradlew testDebugUnitTest` for JVM tests, `python3 scripts/run_sinhala_python_tests.py` for layout and dictionary generation tests, and `./gradlew connectedDebugAndroidTest` with an Android device for instrumentation tests. App-specific editing depends on the host exposing selection and surrounding text through Android’s input connection. Private fields and editors that omit surrounding text can limit contextual editing. Gesture-only alternatives require swipes to be enabled. Offline predictions depend on the bundled vocabulary and local history.
 
 ## Install
 

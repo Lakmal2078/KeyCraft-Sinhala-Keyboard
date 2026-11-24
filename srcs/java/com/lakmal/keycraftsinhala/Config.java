@@ -87,6 +87,8 @@ public class Config
   public int clipboard_history_duration;
   public boolean space_bar_auto_complete;
   public boolean sinhala_transliteration;
+  public boolean literal_singlish = true;
+  public boolean double_space_period;
   public boolean physical_keyboard_hide;
   public Typeface custom_font = null;
   public boolean high_contrast_labels;
@@ -192,7 +194,8 @@ public class Config
     float dpi_ratio = Math.max(dm.xdpi, dm.ydpi) / Math.min(dm.xdpi, dm.ydpi);
     float swipe_scaling = Math.min(dm.widthPixels, dm.heightPixels) / 10.f * dpi_ratio;
     float swipe_dist_value = parseFloatPref(_prefs, "swipe_dist", 15f);
-    swipe_dist_px = swipe_dist_value / 25.f * swipe_scaling;
+    swipe_dist_px = _prefs.getBoolean("enable_swipes", true)
+        ? swipe_dist_value / 25.f * swipe_scaling : Float.POSITIVE_INFINITY;
     float slider_sensitivity = parseFloatPref(_prefs, "slider_sensitivity", 30f) / 100.f;
     slide_step_px = slider_sensitivity * swipe_scaling;
     vibrate_custom = _prefs.getBoolean("vibrate_custom", false);
@@ -244,6 +247,8 @@ public class Config
     clipboard_history_enabled = _prefs.getBoolean("clipboard_history_enabled", false);
     clipboard_history_duration = parseIntPref(_prefs, "clipboard_history_duration", 5);
     space_bar_auto_complete = _prefs.getBoolean("space_bar_auto_complete", false);
+    literal_singlish = _prefs.getBoolean("literal_singlish", true);
+    double_space_period = _prefs.getBoolean("double_space_period", false);
     sinhala_transliteration = _prefs.getBoolean("sinhala_transliteration", true);
     physical_keyboard_hide = _prefs.getString("physical_keyboard_behavior", "hide").equals("hide");
     custom_font = get_custom_font(_prefs.getString("keyboard_font", "default"));

@@ -6,6 +6,35 @@ import static org.junit.Assert.*;
 public class SinhalaTransliteratorTest
 {
   @Test
+  public void everydaySpellingVariantsUseTheSameFirstSuggestion()
+  {
+    assertEquals("ආයුබෝවන්", SinhalaTransliterator.getSuggestions("aayuboovan").get(0));
+    assertEquals("යාලුවා", SinhalaTransliterator.getSuggestions("yaaluvaa").get(0));
+    assertEquals("වතුර", SinhalaTransliterator.getSuggestions("vathura").get(0));
+    assertEquals(SinhalaTransliterator.parsePhonetic("kryae"),
+        SinhalaTransliterator.parsePhonetic("kryæ"));
+    assertEquals(SinhalaTransliterator.parsePhonetic("kraae"),
+        SinhalaTransliterator.parsePhonetic("krǣ"));
+  }
+
+  @Test
+  public void intervocalicDhSupportsEverydaySinglish()
+  {
+    assertEquals("නිවරදි", SinhalaTransliterator.transliterateWord("niwaradhi"));
+    assertEquals("නිවරදි", SinhalaTransliterator.getSuggestions("niwaradhi").get(0));
+    assertTrue(SinhalaTransliterator.getSuggestions("niwaradhi").contains("නිවරධි"));
+    assertEquals("හොඳටම", SinhalaTransliterator.getSuggestions("hodhatama").get(0));
+    assertEquals("මාධව", SinhalaTransliterator.getSuggestions("madhawa").get(0));
+  }
+
+  @Test
+  public void suggestionsRespectPhonemicCapitalization()
+  {
+    assertEquals("ඩ", SinhalaTransliterator.getSuggestions("Da").get(0));
+    assertEquals("ද", SinhalaTransliterator.getSuggestions("da").get(0));
+  }
+
+  @Test
   public void testRequestedWords()
   {
     // The specific words requested by the user

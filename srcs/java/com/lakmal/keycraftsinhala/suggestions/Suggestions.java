@@ -18,9 +18,19 @@ import com.lakmal.keycraftsinhala.SinhalaTransliterator;
     [CandidatesView]. */
 public final class Suggestions
 {
+  public com.lakmal.keycraftsinhala.PersonalWords personalWords;
+  private List<String> contextWords = java.util.Collections.emptyList();
   Callback _callback;
   Config _config;
   boolean _enabled;
+  private Cdict sinhalaDictionary;
+
+  public void loadSinhalaDictionary(android.content.Context context)
+  {
+    Cdict[] dictionaries = Dictionaries.instance(context).load("si");
+    if (dictionaries != null) sinhalaDictionary = Dictionaries.find_by_name(dictionaries, "main");
+  }
+
   private SinhalaLearner _sinhala_learner = null;
 
   /** Current suggestions. The best suggestion is at index [0]. */
@@ -50,6 +60,7 @@ public final class Suggestions
 
   public void started()
   {
+    contextWords = java.util.Collections.emptyList();
     _enabled = _config.suggestions_enabled
       && !_config.editor_config.is_sensitive_input
       && _config.editor_config.should_show_candidates_view;
@@ -85,6 +96,7 @@ public final class Suggestions
     if (!_enabled || list == null || list.isEmpty())
       return;
     clear();
+    contextWords = new java.util.ArrayList<>(list);
     is_prediction = true;
     for (int i = 0; i < list.size() && count < MAX_COUNT; i++)
       addUniqueSuggestion(list.get(i));
@@ -99,6 +111,29 @@ public final class Suggestions
     {
       clear();
       show_clipboard_suggestion();
+      return;
+    }
+    if (word.charAt(0) >= 'අ' && word.charAt(0) <= 'ෆ')
+    {
+      clear();
+      Cdict dict = "si".equals(_config.current_dictionary_name) ? _config.current_dictionary : sinhalaDictionary;
+      if (dict != null)
+      {
+        Cdict.Result match = dict.find(word);
+        if (match.found) addUniqueSuggestion(dict.word(match.index));
+        if (personalWords != null && personalWords.contains(word)) addUniqueSuggestion(word);
+        int[] suffixes = dict.suffixes(match, MAX_COUNT);
+        for (int index : suffixes)
+        {
+          if (count >= 2) break;
+          addUniqueSuggestion(dict.word(index));
+        }
+      }
+      for (String next : contextWords)
+        if (next.startsWith(word)) addUniqueSuggestion(next);
+      if (personalWords != null)
+        for (String personal : personalWords.matching(word)) addUniqueSuggestion(personal);
+      _callback.set_suggestions(this);
       return;
     }
     if (_config.quick_calculator_enabled)
@@ -125,7 +160,7 @@ public final class Suggestions
         return;
       }
     }
-    if (_config.sinhala_transliteration && is_ascii_letters(word))
+    if (_config.sinhala_transliteration && _config.editor_config.isProseField() && is_ascii_letters(word))
     {
       SinhalaLearner learner = (_config.editor_config != null
           && _config.editor_config.is_sensitive_input) ? null : _sinhala_learner;
@@ -133,6 +168,15 @@ public final class Suggestions
       if (!list.isEmpty())
       {
         clear();
+        if (_config.literal_singlish)
+        {
+          String primary = SinhalaTransliterator.transliterateWord(word, learner);
+          addUniqueSuggestion(primary);
+          for (String next : contextWords)
+            if (next.startsWith(primary)) addUniqueSuggestion(next);
+          if (personalWords != null)
+            for (String next : personalWords.matching(primary)) addUniqueSuggestion(next);
+        }
         for (int i = 0; i < list.size() && count < MAX_COUNT; i++)
           addUniqueSuggestion(list.get(i));
         // Keep the literal spelling reachable even for ambiguous prefixes.

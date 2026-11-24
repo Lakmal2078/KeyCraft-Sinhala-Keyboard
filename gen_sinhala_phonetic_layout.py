@@ -73,7 +73,7 @@ KEYS_MAP: dict[str, tuple[str, str, str, str]] = {
     'g': ('ග', 'ඝ', 'ඟ', ''),
     'h': ('හ', '\N{Sinhala Sign Visargaya}', vow('Kombuva Haa Gayanukitta'), 'ඖ'),
     'j': ('ජ', 'ඣ', 'ඦ', ''),
-    'k': ('ක', 'ඛ', '', 'ඐ'),
+    'k': ('ක', 'ඛ', 'ඏ', 'ඐ'),
     'l': ('ල', 'ළ', vow('Gayanukitta'), vow('Diga Gayanukitta')),
     # Row 3 ###########################################
     'z': ('ඤ', 'ඥ', '', ''),  # In XKB contains bar, broken bar

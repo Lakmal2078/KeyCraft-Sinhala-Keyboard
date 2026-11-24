@@ -90,6 +90,10 @@ public class SettingsActivity extends PreferenceActivity
       });
     }
 
+    findPreference("personal_words").setOnPreferenceClickListener(preference -> {
+      showPersonalWords();
+      return true;
+    });
     Preference clearLearnedData = findPreference("clear_sinhala_learned_data");
     if (clearLearnedData != null)
     {
@@ -101,6 +105,7 @@ public class SettingsActivity extends PreferenceActivity
             .setPositiveButton(R.string.pref_clear_sinhala_learned_data_action, (dialog, which) -> {
               try
               {
+                PersonalWords.open(this).clear();
                 int message = SinhalaLearner.clearAllLearnedData(this)
                     ? R.string.pref_clear_sinhala_learned_data_done
                     : R.string.pref_clear_sinhala_learned_data_failed;
@@ -118,6 +123,28 @@ public class SettingsActivity extends PreferenceActivity
         return true;
       });
     }
+  }
+
+  private void showPersonalWords()
+  {
+    PersonalWords store = PersonalWords.open(this);
+    String[] words = store.matching("").toArray(new String[0]);
+    new AlertDialog.Builder(this).setTitle(R.string.personal_words)
+        .setItems(words, (dialog, index) -> new AlertDialog.Builder(this)
+            .setMessage(words[index]).setPositiveButton(R.string.remove_word,
+                (confirm, button) -> { store.remove(words[index]); showPersonalWords(); })
+            .setNegativeButton(android.R.string.cancel, null).show())
+        .setPositiveButton(R.string.add_word, (dialog, button) -> {
+          android.widget.EditText input = new android.widget.EditText(this);
+          input.setSingleLine(true);
+          input.setHint(R.string.sinhala_word);
+          new AlertDialog.Builder(this).setTitle(R.string.add_word).setView(input)
+              .setPositiveButton(android.R.string.ok, (add, ok) -> {
+                if (!store.learn(input.getText().toString().trim()))
+                  Toast.makeText(this, R.string.sinhala_word, Toast.LENGTH_SHORT).show();
+                showPersonalWords();
+              }).setNegativeButton(android.R.string.cancel, null).show();
+        }).setNegativeButton(android.R.string.cancel, null).show();
   }
 
   static boolean resetKeyboardSettings(SharedPreferences prefs, boolean preserveMigrationMarker)

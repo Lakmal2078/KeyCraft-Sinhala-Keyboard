@@ -65,7 +65,7 @@ public final class PhoneticParser
   private static final String[][] CONSONANTS = {
     {"ksh", "\u0D9A\u0DCA\u200D\u0DC2"},
     {"Ksh", "\u0D9A\u0DCA\u200D\u0DC2"},
-    {"chch", "\u0DA0\u0DCA\u200D\u0DA0"}, // ච්ච
+    {"chch", "\u0DA0\u0DCA\u0DA0"}, // ච්ච
     {"nndh", "\u0DB3"}, // ඳ
     {"ndh", "\u0DB1\u0DCA\u200D\u0DB0"}, // න්‍ධ
     {"shh", "\u0DC2\u0DCA"}, // ෂ්
@@ -351,7 +351,7 @@ public final class PhoneticParser
   private static boolean isVowel(char c)
   {
     c = Character.toLowerCase(c);
-    return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+    return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'æ' || c == 'ǣ';
   }
   private PhoneticParser() {}
 }

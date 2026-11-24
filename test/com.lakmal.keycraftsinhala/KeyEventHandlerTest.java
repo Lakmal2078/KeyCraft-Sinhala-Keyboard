@@ -21,6 +21,7 @@ public class KeyEventHandlerTest
   public void setUp()
   {
     config = new Config();
+    config.literal_singlish = false; // Exercise legacy live composition unless a test opts into literal preview.
     config.editor_config = new EditorConfig();
     config.editor_config.initial_text_before_cursor = "";
     config.editor_config.should_show_candidates_view = true;
@@ -51,6 +52,40 @@ public class KeyEventHandlerTest
   {
     for (int i = 0; i < text.length(); i++)
       handler.key_up(KeyValue.makeCharKey(text.charAt(i)), Pointers.Modifiers.EMPTY);
+  }
+
+  @Test
+  public void literalPreviewPreservesEnglishAndConvertsOnlyOnSelection()
+  {
+    config.literal_singlish = true;
+    config.sinhala_transliteration = true;
+    type("API");
+    handler.handle_space_bar();
+    assertEquals("API ", document.toString());
+    type("niwaradhi");
+    verify(connection).setComposingText("niwaradhi", 1);
+    assertEquals("නිවරදි", suggestions.suggestions[0]);
+    handler.suggestion_entered("නිවරදි", false);
+    assertEquals("API නිවරදි", document.toString());
+  }
+
+  @Test
+  public void directKeysReplaceOnlyThePriorSign()
+  {
+    when(connection.getTextBeforeCursor(anyInt(), anyInt())).thenAnswer(call -> document.toString());
+    type("කෙේර");
+    assertEquals("කේර", document.toString());
+    handler.handle_backspace();
+    handler.handle_backspace();
+    assertEquals("ක", document.toString());
+  }
+
+  @Test
+  public void candidateKeepsPrecedingComma()
+  {
+    type("මල,ගෙ");
+    handler.suggestion_entered("ගෙදර", false);
+    assertEquals("මල,ගෙදර", document.toString());
   }
 
   @Test

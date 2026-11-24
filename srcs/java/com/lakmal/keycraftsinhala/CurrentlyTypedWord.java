@@ -138,7 +138,7 @@ public final class CurrentlyTypedWord
     int c = len + _w_cursor;
     _w.delete(Math.max(c - remove_before, 0), Math.max(Math.min(c + remove_after, len), 0));
     _cursor -= remove_before;
-    _w_cursor -= remove_after;
+    _w_cursor += Math.min(remove_after, Math.max(0, -_w_cursor));
     callback();
   }
 
@@ -263,6 +263,7 @@ public final class CurrentlyTypedWord
     return Character.isLetterOrDigit(c)
         || type == Character.NON_SPACING_MARK
         || type == Character.COMBINING_SPACING_MARK
+        || c == 0x200D || c == 0x200C
         || (c == '\'') || (c == '/')
         || (c == '+') || (c == '-') || (c == '*') || (c == '%') || (c == '^')
         || (c == '×') || (c == '÷') || (c == '=') || (c == '.')

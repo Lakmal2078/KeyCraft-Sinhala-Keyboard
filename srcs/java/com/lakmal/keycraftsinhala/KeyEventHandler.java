@@ -37,6 +37,7 @@ public final class KeyEventHandler
   LastAction _next_last_action = null;
   StringBuilder _sinhala_buffer = new StringBuilder();
   SinhalaLearner _sinhala_learner;
+  final PersonalWords personalWords;
   String _last_committed_sinhala = null;
   String _sinhala_committed_text = "";
   int _max_sinhala_composing_len = 0;
@@ -59,6 +60,12 @@ public final class KeyEventHandler
     _suggestions = sg;
     _typedword = new CurrentlyTypedWord(handler, this);
     _sinhala_learner = new SinhalaLearner(context);
+    personalWords = context == null ? new PersonalWords(null) : PersonalWords.open(context);
+    if (_suggestions != null)
+    {
+      _suggestions.personalWords = personalWords;
+      if (context != null) _suggestions.loadSinhalaDictionary(context);
+    }
     if (_suggestions != null)
       _suggestions.setSinhalaLearner(_sinhala_learner);
   }
@@ -137,6 +144,7 @@ public final class KeyEventHandler
     reset_sinhala_composing_state();
     _move_cursor_force_fallback =
       _config.editor_config.should_move_cursor_force_fallback;
+    previousSpaceNanos = 0;
     _last_action = null;
     _next_last_action = null;
     last_replaced_word = null;
@@ -227,6 +235,8 @@ public final class KeyEventHandler
   {
     if (key == null)
       return;
+    if (key.getKind() != KeyValue.Kind.Editing || key.getEditing() != KeyValue.Editing.SPACE_BAR)
+      previousSpaceNanos = 0;
     _next_last_action = LastAction.OTHER;
     Pointers.Modifiers old_mods = _mods;
     update_meta_state(mods);
@@ -266,6 +276,13 @@ public final class KeyEventHandler
     last_replacement_word_len = 0;
     _next_last_action = LastAction.OTHER;
     InputConnection conn = _recv.getCurrentInputConnection();
+    if (add_space_after && conn != null && !_config.editor_config.is_sensitive_input)
+    {
+      CharSequence following = conn.getTextAfterCursor(1, 0);
+      if (following != null && following.length() > 0
+          && !SinhalaText.wordPart(following.charAt(0))) add_space_after = false;
+    }
+    replacementAddedSpace = add_space_after;
     if (text.startsWith("📋 ") && conn != null)
     {
       String pasteText = (_suggestions.clipboard_full_text != null)
@@ -300,6 +317,8 @@ public final class KeyEventHandler
       if (add_space_after)
         text = text + " ";
       commit_sinhala_replacement(conn, text);
+      last_replaced_word = typedSinglish;
+      last_replacement_word_len = text.length();
       _sinhala_buffer.setLength(0);
       _typedword.typed(text);
       _suggestions.clear();
@@ -318,8 +337,22 @@ public final class KeyEventHandler
     int cur_rel = _typedword.cursor_relative();
     if (old.length() > 0)
     {
-      replace_surrounding_text(old.length() + cur_rel, -cur_rel, text);
-      last_replaced_word = old;
+      int cursor = old.length() + cur_rel;
+      int left = cursor, right = cursor;
+      while (left > 0 && SinhalaText.wordPart(old.charAt(left-1))) left--;
+      while (right < old.length() && SinhalaText.wordPart(old.charAt(right))) right++;
+      if (_config.smart_snippets_enabled && SmartSnippets.getSnippet(old) != null)
+      {
+        left = 0;
+        right = old.length();
+      }
+      if (right < old.length() && add_space_after)
+      {
+        text = rawText;
+        replacementAddedSpace = false;
+      }
+      replace_surrounding_text(cursor-left, right-cursor, text);
+      last_replaced_word = old.substring(left, right);
       last_replacement_word_len = text.length();
     }
     else if (conn != null)
@@ -358,6 +391,7 @@ public final class KeyEventHandler
     }
 
     String raw = (committedWord != null) ? committedWord.trim() : "";
+    if (raw.length() <= SinhalaLearner.MAX_WORD_LENGTH) personalWords.learn(raw);
     if (_last_committed_sinhala != null)
     {
       if (_sinhala_learner != null)
@@ -404,6 +438,15 @@ public final class KeyEventHandler
     if (_config.sinhala_transliteration && _sinhala_buffer.length() > 0)
     {
       return;
+    }
+    int cursor = word.length() + _typedword.cursor_relative();
+    if (cursor >= 0 && cursor <= word.length() && !word.startsWith("//") && !word.startsWith(".."))
+    {
+      int left = cursor, right = cursor;
+      while (left > 0 && SinhalaText.wordPart(word.charAt(left-1))) left--;
+      while (right < word.length() && SinhalaText.wordPart(word.charAt(right))) right++;
+      if (right > left && word.charAt(left) >= 'අ' && word.charAt(left) <= 'ෆ')
+        word = word.substring(left, right);
     }
     _suggestions.currently_typed_word(word);
   }
@@ -622,6 +665,11 @@ public final class KeyEventHandler
     reset_sinhala_composing_state();
   }
 
+  private String composingPreview()
+  {
+    return _config.literal_singlish ? _sinhala_buffer.toString() : transliterate_sinhala_buffer();
+  }
+
   private String transliterate_sinhala_buffer()
   {
     SinhalaLearner learner = _config.editor_config.is_sensitive_input ? null : _sinhala_learner;
@@ -646,7 +694,7 @@ public final class KeyEventHandler
     InputConnection conn = _recv.getCurrentInputConnection();
     if (conn == null)
       return;
-    String expected = transliterate_sinhala_buffer();
+    String expected = composingPreview();
     _runtime_fallback_commit_replace = true;
     int oldLen = candidatesEnd - candidatesStart;
     conn.beginBatchEdit();
@@ -678,11 +726,13 @@ public final class KeyEventHandler
     InputConnection conn = _recv.getCurrentInputConnection();
     if (conn == null)
       return;
+    if (!text.equals(" ")) previousSpaceNanos = 0;
 
     boolean is_sinhala = _config.sinhala_transliteration
         && !_config.editor_config.is_password_input
         && (_meta_state & (KeyEvent.META_CTRL_ON | KeyEvent.META_ALT_ON | KeyEvent.META_META_ON)) == 0;
 
+    is_sinhala = is_sinhala && _config.editor_config.isProseField();
     String tracked = _typedword.get();
     boolean snippet = _config.smart_snippets_enabled
         && (tracked.startsWith("//") || tracked.startsWith(".."));
@@ -700,7 +750,7 @@ public final class KeyEventHandler
     if (is_sinhala && !snippet && is_ascii_letters(text))
     {
       _sinhala_buffer.append(text);
-      String transliterated = transliterate_sinhala_buffer();
+      String transliterated = composingPreview();
       update_sinhala_composing(conn, transliterated);
       if (_config.suggestions_enabled)
         _suggestions.currently_typed_word(_sinhala_buffer.toString());
@@ -709,6 +759,31 @@ public final class KeyEventHandler
     }
 
     finish_composing();
+    if (text.length() == 1 && SinhalaText.mark(text.charAt(0)) && !_config.editor_config.is_sensitive_input)
+    {
+      CharSequence before = conn.getTextBeforeCursor(16, 0);
+      if (before != null)
+      {
+        int remove = SinhalaText.replaceBeforeMark(before, text.charAt(0));
+        if (remove < 0) return;
+        CharSequence after = conn.getTextAfterCursor(1, 0);
+        int forward = 0;
+        if (after != null && after.length() > 0 && !_typedword.is_selection_not_empty())
+        {
+          char next = after.charAt(0);
+          char incoming = text.charAt(0);
+          if (SinhalaText.mark(next) && SinhalaText.nasal(next) == SinhalaText.nasal(incoming))
+            forward = 1;
+          else if (SinhalaText.nasal(incoming) && SinhalaText.mark(next))
+            return;
+        }
+        if ((remove > 0 || forward > 0) && !_typedword.is_selection_not_empty())
+        {
+          replace_surrounding_text(remove, forward, text);
+          return;
+        }
+      }
+    }
     _autocap.typed(text);
     _typedword.typed(text);
     conn.commitText(text, 1);
@@ -738,11 +813,13 @@ public final class KeyEventHandler
     if (conn == null)
       return;
     conn.beginBatchEdit();
-    conn.deleteSurroundingText(remove_before, remove_after);
-    conn.commitText(new_text, 1);
-    _typedword.remove_surrounding_text(remove_before, remove_after);
-    _typedword.typed(new_text);
-    conn.endBatchEdit();
+    try
+    {
+      if (!conn.deleteSurroundingText(remove_before, remove_after)) return;
+      _typedword.remove_surrounding_text(remove_before, remove_after);
+      if (conn.commitText(new_text, 1)) _typedword.typed(new_text);
+    }
+    finally { conn.endBatchEdit(); }
   }
 
   /** See {!InputConnection.performContextMenuAction}. */
@@ -826,6 +903,7 @@ public final class KeyEventHandler
   public void toggle_language()
   {
     finish_composing();
+    _last_committed_sinhala = null;
     _config.sinhala_transliteration = !_config.sinhala_transliteration;
     Config.globalPrefs().edit().putBoolean("sinhala_transliteration", _config.sinhala_transliteration).apply();
     _suggestions.clear();
@@ -1021,21 +1099,33 @@ public final class KeyEventHandler
   /** Length of the text before the cursor that should be replaced by
       backspace. */
   int last_replacement_word_len = 0;
+  boolean replacementAddedSpace;
+
+  private long previousSpaceNanos;
 
   /** Implement autocorrect and Sinhala auto-transliteration when enabled in the settings. */
   void handle_space_bar()
   {
+    long now = System.nanoTime();
+    boolean secondSpace = previousSpaceNanos != 0 && now - previousSpaceNanos <= 500000000L;
+    previousSpaceNanos = now;
     InputConnection conn = _recv.getCurrentInputConnection();
     if (_sinhala_buffer.length() > 0 && conn != null)
     {
-      // Space commits the transliteration, not an unselected suggestion.
+      // The literal-preview mode commits the original spelling on space.
       // Alternative candidates are committed only when the user taps one.
-      String committedSinhala = transliterate_sinhala_buffer();
+      String committedSinhala = composingPreview();
       commit_sinhala_replacement(conn, committedSinhala + " ");
       _sinhala_buffer.setLength(0);
       _typedword.typed(committedSinhala + " ");
       _suggestions.clear();
-      update_sinhala_predictions(conn, committedSinhala);
+      if (!_config.literal_singlish || SinhalaLearner.isValidSinhalaWord(committedSinhala))
+        update_sinhala_predictions(conn, committedSinhala);
+      else
+      {
+        _last_committed_sinhala = null;
+        _recv.set_suggestions(_suggestions);
+      }
       _next_last_action = LastAction.OTHER;
       return;
     }
@@ -1044,21 +1134,41 @@ public final class KeyEventHandler
         && _last_action == LastAction.OTHER)
     {
       String typed = _typedword.get();
-      if (!_config.editor_config.is_no_suggestions
+      if (_config.editor_config.isProseField() && !_config.editor_config.is_no_suggestions
           && _config.space_bar_auto_complete && _suggestions.count > 0
           && _suggestions.suggestions[0] != null
           && !_suggestions.suggestions[0].startsWith("📋 "))
       {
         // Don't replace the typed word if unecessary to avoid flickering
         String w = _suggestions.suggestions[0];
-        if (!w.equals(typed))
+        if (("teh".equals(typed) && "the".equals(w)) || ("adn".equals(typed) && "and".equals(w)))
         {
           suggestion_entered(w, true);
           return;
         }
       }
     }
+    if (conn != null && secondSpace && _config.editor_config.isProseField() && _config.double_space_period && !_typedword.is_selection_not_empty()
+        && !_config.editor_config.is_sensitive_input && !_config.editor_config.is_no_suggestions)
+    {
+      CharSequence before = conn.getTextBeforeCursor(3, 0);
+      if (before != null && before.length() >= 2 && before.charAt(before.length()-1) == ' ')
+      {
+        char prev = before.charAt(before.length()-2);
+        if (Character.isLetter(prev) || SinhalaText.mark(prev))
+        {
+          replace_surrounding_text(1, 0, ". ");
+          return;
+        }
+      }
+    }
+    String word = _typedword.get();
+    boolean completeWord = !_typedword.is_selection_not_empty() && _typedword.cursor_relative() == 0;
     send_text(" ");
+    if (completeWord && SinhalaLearner.isValidSinhalaWord(word))
+      update_sinhala_predictions(conn, word);
+    else
+      _last_committed_sinhala = null;
   }
 
   void handle_delete_word()
@@ -1125,7 +1235,7 @@ public final class KeyEventHandler
       _sinhala_buffer.deleteCharAt(_sinhala_buffer.length() - 1);
       if (_sinhala_buffer.length() > 0)
       {
-        String transliterated = transliterate_sinhala_buffer();
+        String transliterated = composingPreview();
         update_sinhala_composing(conn, transliterated);
         if (_config.suggestions_enabled)
           _suggestions.currently_typed_word(_sinhala_buffer.toString());
@@ -1143,12 +1253,30 @@ public final class KeyEventHandler
     if (_last_action == LastAction.SUGGESTION_ENTERED
         && last_replaced_word != null)
     {
-      replace_surrounding_text(last_replacement_word_len, 0, last_replaced_word + " ");
+      replace_surrounding_text(last_replacement_word_len, 0, last_replaced_word + (replacementAddedSpace ? " " : ""));
       last_replaced_word = null;
       _next_last_action = LastAction.SUGGESTION_UNDO;
     }
     else
     {
+      if (conn != null && !_typedword.is_selection_not_empty() && !_config.editor_config.is_sensitive_input)
+      {
+        CharSequence before = conn.getTextBeforeCursor(8, 0);
+        int count = before == null ? 0 : SinhalaText.backspaceLength(before);
+        int forward = 0;
+        if (count == 1 && before != null && SinhalaText.consonant(before.charAt(before.length()-1)))
+        {
+          CharSequence after = conn.getTextAfterCursor(8, 0);
+          if (after != null)
+            while (forward < after.length() && (SinhalaText.mark(after.charAt(forward))
+                || after.charAt(forward) == 0x200D || after.charAt(forward) == 0x200C)) forward++;
+        }
+        if (count > 0 && conn.deleteSurroundingText(count, forward))
+        {
+          _typedword.remove_surrounding_text(count, forward);
+          return;
+        }
+      }
       send_key_down_up(KeyEvent.KEYCODE_DEL);
     }
   }
@@ -1162,6 +1290,7 @@ public final class KeyEventHandler
     public InputConnection getCurrentInputConnection();
     public Handler getHandler();
     public void language_changed();
+    default boolean isSinhalaLayout() { return false; }
   }
 
   class Autocapitalisation_callback implements Autocapitalisation.Callback
@@ -1169,7 +1298,7 @@ public final class KeyEventHandler
     @Override
     public void update_shift_state(boolean should_enable, boolean should_disable)
     {
-      if (should_enable)
+      if (should_enable && !_recv.isSinhalaLayout())
         _recv.set_shift_state(true, false);
       else if (should_disable)
         _recv.set_shift_state(false, false);

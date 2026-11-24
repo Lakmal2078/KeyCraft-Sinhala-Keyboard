@@ -22,7 +22,13 @@ import java.util.TreeMap;
  */
 public final class SinhalaTransliterator
 {
+  // In casual Singlish, lowercase dh between vowels often spells dental ද.
+  private static final java.util.regex.Pattern INTERVOCALIC_DH =
+      java.util.regex.Pattern.compile("(?<=[aeiouAEIOU])dh(?=[aeiouAEIOU])");
   private static final Map<String, String> COMMON_WORDS = new HashMap<>();
+  private static final Map<String, String> SPELLING_VARIANTS = new HashMap<>();
+  private static final java.util.regex.Pattern DOUBLE_VOWEL =
+      java.util.regex.Pattern.compile("([aeiou])\\1");
   private static final Map<String, String> COMMON_PHRASES = new HashMap<>();
   private static final PrefixTrieNode COMMON_WORDS_PREFIX_TRIE = new PrefixTrieNode();
 
@@ -1393,11 +1399,33 @@ public final class SinhalaTransliterator
     for (Map.Entry<String, String> entry : COMMON_WORDS.entrySet())
     {
       addPrefixWord(entry.getKey(), entry.getValue());
+      String key = spellingVariantKey(entry.getKey());
+      String existing = SPELLING_VARIANTS.get(key);
+      // An empty value marks competing words. Never guess between them.
+      if (existing == null || existing.equals(entry.getValue()))
+        SPELLING_VARIANTS.put(key, entry.getValue());
+      else
+        SPELLING_VARIANTS.put(key, "");
     }
   }
   private static final com.lakmal.keycraftsinhala.transliteration.DictionaryProvider DICTIONARY =
       new com.lakmal.keycraftsinhala.transliteration.ExistingDictionaryAdapter(
           new com.lakmal.keycraftsinhala.transliteration.CommonWordsProvider(COMMON_WORDS));
+
+  private static String spellingVariantKey(String word)
+  {
+    return DOUBLE_VOWEL.matcher(word.replace('v', 'w')).replaceAll("$1");
+  }
+
+  private static String lookupSpellingVariant(String word)
+  {
+    // Short syllables and explicit capital letters carry phonetic information.
+    if (word.length() < 4 || !word.equals(word.toLowerCase(Locale.ROOT)))
+      return null;
+    String value = SPELLING_VARIANTS.get(spellingVariantKey(word));
+    return value == null || value.isEmpty() || value.charAt(0) < 0x0D80
+        || value.charAt(0) > 0x0DFF ? null : value;
+  }
 
   private static final class PrefixTrieNode
   {
@@ -1446,7 +1474,8 @@ public final class SinhalaTransliterator
         String candidate = current.value;
         if (!suggestions.contains(candidate))
         {
-          if (suggestions.size() == 1 && !DICTIONARY.contains(prefix))
+          if (suggestions.size() == 1 && !DICTIONARY.contains(prefix)
+              && lookupSpellingVariant(prefix) == null)
             suggestions.add(0, candidate);
           else
             suggestions.add(candidate);
@@ -1548,6 +1577,18 @@ public final class SinhalaTransliterator
 
     String phoneticInput = com.lakmal.keycraftsinhala.transliteration.SinglishNormalizer.normalizeForPhonetic(
         com.lakmal.keycraftsinhala.transliteration.SinglishNormalizer.preserveCase(word));
+    String variant = lookupSpellingVariant(phoneticInput);
+    if (variant != null)
+      return variant;
+    if (phoneticInput.contains("dh"))
+    {
+      String dental = INTERVOCALIC_DH.matcher(phoneticInput).replaceAll("d");
+      if (!dental.equals(phoneticInput))
+      {
+        String known = DICTIONARY.lookup(dental.toLowerCase(Locale.ROOT));
+        return known != null ? known : parsePhonetic(dental);
+      }
+    }
     return parsePhonetic(phoneticInput);
   }
 
@@ -1651,24 +1692,12 @@ public final class SinhalaTransliterator
     String trimmed = word.trim();
     String lower = trimmed.toLowerCase(Locale.ROOT);
 
-    String dictionaryValue = DICTIONARY.lookup(lower);
-    if (dictionaryValue != null && !list.contains(dictionaryValue))
-      list.add(dictionaryValue);
-
-    // Only expose learned corrections as alternatives when no canonical entry
-    // exists for the exact input.
-    if (dictionaryValue == null && learner != null)
-    {
-      String learned = learner.getLearnedCorrection(trimmed);
-      if (learned != null && !learned.isEmpty() && !list.contains(learned))
-        list.add(learned);
-    }
-
     String primary = transliterateWord(trimmed, learner);
-    if (!list.contains(primary))
-    {
-      list.add(primary);
-    }
+    list.add(primary);
+
+    String dictionaryValue = DICTIONARY.lookup(lower);
+    if (dictionaryValue != null && !dictionaryValue.equals(primary))
+      list.add(dictionaryValue);
 
     if ("ka".equals(lower))
     {
@@ -1680,6 +1709,14 @@ public final class SinhalaTransliterator
       if (!list.contains(trimmed))
         list.add(trimmed); // raw English spelling stays reachable
       return list;
+    }
+
+    // Keep the aspirated spelling available alongside the everyday spelling.
+    if (dictionaryValue == null && trimmed.contains("dh") && INTERVOCALIC_DH.matcher(trimmed).find())
+    {
+      String aspirated = parsePhonetic(trimmed);
+      if (!list.contains(aspirated))
+        list.add(aspirated);
     }
 
     // Prefix completions use the prebuilt trie instead of scanning the full lexicon.
