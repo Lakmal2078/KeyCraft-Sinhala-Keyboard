@@ -784,9 +784,12 @@ public final class KeyEventHandler
         }
       }
     }
-    _autocap.typed(text);
-    _typedword.typed(text);
-    conn.commitText(text, 1);
+    // Updating the word tracker publishes candidates synchronously.
+    if (conn.commitText(text, 1))
+    {
+      _autocap.typed(text);
+      _typedword.typed(text);
+    }
   }
 
   /** Commits image content (GIF, PNG, JPEG, WebP) to the focused app.
@@ -812,14 +815,16 @@ public final class KeyEventHandler
     InputConnection conn = _recv.getCurrentInputConnection();
     if (conn == null)
       return;
+    boolean committed;
     conn.beginBatchEdit();
     try
     {
       if (!conn.deleteSurroundingText(remove_before, remove_after)) return;
-      _typedword.remove_surrounding_text(remove_before, remove_after);
-      if (conn.commitText(new_text, 1)) _typedword.typed(new_text);
+      committed = conn.commitText(new_text, 1);
     }
     finally { conn.endBatchEdit(); }
+    _typedword.remove_surrounding_text(remove_before, remove_after);
+    if (committed) _typedword.typed(new_text);
   }
 
   /** See {!InputConnection.performContextMenuAction}. */

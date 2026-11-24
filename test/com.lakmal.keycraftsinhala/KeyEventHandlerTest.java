@@ -11,6 +11,7 @@ import static org.mockito.Mockito.*;
 
 public class KeyEventHandlerTest
 {
+  private KeyEventHandler.IReceiver receiver;
   private Config config;
   private InputConnection connection;
   private KeyEventHandler handler;
@@ -40,7 +41,7 @@ public class KeyEventHandlerTest
       document.delete(Math.max(0, document.length() - count), document.length());
       return true;
     });
-    KeyEventHandler.IReceiver receiver = mock(KeyEventHandler.IReceiver.class);
+    receiver = mock(KeyEventHandler.IReceiver.class);
     when(receiver.getCurrentInputConnection()).thenReturn(connection);
     when(receiver.getHandler()).thenReturn(mock(Handler.class));
     suggestions = new Suggestions(receiver, config);
@@ -67,6 +68,25 @@ public class KeyEventHandlerTest
     assertEquals("නිවරදි", suggestions.suggestions[0]);
     handler.suggestion_entered("නිවරදි", false);
     assertEquals("API නිවරදි", document.toString());
+  }
+
+  @Test
+  public void directSinhalaTapCommitsBeforePublishingSuggestions()
+  {
+    config.sinhala_transliteration = true;
+    config.literal_singlish = true;
+    when(receiver.isSinhalaLayout()).thenReturn(true);
+    when(connection.getTextBeforeCursor(anyInt(), anyInt())).thenAnswer(call -> document.toString());
+    for (String key : new String[]{"ක", "ෙ", "ර"})
+    {
+      clearInvocations(receiver, connection);
+      type(key);
+      org.mockito.InOrder calls = inOrder(connection, receiver);
+      calls.verify(connection).commitText(key, 1);
+      calls.verify(receiver).set_suggestions(suggestions);
+      verify(connection, never()).setComposingText(any(), anyInt());
+    }
+    assertEquals("කෙර", document.toString());
   }
 
   @Test

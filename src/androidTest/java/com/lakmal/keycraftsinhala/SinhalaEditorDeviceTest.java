@@ -20,15 +20,18 @@ public class SinhalaEditorDeviceTest
   {
     InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
       EditText editor = new EditText(ApplicationProvider.getApplicationContext());
-      editor.setText("ක!");
-      editor.setSelection(1);
+      editor.setText("!");
+      editor.setSelection(0);
       EditorInfo info = new EditorInfo();
       InputConnection connection = editor.onCreateInputConnection(info);
       assertNotNull(connection);
       Config config = new Config();
       config.editor_config = new EditorConfig();
-      config.editor_config.initial_sel_start = config.editor_config.initial_sel_end = 1;
-      config.editor_config.initial_text_before_cursor = "ක";
+      config.sinhala_transliteration = true;
+      config.suggestions_enabled = true;
+      config.editor_config.should_show_candidates_view = true;
+      config.editor_config.initial_sel_start = config.editor_config.initial_sel_end = 0;
+      config.editor_config.initial_text_before_cursor = "";
       KeyEventHandler.IReceiver receiver = new KeyEventHandler.IReceiver() {
         public void handle_event_key(KeyValue.Event event) {}
         public void set_shift_state(boolean enabled, boolean lock) {}
@@ -37,11 +40,15 @@ public class SinhalaEditorDeviceTest
         public InputConnection getCurrentInputConnection() { return connection; }
         public Handler getHandler() { return new Handler(Looper.getMainLooper()); }
         public void language_changed() {}
+        public boolean isSinhalaLayout() { return true; }
         public void set_suggestions(Suggestions suggestions) {}
       };
       KeyEventHandler handler = new KeyEventHandler(config, receiver, new Suggestions(receiver, config));
       handler.started();
-      handler.send_text("ෙ");
+      handler.key_up(KeyValue.makeCharKey('ක'), Pointers.Modifiers.EMPTY);
+      assertEquals("ක!", editor.getText().toString());
+      handler.key_up(KeyValue.makeCharKey('ෙ'), Pointers.Modifiers.EMPTY);
+      assertEquals("කෙ!", editor.getText().toString());
       handler.send_text("ේ");
       assertEquals("කේ!", editor.getText().toString());
       handler.send_text("්");
