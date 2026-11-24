@@ -388,4 +388,40 @@ public class ProductionRemediationTest
     assertTrue(fdroidMd.contains("CurrentVersion: 1.3.0"));
     assertTrue(fdroidMd.contains("CurrentVersionCode: 5"));
   }
+
+  @Test
+  public void mobSfScorecardHardeningApplied() throws Exception
+  {
+    String buildGradle = new String(
+        Files.readAllBytes(new File("build.gradle.kts").toPath()),
+        StandardCharsets.UTF_8);
+    assertTrue("minSdk must be >= 29 to avoid unpatched Android and Janus v1 exposure",
+        buildGradle.contains("minSdk = 29"));
+
+    String networkConfig = new String(
+        Files.readAllBytes(new File("res/xml/network_security_config.xml").toPath()),
+        StandardCharsets.UTF_8);
+    assertTrue(networkConfig.contains("cleartextTrafficPermitted=\"false\""));
+    assertFalse("base-config must not declare broad system certificate trust anchors",
+        networkConfig.contains("<certificates src=\"system\""));
+    assertTrue(networkConfig.contains("raw.githubusercontent.com"));
+
+    String keyboard2Src = new String(
+        Files.readAllBytes(new File("srcs/java/com/lakmal/keycraftsinhala/Keyboard2.java").toPath()),
+        StandardCharsets.UTF_8);
+    assertFalse("Keyboard2.java must not import android.util.Log directly",
+        keyboard2Src.contains("import android.util.Log;"));
+    assertFalse("Keyboard2.java must not call raw Log.w",
+        keyboard2Src.contains("Log.w("));
+    assertTrue(keyboard2Src.contains("Logs.warn("));
+
+    Logs.set_debug_logs(false);
+    assertFalse(Logs.isDebugEnabled());
+    Logs.warn("release warning must be suppressed");
+
+    String proguardRules = new String(
+        Files.readAllBytes(new File("proguard-rules.pro").toPath()),
+        StandardCharsets.UTF_8);
+    assertTrue(proguardRules.contains("-assumenosideeffects class android.util.Log"));
+  }
 }

@@ -3,7 +3,6 @@ package com.lakmal.keycraftsinhala;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -123,10 +122,10 @@ public class InputPrivacyTest
       .when(keyboard).getCurrentInputConnection();
     try
     {
-      try (MockedStatic<Log> logs = mockStatic(Log.class))
+      try (MockedStatic<Logs> logs = mockStatic(Logs.class))
       {
         invoke("launch_translate");
-        logs.verify(() -> Log.w(Logs.TAG, "Unable to launch translation: SecurityException"));
+        logs.verify(() -> Logs.warn("Unable to launch translation: SecurityException"));
       }
     }
     catch (Throwable t)

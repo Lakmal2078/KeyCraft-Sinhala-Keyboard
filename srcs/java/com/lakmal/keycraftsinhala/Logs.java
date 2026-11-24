@@ -54,6 +54,12 @@ public final class Logs
     return _debug_logs != null;
   }
 
+  public static void warn(String msg)
+  {
+    if (_debug_logs != null)
+      Log.w(TAG, msg);
+  }
+
   public static void exn(String msg, Throwable e)
   {
     if (_debug_logs != null)

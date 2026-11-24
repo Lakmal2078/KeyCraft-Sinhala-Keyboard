@@ -12,8 +12,6 @@ import android.os.Build.VERSION;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.InputType;
-import android.util.Log;
-import android.util.LogPrinter;
 import android.view.*;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
@@ -719,7 +717,7 @@ public class Keyboard2 extends InputMethodService
               try { startActivity(webIntent); }
               catch (ActivityNotFoundException | SecurityException | IllegalArgumentException ex)
               {
-                Log.w(Logs.TAG, "Unable to launch translation: " + ex.getClass().getSimpleName());
+                Logs.warn("Unable to launch translation: " + ex.getClass().getSimpleName());
               }
             })
             .create();
@@ -731,7 +729,7 @@ public class Keyboard2 extends InputMethodService
     catch (ActivityNotFoundException | SecurityException | IllegalArgumentException e)
     {
       // Exception messages can include the URL and selected text.
-      Log.w(Logs.TAG, "Unable to launch translation: " + e.getClass().getSimpleName());
+      Logs.warn("Unable to launch translation: " + e.getClass().getSimpleName());
     }
   }
 
@@ -763,7 +761,7 @@ public class Keyboard2 extends InputMethodService
     catch (android.content.res.Resources.NotFoundException | ClassCastException
         | IllegalStateException | SecurityException | WindowManager.BadTokenException e)
     {
-      Log.w(Logs.TAG, "Unable to open theme picker: " + e.getClass().getSimpleName());
+      Logs.warn("Unable to open theme picker: " + e.getClass().getSimpleName());
     }
   }
 

@@ -55,7 +55,7 @@ android {
 
   defaultConfig {
     applicationId = "com.lakmal.keycraftsinhala"
-    minSdk = 21
+    minSdk = 29
     targetSdk { version = release(36) }
     versionCode = 7
     versionName = "1.4.1"
