@@ -57,8 +57,8 @@ android {
     applicationId = "com.lakmal.keycraftsinhala"
     minSdk = 21
     targetSdk { version = release(36) }
-    versionCode = 5
-    versionName = "1.3.0"
+    versionCode = 6
+    versionName = "1.4.0"
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
