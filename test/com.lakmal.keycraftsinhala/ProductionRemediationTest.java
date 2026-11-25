@@ -128,7 +128,7 @@ public class ProductionRemediationTest
   }
 
   @Test
-  public void h4_privacyDocsMatchIncludeOnlySettingsBackupPolicy() throws Exception
+  public void h4_privacyDocsMatchNoAppDataBackupPolicy() throws Exception
   {
     String privacyHtml = new String(
         Files.readAllBytes(new File("docs/privacy.html").toPath()),
@@ -137,15 +137,13 @@ public class ProductionRemediationTest
         Files.readAllBytes(new File("README.md").toPath()),
         StandardCharsets.UTF_8);
 
-    assertTrue("docs/privacy.html must disclose preferences backup filename",
-        privacyHtml.contains("com.lakmal.keycraftsinhala_preferences.xml"));
-    assertFalse("docs/privacy.html must not falsely claim preferences are excluded",
-        privacyHtml.contains("preferences and app data are excluded"));
-
-    assertTrue("README.md must disclose preferences backup filename",
-        readme.contains("com.lakmal.keycraftsinhala_preferences.xml"));
-    assertFalse("README.md must not falsely claim preferences do not backup",
-        readme.contains("Keyboard preferences සහ app data cloud backup හෝ device-to-device transfer වෙත backup නොවේ"));
+    for (String documentation : new String[]{privacyHtml, readme})
+    {
+      assertTrue(documentation.contains("disables Android cloud backup"));
+      assertTrue(documentation.contains("exclude its app data from cloud backup and device-to-device transfer"));
+      assertTrue(documentation.contains("pinned clipboard entries"));
+      assertFalse(documentation.contains("com.lakmal.keycraftsinhala_preferences.xml"));
+    }
   }
 
   @Test
