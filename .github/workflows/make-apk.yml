@@ -112,7 +112,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [29, 36]
+        api: [29, 30, 31, 32, 33, 34, 35, 36]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -162,4 +162,5 @@ jobs:
             dist/KeyCraft-Sinhala-Keyboard-release.apk
             dist/KeyCraft-Sinhala-Keyboard-release.apk.sha256
           body_path: docs/releases/${{ github.ref_name }}.md
+          draft: true
           fail_on_unmatched_files: true

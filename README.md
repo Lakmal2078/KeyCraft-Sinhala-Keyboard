@@ -58,6 +58,8 @@ Run `./gradlew testDebugUnitTest` for JVM tests, `python3 scripts/run_sinhala_py
 
 ## Install
 
+Version 1.4.2 requires Android 10 (API 29) or later.
+
 1. Download the latest APK from the [GitHub Releases](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases) page, or build it using the instructions above.
 2. Open the APK on your Android device and approve installation from that source if Android asks.
 3. Open KeyCraft and follow the in-app instructions to enable it as an input method and select it as the current keyboard.
@@ -66,7 +68,7 @@ The exact Settings labels can vary by Android version and device manufacturer.
 
 ## Privacy and backups
 
-Android Backup and device-to-device transfer include only keyboard configuration settings stored in `com.lakmal.keycraftsinhala_preferences.xml`. Learned Sinhala predictions, downloaded dictionaries, recent emojis, cached files, and in-memory clipboard history are excluded.
+KeyCraft disables Android cloud backup and configures Android to exclude its app data from cloud backup and device-to-device transfer. This includes keyboard settings, learned words, downloaded dictionaries, and pinned clipboard entries. The in-memory clipboard history is not persisted.
 
 ## Screenshots
 

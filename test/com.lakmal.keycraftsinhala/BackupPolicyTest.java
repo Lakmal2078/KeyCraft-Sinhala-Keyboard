@@ -1,6 +1,9 @@
 package com.lakmal.keycraftsinhala;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -35,13 +38,25 @@ public class BackupPolicyTest
     assertEquals("android.view.InputMethod", ((Element) actions.item(0)).getAttribute("android:name"));
 
     Document legacy = parse("res/xml/backup_rules.xml");
-    assertEquals(0, legacy.getElementsByTagName("include").getLength());
-    assertEquals(2, legacy.getElementsByTagName("exclude").getLength());
+    assertAllDomainsExcluded(legacy.getDocumentElement());
     Document modern = parse("res/xml/data_extraction_rules.xml");
-    assertEquals(0, modern.getElementsByTagName("include").getLength());
-    assertEquals(4, modern.getElementsByTagName("exclude").getLength());
-    NodeList excludes = modern.getElementsByTagName("exclude");
+    assertAllDomainsExcluded((Element) modern.getElementsByTagName("cloud-backup").item(0));
+    assertAllDomainsExcluded((Element) modern.getElementsByTagName("device-transfer").item(0));
+  }
+
+  private static void assertAllDomainsExcluded(Element rules)
+  {
+    assertNotNull(rules);
+    assertEquals(0, rules.getElementsByTagName("include").getLength());
+    Set<String> domains = new HashSet<>();
+    NodeList excludes = rules.getElementsByTagName("exclude");
     for (int i = 0; i < excludes.getLength(); i++)
-      assertEquals(".", ((Element) excludes.item(i)).getAttribute("path"));
+    {
+      Element exclusion = (Element) excludes.item(i);
+      assertEquals(".", exclusion.getAttribute("path"));
+      assertTrue(domains.add(exclusion.getAttribute("domain")));
+    }
+    assertEquals(new HashSet<>(Arrays.asList("root", "file", "database", "sharedpref", "external",
+        "device_root", "device_file", "device_database", "device_sharedpref")), domains);
   }
 }
