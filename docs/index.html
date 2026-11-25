@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b1220">
-  <meta name="description" content="Type Sinhala naturally on Android with KeyCraft: on-device Singlish transliteration, Material 3 themes, corner-swipe gestures, Termux coding layout and productivity tools. Free, open-source and ad-free.">
-  <title>KeyCraft — Sinhala Keyboard for Android</title>
+  <meta name="description" content="Download KeyCraft Sinhala Keyboard v1.4.2 for Android 10+. The free Singlish keyboard adds encrypted pinned clipboard entries and improves Sinhala conjunct typing.">
+  <title>KeyCraft Sinhala Keyboard v1.4.2 for Android</title>
   <link rel="canonical" href="https://keycraft-sinhala-landing.lakmal-gamage.workers.dev/">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="apple-touch-icon" href="assets/favicon.png">
   <!-- Open Graph Tags -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="KeyCraft Sinhala" />
-  <meta property="og:description" content="Write Sinhala naturally on Android with KeyCraft: fast Singlish-to-Sinhala typing, Material 3 themes and useful productivity tools. Free, open-source and ad-free." />
+  <meta property="og:title" content="KeyCraft Sinhala Keyboard v1.4.2 for Android" />
+  <meta property="og:description" content="Download KeyCraft Sinhala Keyboard v1.4.2 for Android 10+. The free Singlish keyboard adds encrypted pinned clipboard entries and improves Sinhala conjunct typing." />
   <meta property="og:url" content="https://keycraft-sinhala-landing.lakmal-gamage.workers.dev/" />
   <meta property="og:image" content="https://keycraft-sinhala-landing.lakmal-gamage.workers.dev/og-image.png" />
   <meta property="og:image:secure_url" content="https://keycraft-sinhala-landing.lakmal-gamage.workers.dev/og-image.png" />
@@ -22,8 +22,8 @@
   <meta property="og:image:alt" content="KeyCraft Sinhala Keyboard for Android" />
   <meta property="og:site_name" content="KeyCraft" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="KeyCraft Sinhala" />
-  <meta name="twitter:description" content="Write Sinhala naturally on Android with KeyCraft. Free, open-source and ad-free." />
+  <meta name="twitter:title" content="KeyCraft Sinhala Keyboard v1.4.2 for Android" />
+  <meta name="twitter:description" content="Download KeyCraft Sinhala Keyboard v1.4.2 for Android 10+. The free Singlish keyboard adds encrypted pinned clipboard entries and improves Sinhala conjunct typing." />
   <meta name="twitter:image" content="https://keycraft-sinhala-landing.lakmal-gamage.workers.dev/og-image.png" />
   <script type="application/ld+json">
   {
@@ -597,6 +597,29 @@
     }
     .footer-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; }
 
+    /* Release promotion */
+    .release-actions .primary { min-height: 54px; }
+    .release-actions .button { max-width: 100%; text-align: center; }
+    .release-requirement { margin: 12px 0 0; color: var(--muted); font-size: .92rem; }
+    #whats-new { padding-top: 0; }
+    .update-panel {
+      padding: clamp(20px, 4vw, 40px);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(145deg, var(--accent-soft), var(--surface-1) 75%);
+    }
+    .update-panel h2 { margin: 12px 0 18px; }
+    .update-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px 28px;
+      margin: 0;
+      padding-inline-start: 1.25rem;
+    }
+    .update-list li::marker { color: var(--accent); }
+    .update-list p { margin: 5px 0 0; color: var(--muted); }
+    [lang="si"] { line-height: 1.65; }
+
     @media (max-width: 960px) {
       .hero, .theme-studio-grid, .demo-layout, .guide-shell { grid-template-columns: 1fr; }
       .steps-grid { grid-template-columns: 1fr; }
@@ -607,7 +630,15 @@
       .header-inner { flex-direction: column; align-items: stretch; padding: 12px 0; gap: 10px; }
       .nav-wrap { justify-content: space-between; flex-wrap: wrap; gap: 10px; }
       nav a { padding: 8px 10px; font-size: .84rem; }
-      section { padding: 42px 0; }
+      section { padding: 30px 0; }
+      .hero { padding: 28px 0 24px; gap: 20px; }
+      .actions { gap: 8px; margin-top: 16px; }
+      .release-actions > .button { width: 100%; padding-inline: 12px; }
+      .update-list { grid-template-columns: minmax(0, 1fr); }
+      .button.sm, .lang-switch button { min-height: 44px; }
+      .checksum-inline code { min-width: 0; overflow-wrap: anywhere; }
+      .smart-step > * { min-width: 0; }
+      .hero-stage { padding: 12px; }
       .m3-card, .smart-step { padding: 18px; }
       .kbd-device { padding: 10px; }
       .vkey { height: 40px; font-size: .86rem; }
@@ -673,26 +704,11 @@
           <span class="en">Type Singlish naturally across messaging, Chrome web apps and AI chats. Customize 25+ themes, corner-swipe gestures, Termux coding rows and productivity tools — free and ad-free.</span>
           <span class="si" lang="si">WhatsApp, Chrome Web Apps සහ AI chats ඇතුළු සෑම තැනකම පහසුවෙන් Singlish වලින් සිංහල ටයිප් කරන්න. Themes 25+, corner-swipe gestures, Termux coding layout සහ productivity tools සමඟ නොමිලේ.</span>
         </p>
-        <div class="actions">
-          <a class="button primary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/download/v1.4.2/KeyCraft-Sinhala-Keyboard-release.apk">
-            <span aria-hidden="true">↓</span>
-            <span class="en">Download APK · v1.4.2</span>
-            <span class="si" lang="si">APK Download · v1.4.2</span>
-          </a>
-          <a class="button tonal" href="#demo">
-            <span class="en">Try Singlish Lab</span>
-            <span class="si" lang="si">Singlish අත්හදා බලන්න</span>
-          </a>
-          <a class="button" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard">
-            <span class="en">GitHub Source</span>
-            <span class="si" lang="si">Source Code</span>
-          </a>
+        <div class="actions release-actions">
+          <a class="button primary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/download/v1.4.2/KeyCraft-Sinhala-Keyboard-release.apk"><span class="en">Download v1.4.2 APK now</span><span class="si" lang="si">දැන්ම v1.4.2 APK Download කරන්න</span></a>
+          <a class="button tonal" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.4.2"><span class="en">View release notes</span><span class="si" lang="si">Release Notes බලන්න</span></a>
         </div>
-        <p>
-          <span class="en">Requires Android 10 or later. v1.4.2 encrypts pinned clipboard entries and improves Sinhala conjunct typing.</span>
-          <span class="si" lang="si">Android 10 හෝ ඊට පසු අනුවාදයක් අවශ්‍යයි. v1.4.2 හි pin කළ clipboard අයිතම encrypt කරන අතර සිංහල බැඳි අකුරු ටයිප් කිරීම වැඩිදියුණු කර ඇත.</span>
-          <a href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.4.2"><span class="en">Release notes</span><span class="si" lang="si">අනුවාද විස්තර</span></a>
-        </p>
+        <p class="release-requirement"><span class="en">Requires Android 10 or later.</span><span class="si" lang="si">Android 10 හෝ ඊට පසු අනුවාදයක් අවශ්‍යයි.</span></p>
         <div class="trust-row" aria-label="KeyCraft highlights">
           <span class="pill">GPL-3.0 Open Source</span>
           <span class="pill"><span class="en">Zero Ads</span><span class="si" lang="si">දැන්වීම් නැහැ</span></span>
@@ -716,6 +732,21 @@
             <strong>100% Local</strong>
             <span><span class="en">No keystroke cloud logging</span><span class="si" lang="si">දත්ත රැස් කිරීමක් නැහැ</span></span>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="whats-new" aria-labelledby="whats-new-title">
+      <div class="update-panel">
+        <span class="section-kicker">v1.4.2 Update</span>
+        <h2 id="whats-new-title"><span class="en">What’s New in v1.4.2</span><span class="si" lang="si">v1.4.2 හි අලුත් දේ</span></h2>
+        <ul class="update-list">
+          <li><strong><span class="en">Encrypted clipboard pins</span><span class="si" lang="si">Pin කළ clipboard අයිතම සඳහා encryption</span></strong><p><span class="en">Existing pins migrate to encrypted storage on first access. New pins are protected by Android Keystore.</span><span class="si" lang="si">පැරණි pin කළ අයිතම පළමුව විවෘත කරන විට encrypt වේ. අලුත් අයිතම Android Keystore මඟින් ආරක්ෂා වේ.</span></p></li>
+          <li><strong><span class="en">Improved Sinhala conjunct typing</span><span class="si" lang="si">සිංහල බැඳි අකුරු ටයිප් කිරීම වැඩිදියුණු කර ඇත</span></strong><p><span class="en">Joiner gestures work after a consonant and virama, preventing invisible joiners in an empty editor.</span><span class="si" lang="si">ව්‍යංජනයක් සහ හල් ලකුණක් පසුපස පමණක් joiner gesture එක ක්‍රියා කරයි. ඒ නිසා හිස් තැනකට නොපෙනෙන joiner අකුරු එකතු වෙන්නේ නැහැ.</span></p></li>
+          <li><strong><span class="en">App data excluded from Android backups</span><span class="si" lang="si">Android backup වලින් app දත්ත ඉවත් කර ඇත</span></strong><p><span class="en">Keyboard settings, learned words and clipboard data are excluded from cloud backup and device-to-device transfer.</span><span class="si" lang="si">Keyboard සැකසුම්, ඉගෙනගත් වචන සහ clipboard දත්ත cloud backup සහ උපාංග අතර මාරු කිරීම්වලින් ඉවත් කර ඇත.</span></p></li>
+        </ul>
+        <div class="actions release-actions">
+          <a class="button primary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.4.2"><span class="en">Update to v1.4.2 now</span><span class="si" lang="si">දැන්ම v1.4.2 Update කරන්න</span></a>
         </div>
       </div>
     </section>
@@ -772,10 +803,7 @@
                 <span id="copy-status" style="margin-left:8px;font-size:.78rem;color:var(--accent)" role="status" aria-live="polite"></span>
               </div>
             </div>
-            <a class="button primary sm" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.4.2">
-              <span class="en">Open v1.4.2 Release ↗</span>
-              <span class="si" lang="si">v1.4.2 Release වෙත ↗</span>
-            </a>
+            <a class="button primary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/download/v1.4.2/KeyCraft-Sinhala-Keyboard-release.apk"><span class="en">Download v1.4.2 APK</span><span class="si" lang="si">v1.4.2 APK එක බාගන්න</span></a>
           </article>
 
           <!-- Step 2 -->
@@ -1166,9 +1194,9 @@
         <span class="section-kicker"><span class="en">Make Sinhala typing yours</span><span class="si" lang="si">සිංහල typing ඔබට ගැළපෙන ලෙස</span></span>
         <h2 id="cta-title"><span class="en">Ready to switch to KeyCraft?</span><span class="si" lang="si">KeyCraft අත්හදා බලන්න සූදානම්ද?</span></h2>
         <p><span class="en">Get the signed v1.4.2 release APK, explore the source code, or contribute themes and phonetic improvements on GitHub.</span><span class="si" lang="si">v1.4.2 APK එක ලබාගන්න, Source Code පරීක්ෂා කරන්න, නැතිනම් GitHub හරහා ව්‍යාපෘතියට දායක වන්න.</span></p>
-        <div class="actions">
-          <a class="button primary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/download/v1.4.2/KeyCraft-Sinhala-Keyboard-release.apk"><span class="en">Download KeyCraft APK</span><span class="si" lang="si">KeyCraft APK Download කරන්න</span></a>
-          <a class="button" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard"><span class="en">Contribute on GitHub</span><span class="si" lang="si">GitHub හරහා දායක වන්න</span></a>
+        <div class="actions release-actions">
+          <a class="button primary" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/download/v1.4.2/KeyCraft-Sinhala-Keyboard-release.apk"><span class="en">Download v1.4.2 APK now</span><span class="si" lang="si">දැන්ම v1.4.2 APK Download කරන්න</span></a>
+          <a class="button tonal" href="https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases/tag/v1.4.2"><span class="en">View release notes</span><span class="si" lang="si">Release Notes බලන්න</span></a>
         </div>
       </div>
     </section>
