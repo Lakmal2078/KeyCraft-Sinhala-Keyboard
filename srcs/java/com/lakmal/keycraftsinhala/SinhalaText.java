@@ -19,6 +19,15 @@ final class SinhalaText
 
   static boolean mark(char c) { return vowelSign(c) || nasal(c) || c == '්'; }
 
+  static boolean joiner(char c) { return c == '\u200D' || c == '\u200C'; }
+
+  static boolean canAppendJoiner(CharSequence before)
+  {
+    int length = before == null ? 0 : before.length();
+    return length >= 2 && before.charAt(length - 1) == '්'
+        && consonant(before.charAt(length - 2));
+  }
+
   /** Return the number of preceding units to replace, or -1 for an orphan mark. */
   static int replaceBeforeMark(CharSequence before, char sign)
   {
@@ -41,10 +50,10 @@ final class SinhalaText
     if (i < 0) return 0;
     char tail = before.charAt(i);
     if (mark(tail)) return 1;
-    boolean joiner = tail == 0x200D || tail == 0x200C;
+    boolean joiner = joiner(tail);
     if (!consonant(tail) && !joiner) return 0;
     int start = i;
-    if (!joiner && start > 0 && (before.charAt(start-1) == 0x200D || before.charAt(start-1) == 0x200C)) start--;
+    if (!joiner && start > 0 && joiner(before.charAt(start-1))) start--;
     if (start >= 2 && before.charAt(start-1) == '්' && consonant(before.charAt(start-2)))
       return i - start + 2;
     return consonant(tail) ? 1 : 0;
@@ -52,6 +61,6 @@ final class SinhalaText
 
   static boolean wordPart(char c)
   {
-    return Character.isLetterOrDigit(c) || mark(c) || c == 0x200D || c == 0x200C;
+    return Character.isLetterOrDigit(c) || mark(c) || joiner(c);
   }
 }

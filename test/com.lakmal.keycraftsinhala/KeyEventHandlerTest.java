@@ -385,4 +385,23 @@ public class KeyEventHandlerTest
     handler.handle_backspace();
     assertEquals("amm", document.toString());
   }
+
+  @Test
+  public void directSinhalaJoinersRequireConsonantAndVirama()
+  {
+    when(receiver.isSinhalaLayout()).thenReturn(true);
+    when(connection.getTextBeforeCursor(anyInt(), anyInt())).thenAnswer(call -> document.toString());
+    for (String name : new String[]{"zwj", "zwnj"})
+    {
+      document.setLength(0);
+      KeyValue joiner = KeyValue.getKeyByName(name);
+      handler.key_up(joiner, Pointers.Modifiers.EMPTY);
+      assertEquals("", document.toString());
+      type("ක්");
+      handler.key_up(joiner, Pointers.Modifiers.EMPTY);
+      assertEquals("ක්" + joiner.getChar(), document.toString());
+      handler.key_up(joiner, Pointers.Modifiers.EMPTY);
+      assertEquals("ක්" + joiner.getChar(), document.toString());
+    }
+  }
 }

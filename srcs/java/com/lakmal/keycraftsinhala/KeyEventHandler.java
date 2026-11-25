@@ -768,6 +768,10 @@ public final class KeyEventHandler
     }
 
     finish_composing();
+    if (text.length() == 1 && SinhalaText.joiner(text.charAt(0)) && _recv.isSinhalaLayout()
+        && (_config.editor_config.is_sensitive_input
+            || !SinhalaText.canAppendJoiner(conn.getTextBeforeCursor(2, 0))))
+      return;
     if (text.length() == 1 && SinhalaText.mark(text.charAt(0)) && !_config.editor_config.is_sensitive_input)
     {
       CharSequence before = conn.getTextBeforeCursor(16, 0);
