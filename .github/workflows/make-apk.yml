@@ -6,153 +6,160 @@ on:
       - "v*"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
-    name: Build KeyCraft Sinhala Keyboard APK
+    name: Test and build unsigned release APK
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
-
-      - name: Make Gradle wrapper executable
-        run: chmod +x gradlew
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: 17
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
         with:
           packages: platform-tools platforms;android-36 build-tools;36.0.0
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.11'
+      - name: Run unit tests and assemble release
+        run: ./gradlew test assembleRelease assembleDebug assembleDebugAndroidTest
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unsigned-release-apk
+          path: build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release-unsigned.apk
+          if-no-files-found: error
+          retention-days: 7
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-smoke-test-harness
+          path: |
+            build/outputs/apk/debug/*.apk
+            build/outputs/apk/androidTest/debug/*.apk
+          if-no-files-found: error
+          retention-days: 7
 
-      - name: Install build tools (fontforge)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y fontforge
-
-      - name: Prepare environment for runner
-        run: |
-          sed -i '/android.aapt2FromMavenOverride/d' gradle.properties || true
-
-      - name: Prepare ephemeral debug signing key
-        run: |
-          debug_password="$(openssl rand -hex 24)"
-          keytool -genkeypair -noprompt \
-            -dname "cn=Debug Build" \
-            -alias debug \
-            -keypass "$debug_password" \
-            -keystore debug.keystore \
-            -keyalg RSA \
-            -storepass "$debug_password" \
-            -validity 1
-          {
-            echo "DEBUG_KEYSTORE_PASSWORD=$debug_password"
-            echo "DEBUG_KEY_PASSWORD=$debug_password"
-          } >> "$GITHUB_ENV"
-
-      - name: Prepare release signing key
+  sign:
+    name: Sign and verify release APK
+    if: github.ref_type == 'tag' || github.ref_name == github.event.repository.default_branch
+    needs: build
+    runs-on: ubuntu-latest
+    environment: release-signing
+    steps:
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+        with:
+          packages: build-tools;36.0.0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: unsigned-release-apk
+          path: unsigned
+      - name: Sign APK and verify trusted certificate
+        shell: bash
         env:
           RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
           RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_CERT_SHA256: ${{ vars.RELEASE_CERT_SHA256 }}
         run: |
-          if [ -z "$RELEASE_KEYSTORE_BASE64" ]; then
-            echo "::error::Missing RELEASE_KEYSTORE_BASE64 secret"
-            exit 1
-          fi
-          if [ -z "$RELEASE_KEYSTORE_PASSWORD" ]; then
-            echo "::error::Missing RELEASE_KEYSTORE_PASSWORD secret"
-            exit 1
-          fi
-          if [ -z "$RELEASE_KEY_ALIAS" ]; then
-            echo "::error::Missing RELEASE_KEY_ALIAS secret"
-            exit 1
-          fi
-          if [ -z "$RELEASE_KEY_PASSWORD" ]; then
-            echo "::error::Missing RELEASE_KEY_PASSWORD secret"
-            exit 1
-          fi
-          release_keystore="$RUNNER_TEMP/release.keystore"
-          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$release_keystore"
-          chmod 600 "$release_keystore"
-          echo "RELEASE_KEYSTORE=$release_keystore" >> "$GITHUB_ENV"
-
-      - name: Run unit tests
-        env:
-          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
-          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-        run: ./gradlew test
-
-      - name: Build signed release APK
-        env:
-          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
-          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
-
-      - name: Generate release APK SHA-256
-        run: |
-          apk="build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk"
-          test -s "$apk"
-          (cd "$(dirname "$apk")" && sha256sum "$(basename "$apk")" > "$(basename "$apk").sha256")
-          cat "$apk.sha256"
-
-      - name: Upload signed release APK and checksum
-        uses: actions/upload-artifact@v4
+          : "${RELEASE_KEYSTORE_BASE64:?Missing signing keystore}"
+          : "${RELEASE_KEYSTORE_PASSWORD:?Missing keystore password}"
+          : "${RELEASE_KEY_ALIAS:?Missing signing alias}"
+          : "${RELEASE_KEY_PASSWORD:?Missing signing key password}"
+          : "${RELEASE_CERT_SHA256:?Configure the trusted release certificate SHA-256}"
+          expected=$(printf '%s' "$RELEASE_CERT_SHA256" | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          [[ "$expected" =~ ^[a-f0-9]{64}$ ]]
+          umask 077
+          keystore=$(mktemp "$RUNNER_TEMP/release.XXXXXX")
+          trap 'rm -f "$keystore"' EXIT
+          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$keystore"
+          unset RELEASE_KEYSTORE_BASE64
+          apksigner="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          mkdir dist
+          apk="KeyCraft-Sinhala-Keyboard-release.apk"
+          "$apksigner" sign --ks "$keystore" --ks-key-alias "$RELEASE_KEY_ALIAS" \
+            --ks-pass env:RELEASE_KEYSTORE_PASSWORD --key-pass env:RELEASE_KEY_PASSWORD \
+            --out "dist/$apk" "unsigned/KeyCraft-Sinhala-Keyboard-release-unsigned.apk"
+          "$apksigner" verify --print-certs "dist/$apk" > dist/signature.txt
+          actual=$(sed -n 's/^Signer #[0-9]* certificate SHA-256 digest: //p' dist/signature.txt)
+          test "$actual" = "$expected"
+          (cd dist && sha256sum "$apk" > "$apk.sha256")
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: keycraft-sinhala-keyboard-release
           path: |
-            build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk
-            build/outputs/apk/release/KeyCraft-Sinhala-Keyboard-release.apk.sha256
+            dist/KeyCraft-Sinhala-Keyboard-release.apk
+            dist/KeyCraft-Sinhala-Keyboard-release.apk.sha256
+            dist/signature.txt
+          if-no-files-found: error
           retention-days: 7
 
-      - name: Remove release signing key
-        if: always()
-        run: rm -f "$RUNNER_TEMP/release.keystore"
+  verify-release:
+    name: Smoke-test signed APK on API ${{ matrix.api }}
+    needs: sign
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [29, 36]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: keycraft-sinhala-keyboard-release
+          path: dist
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-smoke-test-harness
+          path: harness
+      - name: Verify signed artifact checksum
+        working-directory: dist
+        run: sha256sum --check KeyCraft-Sinhala-Keyboard-release.apk.sha256
+      - name: Enable emulator acceleration
+        run: sudo chmod a+rw /dev/kvm
+      - uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
+        with:
+          api-level: ${{ matrix.api }}
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: python3 scripts/smoke_release_apk.py dist/KeyCraft-Sinhala-Keyboard-release.apk harness
 
   release:
-    name: Publish signed GitHub release
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    name: Publish verified APK to GitHub Releases
+    needs: verify-release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout release source and notes
-        uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ github.ref }}
-      - name: Download signed release APK
-        uses: actions/download-artifact@v4
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: keycraft-sinhala-keyboard-release
           path: dist
-
-      - name: Publish to GitHub Releases
-        uses: softprops/action-gh-release@v2
+      - name: Verify published artifact checksum
+        working-directory: dist
+        run: sha256sum --check KeyCraft-Sinhala-Keyboard-release.apk.sha256
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
           files: |
             dist/KeyCraft-Sinhala-Keyboard-release.apk
             dist/KeyCraft-Sinhala-Keyboard-release.apk.sha256
           body_path: docs/releases/${{ github.ref_name }}.md
-          prerelease: false
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fail_on_unmatched_files: true

@@ -35,3 +35,19 @@
 
 - A successful Gradle build and APK signature verification do not replace on-device smoke testing.
 - Keep the `mapping.txt` file paired with the exact APK for crash de-obfuscation.
+
+## GitHub release workflow setup
+
+The `release-signing` GitHub Actions environment should restrict deployments to the default
+branch and approved release tags. Configure its signing secrets
+`RELEASE_KEYSTORE_BASE64`, `RELEASE_KEYSTORE_PASSWORD`, `RELEASE_KEY_ALIAS`, and
+`RELEASE_KEY_PASSWORD`. Set the environment variable `RELEASE_CERT_SHA256` from the
+trusted certificate used for existing production APKs. The variable accepts colon-separated
+or compact SHA-256 fingerprints. Require reviewer approval where the repository supports it.
+
+Dispatch the workflow on the default branch to validate the signed build without publishing.
+The automated gate checks certificate and digest, installs the exact signed APK on API 29
+and 36, enables and selects its IME, and checks that an IME key commits text in the launcher.
+A separately debug-signed harness also tests pinned clipboard migration and authentication.
+Use the device checklist above for the remaining interactive flows, including upgrade testing,
+Sinhala composition, dictionary selection, and direct boot.

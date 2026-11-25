@@ -502,6 +502,7 @@
     <string name="remove_word">Remove word</string>
     <string name="add_word">Add word</string>
     <string name="sinhala_word">Enter a Sinhala word</string>
+    <string name="clipboard_pin_storage_error">Could not save pinned clipboard changes.</string>
 </resources>
 
 

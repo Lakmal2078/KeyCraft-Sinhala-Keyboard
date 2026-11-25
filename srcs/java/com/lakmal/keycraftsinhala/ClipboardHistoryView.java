@@ -72,9 +72,8 @@ public final class ClipboardHistoryView extends NonScrollListView
       return;
     }
     View pinObj = findInPane(R.id.clipboard_pin_view);
-    if (pinObj instanceof ClipboardPinView)
-      ((ClipboardPinView)pinObj).add_entry(clip);
-    _service.remove_history_entry(clip);
+    if (pinObj instanceof ClipboardPinView && ((ClipboardPinView)pinObj).add_entry(clip))
+      _service.remove_history_entry(clip);
   }
 
   /** Paste the specified entry while retaining it in history until cleared or expired. */
