@@ -21,26 +21,42 @@ The candidate strip shows up to three words. For example, `niwaradhi` suggests à
 
 **Personal Sinhala dictionary** in Settings lists saved words. Tap **Add word** to save one or tap an entry to remove it. The keyboard counts accepted Sinhala words and direct entries completed with Space, up to 256 words. The app stores these counts locally, outside Android backup. Sensitive fields skip learning. Swipe gestures and double-space punctuation have separate switches. Double-space punctuation is off by default.
 
+## Repository structure
+
+| Path | Contents |
+| --- | --- |
+| `srcs/java/` | Android keyboard implementation, including Sinhala input and suggestions |
+| `srcs/layouts/`, `res/` | Keyboard layout definitions and Android resources |
+| `assets/` | Bundled dictionaries and font assets |
+| `test/`, `src/androidTest/` | JVM unit tests and Android instrumentation tests |
+| `scripts/` | Sinhala test runner and release APK smoke-test tooling |
+| `buildSrc/`, `gradle/` | Gradle build logic and wrapper |
+| `vendor/cdict` | Dictionary library submodule |
+| `docs/` | Documentation, release notes, and landing page |
+| `fastlane/metadata/android/` | App listing metadata and screenshots |
+
 ## Requirements
 
 To build the Android app, install:
 
-- [Android Studio](https://developer.android.com/studio)
 - **JDK 17**
-- **Android SDK** with Android platform 36 and the corresponding build tools
+- **Android SDK** with Platform 36 and Build Tools 36.0.0, as used by CI
+- **Python 3** for Gradleâ€™s layout checks, resource generation, and Python tests
 
-Android Studio can install and manage the required JDK and Android SDK components. If Gradle cannot locate your SDK, configure the SDK location in Android Studio or set `ANDROID_HOME` / `ANDROID_SDK_ROOT`.
+[Android Studio](https://developer.android.com/studio) can install and manage the required JDK and Android SDK components. If Gradle cannot locate your SDK, configure the SDK location in Android Studio or set `ANDROID_HOME` / `ANDROID_SDK_ROOT`.
 
 ## Build
 
 Clone the repository:
 
 ```sh
-git clone https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard.git
+git clone --recurse-submodules https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard.git
 cd KeyCraft-Sinhala-Keyboard
 ```
 
-Build the debug APK:
+If you already cloned the repository without its submodules, run `git submodule update --init --recursive` from the checkout.
+
+Build the debug APK with the included Gradle wrapper:
 
 ```sh
 ./gradlew assembleDebug
