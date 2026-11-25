@@ -18,6 +18,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
