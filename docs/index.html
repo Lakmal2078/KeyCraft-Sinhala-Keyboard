@@ -400,30 +400,20 @@
       transition: background .25s ease;
     }
     .kbd-toolbar {
-      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
-      padding: 2px 4px 8px; text-align: center; font-size: .82rem; opacity: 0.9;
+      display: grid; grid-template-columns: repeat(8, minmax(0, 1fr));
+      align-items: center; text-align: center; min-height: 44px;
+      margin: -10px -8px 6px; padding: 5px 2px;
+      border-radius: 17px 17px 0 0; background: var(--kbd-bg);
+      font-size: clamp(.85rem, 3.1vw, 1.35rem); font-weight: 800;
     }
-    .kbd-toolbar span { padding: 4px 0; border-radius: 8px; }
-    .kbd-candidates {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
-      padding: 4px 4px 10px; align-items: center; text-align: center;
-    }
-    .kbd-cand {
-      padding: 6px 8px; border-radius: 999px; font-size: .84rem; font-weight: 700;
-      color: var(--kbd-text); background: rgba(255, 255, 255, 0.06);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .kbd-cand.best {
-      background: var(--kbd-active); color: var(--kbd-active-text);
-      border: 1px solid var(--kbd-border);
-    }
+    .kbd-toolbar span { min-width: 0; color: var(--kbd-text); }
     .kbd-row {
       display: grid; gap: 4px; margin-bottom: 5px;
     }
     .kbd-row.r10 { grid-template-columns: repeat(10, 1fr); }
     .kbd-row.r9 { grid-template-columns: repeat(9, 1fr); padding-inline: 5%; }
     .kbd-row.r-mod { grid-template-columns: 1.35fr repeat(7, 1fr) 1.35fr; }
-    .kbd-row.r-bot { grid-template-columns: 1.35fr 1fr 3.2fr 1fr 1.45fr; margin-bottom: 0; }
+    .kbd-row.r-bot { grid-template-columns: 1.45fr .95fr 1.05fr 3.65fr 1.05fr 1.55fr; margin-bottom: 0; }
     .vkey {
       min-width: 0;
       position: relative; height: 42px; padding: 0; border-radius: var(--kbd-radius);
@@ -439,9 +429,19 @@
     .vkey.space { background: var(--kbd-space); font-size: .78rem; color: var(--kbd-sub); }
     .vkey.enter { background: var(--kbd-active); color: var(--kbd-active-text); border-color: var(--kbd-border); font-weight: 800; }
     .vkey-sub {
-      position: absolute; top: 2px; right: 4px; font-size: .58rem; line-height: 1;
-      color: var(--kbd-sub); font-weight: 700; opacity: 0.9;
+      position: absolute; inset-inline-end: 3px; inset-block-start: 2px;
+      font-size: clamp(.46rem, 1.15vw, .68rem); line-height: 1;
+      color: var(--kbd-sub); font-weight: 700;
     }
+    .vkey-sub.tl, .vkey-sub.bl { inset-inline: 3px auto; }
+    .vkey-sub.bl, .vkey-sub.br { inset-block: auto 2px; }
+    .vkey-sub.tc { inset-inline: 0; text-align: center; }
+    .vkey-sub.ml, .vkey-sub.mr { inset-block: 44% auto; }
+    .vkey-sub.ml { inset-inline: 3px auto; }
+    .vkey-sub.bc { inset: auto 0 2px; text-align: center; }
+    .vkey:disabled { cursor: default; opacity: 1; }
+    .kbd-stage .vkey.enter { background: var(--kbd-action); color: var(--kbd-text); }
+    .kbd-stage .vkey.action { font-size: clamp(.55rem, 1.45vw, .86rem); }
 
     /* Interactive Singlish Sandbox & Phonetic Guide */
     .demo-layout {
@@ -874,13 +874,13 @@
 
           <label class="theme-sync-row">
             <span>
-              <strong id="active-theme-title">KeyCraft Dark</strong>
+              <strong id="active-theme-title">Royal Gold</strong>
               <span style="display:block;color:var(--muted);font-size:.8rem">
                 <span class="en">Sync landing page accent colour with theme</span>
                 <span class="si" lang="si">Theme වර්ණය පිටුවේ accent සඳහාත් යොදන්න</span>
               </span>
             </span>
-            <input type="checkbox" id="sync-page-accent" checked>
+            <input type="checkbox" id="sync-page-accent">
           </label>
         </div>
 
@@ -893,53 +893,49 @@
           </div>
           <div class="kbd-stage" id="kbd-stage-surface">
             <div class="kbd-toolbar" aria-hidden="true">
-              <span>⊞</span><span>✥</span><span>文A</span><span>📋</span><span>🎨</span><span>⌨</span><span>⚙</span>
-            </div>
-            <div class="kbd-candidates">
-              <span class="kbd-cand">Samahara</span>
-              <span class="kbd-cand best">සමහර</span>
-              <span class="kbd-cand">ෂමහර</span>
+              <span>⊞</span><span>✥</span><span>⇥</span><span>文A</span><span>▤</span><span>🎨︎</span><span>⌨︎</span><span>⚙︎</span>
             </div>
             <div class="kbd-row r10">
-              <button type="button" class="vkey" data-vkey="q">q<span class="vkey-sub">1</span></button>
-              <button type="button" class="vkey" data-vkey="w">w<span class="vkey-sub">2</span></button>
-              <button type="button" class="vkey" data-vkey="e">e<span class="vkey-sub">3</span></button>
-              <button type="button" class="vkey" data-vkey="r">r<span class="vkey-sub">4</span></button>
-              <button type="button" class="vkey" data-vkey="t">t<span class="vkey-sub">5</span></button>
-              <button type="button" class="vkey" data-vkey="y">y<span class="vkey-sub">6</span></button>
-              <button type="button" class="vkey" data-vkey="u">u<span class="vkey-sub">7</span></button>
-              <button type="button" class="vkey" data-vkey="i">i<span class="vkey-sub">8</span></button>
-              <button type="button" class="vkey" data-vkey="o">o<span class="vkey-sub">9</span></button>
-              <button type="button" class="vkey" data-vkey="p">p<span class="vkey-sub">0</span></button>
+              <button type="button" class="vkey" data-vkey="q">q<span class="vkey-sub tr" aria-hidden="true">1</span><span class="vkey-sub br" aria-hidden="true">Esc</span></button>
+              <button type="button" class="vkey" data-vkey="w">w<span class="vkey-sub tl" aria-hidden="true">~</span><span class="vkey-sub tr" aria-hidden="true">2</span><span class="vkey-sub bl" aria-hidden="true">@</span></button>
+              <button type="button" class="vkey" data-vkey="e">e<span class="vkey-sub tl" aria-hidden="true">!</span><span class="vkey-sub tr" aria-hidden="true">3</span><span class="vkey-sub bl" aria-hidden="true">#</span></button>
+              <button type="button" class="vkey" data-vkey="r">r<span class="vkey-sub tr" aria-hidden="true">4</span><span class="vkey-sub bl" aria-hidden="true">$</span></button>
+              <button type="button" class="vkey" data-vkey="t">t<span class="vkey-sub tr" aria-hidden="true">5</span><span class="vkey-sub bl" aria-hidden="true">%</span></button>
+              <button type="button" class="vkey" data-vkey="y">y<span class="vkey-sub tr" aria-hidden="true">6</span><span class="vkey-sub bl" aria-hidden="true">^</span></button>
+              <button type="button" class="vkey" data-vkey="u">u<span class="vkey-sub tr" aria-hidden="true">7</span><span class="vkey-sub bl" aria-hidden="true">&amp;</span></button>
+              <button type="button" class="vkey" data-vkey="i">i<span class="vkey-sub tr" aria-hidden="true">8</span><span class="vkey-sub bl" aria-hidden="true">*</span></button>
+              <button type="button" class="vkey" data-vkey="o">o<span class="vkey-sub tr" aria-hidden="true">9</span><span class="vkey-sub bl" aria-hidden="true">(</span><span class="vkey-sub br" aria-hidden="true">)</span></button>
+              <button type="button" class="vkey" data-vkey="p">p<span class="vkey-sub tr" aria-hidden="true">0</span></button>
             </div>
             <div class="kbd-row r9">
-              <button type="button" class="vkey" data-vkey="a">a<span class="vkey-sub">@</span></button>
-              <button type="button" class="vkey" data-vkey="s">s<span class="vkey-sub">#</span></button>
-              <button type="button" class="vkey" data-vkey="d">d<span class="vkey-sub">$</span></button>
-              <button type="button" class="vkey" data-vkey="f">f<span class="vkey-sub">%</span></button>
-              <button type="button" class="vkey" data-vkey="g">g<span class="vkey-sub">-</span></button>
-              <button type="button" class="vkey" data-vkey="h">h<span class="vkey-sub">=</span></button>
-              <button type="button" class="vkey" data-vkey="j">j<span class="vkey-sub">{ }</span></button>
-              <button type="button" class="vkey" data-vkey="k">k<span class="vkey-sub">[ ]</span></button>
-              <button type="button" class="vkey" data-vkey="l">l<span class="vkey-sub">\</span></button>
+              <button type="button" class="vkey" data-vkey="a">a<span class="vkey-sub tl" aria-hidden="true">⇄</span><span class="vkey-sub tr" aria-hidden="true">`</span><span class="vkey-sub bl" aria-hidden="true">▣</span><span class="vkey-sub br" aria-hidden="true">Menu</span></button>
+              <button type="button" class="vkey" data-vkey="s">s</button>
+              <button type="button" class="vkey" data-vkey="d">d</button>
+              <button type="button" class="vkey" data-vkey="f">f</button>
+              <button type="button" class="vkey" data-vkey="g">g<span class="vkey-sub tr" aria-hidden="true">-</span><span class="vkey-sub bl" aria-hidden="true">_</span></button>
+              <button type="button" class="vkey" data-vkey="h">h<span class="vkey-sub tr" aria-hidden="true">=</span><span class="vkey-sub bl" aria-hidden="true">+</span></button>
+              <button type="button" class="vkey" data-vkey="j">j<span class="vkey-sub bl" aria-hidden="true">{</span><span class="vkey-sub br" aria-hidden="true">}</span></button>
+              <button type="button" class="vkey" data-vkey="k">k<span class="vkey-sub bl" aria-hidden="true">[</span><span class="vkey-sub br" aria-hidden="true">]</span></button>
+              <button type="button" class="vkey" data-vkey="l">l<span class="vkey-sub tr" aria-hidden="true">|</span><span class="vkey-sub bl" aria-hidden="true">\</span><span class="vkey-sub br" aria-hidden="true">£</span></button>
             </div>
             <div class="kbd-row r-mod">
               <button type="button" class="vkey action" data-vkey="shift" aria-label="Shift">⇧</button>
               <button type="button" class="vkey" data-vkey="z">z</button>
-              <button type="button" class="vkey" data-vkey="x">x</button>
-              <button type="button" class="vkey" data-vkey="c">c<span class="vkey-sub">&lt;</span></button>
-              <button type="button" class="vkey" data-vkey="v">v<span class="vkey-sub">&gt;</span></button>
-              <button type="button" class="vkey" data-vkey="b">b<span class="vkey-sub">?</span></button>
-              <button type="button" class="vkey" data-vkey="n">n<span class="vkey-sub">:</span></button>
-              <button type="button" class="vkey" data-vkey="m">m<span class="vkey-sub">"</span></button>
-              <button type="button" class="vkey action" data-vkey="back" aria-label="Backspace">⌫</button>
+              <button type="button" class="vkey" data-vkey="x">x<span class="vkey-sub br" aria-hidden="true">✂︎</span></button>
+              <button type="button" class="vkey" data-vkey="c">c<span class="vkey-sub tr" aria-hidden="true">&lt;</span><span class="vkey-sub bl" aria-hidden="true">.</span><span class="vkey-sub br" aria-hidden="true">▣</span></button>
+              <button type="button" class="vkey" data-vkey="v">v<span class="vkey-sub tr" aria-hidden="true">&gt;</span><span class="vkey-sub bl" aria-hidden="true">,</span><span class="vkey-sub br" aria-hidden="true">▤</span></button>
+              <button type="button" class="vkey" data-vkey="b">b<span class="vkey-sub tr" aria-hidden="true">?</span><span class="vkey-sub bl" aria-hidden="true">/</span></button>
+              <button type="button" class="vkey" data-vkey="n">n<span class="vkey-sub tr" aria-hidden="true">:</span><span class="vkey-sub bl" aria-hidden="true">;</span></button>
+              <button type="button" class="vkey" data-vkey="m">m<span class="vkey-sub tr" aria-hidden="true">&quot;</span><span class="vkey-sub bl" aria-hidden="true">&#x27;</span></button>
+              <button type="button" class="vkey action" data-vkey="back" aria-label="Backspace">⌫<span class="vkey-sub tr" aria-hidden="true">⌫</span></button>
             </div>
             <div class="kbd-row r-bot">
-              <button type="button" class="vkey action" data-vkey="sym" aria-label="Symbols layout">123+</button>
-              <button type="button" class="vkey action" data-vkey="si" aria-label="Toggle Sinhala mode">සි</button>
-              <button type="button" class="vkey space" data-vkey=" " aria-label="Space bar">සිංහල · Singlish</button>
-              <button type="button" class="vkey action" data-vkey="." aria-label="Period">.</button>
-              <button type="button" class="vkey enter" data-vkey="enter" aria-label="Enter">↵</button>
+              <button type="button" class="vkey action" data-vkey="sym" aria-label="Symbols preview">123+<span class="vkey-sub tl" aria-hidden="true">Ctrl</span><span class="vkey-sub br" aria-hidden="true">▤</span></button>
+              <button type="button" class="vkey action" disabled aria-label="Function key preview">Fn<span class="vkey-sub tr" aria-hidden="true">⌨︎</span><span class="vkey-sub bl" aria-hidden="true">☺︎</span><span class="vkey-sub br" aria-hidden="true">⚙︎</span></button>
+              <button type="button" class="vkey action" data-vkey="si" aria-label="Language key preview">EN<span class="vkey-sub br" aria-hidden="true">◎</span></button>
+              <button type="button" class="vkey space" data-vkey=" " aria-label="Space">␣<span class="vkey-sub tc" aria-hidden="true">⌨︎</span><span class="vkey-sub ml" aria-hidden="true">←</span><span class="vkey-sub mr" aria-hidden="true">→</span></button>
+              <button type="button" class="vkey action" disabled aria-label="Cursor pad preview"><span class="vkey-sub tc" aria-hidden="true">↑</span><span class="vkey-sub ml" aria-hidden="true">←</span><span class="vkey-sub mr" aria-hidden="true">→</span><span class="vkey-sub bc" aria-hidden="true">↓</span></button>
+              <button type="button" class="vkey action enter" data-vkey="enter" aria-label="Search key preview">Search<span class="vkey-sub tr" aria-hidden="true">↵</span></button>
             </div>
           </div>
         </div>
@@ -1220,8 +1216,8 @@
         steps: { 1: false, 2: false, 3: false },
         oem: "stock",
         themeCat: "all",
-        themeId: "dark",
-        syncAccent: true,
+        themeId: "royal_gold",
+        syncAccent: false,
         guideCat: "vowels",
         guideTab: "gestures",
         calcExpr: "25*4+10",
@@ -1262,7 +1258,7 @@
         const savedTheme = localStorage.getItem("keycraft-theme-id");
         if (savedTheme) state.themeId = savedTheme;
         const savedSync = localStorage.getItem("keycraft-sync-accent");
-        if (savedSync === "false") state.syncAccent = false;
+        if (savedSync === "true" || savedSync === "false") state.syncAccent = savedSync === "true";
       } catch {}
 
       // 2. Smart Setup Checklist + Progress Bar + OEM Tips
