@@ -2,6 +2,7 @@ package com.lakmal.keycraftsinhala.suggestions;
 
 import android.content.Context;
 import android.text.InputType;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -105,8 +106,9 @@ public final class CandidatesViewDeviceTest
     });
   }
 
-  private static CandidatesView createView(Context context)
+  private static CandidatesView createView(Context appContext)
   {
+    Context context = new ContextThemeWrapper(appContext, R.style.Light);
     CandidatesView view = new CandidatesView(context, null);
     addItemView(view, context, R.id.candidates_middle);
     addItemView(view, context, R.id.candidates_right);
