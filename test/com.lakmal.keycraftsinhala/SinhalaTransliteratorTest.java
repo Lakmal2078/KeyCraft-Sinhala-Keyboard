@@ -28,6 +28,18 @@ public class SinhalaTransliteratorTest
   }
 
   @Test
+  public void commonSpellingsUseCanonicalGatapillaAndConjuncts()
+  {
+    assertEquals("කෘෂිකර්මය", SinhalaTransliterator.transliterateWord("krushikarmaya"));
+    assertEquals("කෘෂිකර්මය", SinhalaTransliterator.getSuggestions("krushikarmaya").get(0));
+    for (String spelling : new String[]{"stri", "sthri", "strii", "stree", "sthree"})
+    {
+      assertEquals(spelling, "ස්ත්‍රී", SinhalaTransliterator.transliterateWord(spelling));
+      assertEquals(spelling, "ස්ත්‍රී", SinhalaTransliterator.getSuggestions(spelling).get(0));
+    }
+  }
+
+  @Test
   public void intervocalicDhSupportsEverydaySinglish()
   {
     assertEquals("නිවරදි", SinhalaTransliterator.transliterateWord("niwaradhi"));

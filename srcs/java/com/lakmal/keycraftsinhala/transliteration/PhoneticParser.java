@@ -179,6 +179,12 @@ public final class PhoneticParser
         break;
       }
 
+      if (i == len - 2 && word.regionMatches(true, i - 5, "karmaye", 0, 7))
+      {
+        out.append("යේ");
+        break;
+      }
+
       if (i == len - 2 && i > 0 && word.substring(i).equalsIgnoreCase("ge"))
       {
         out.append("\u0D9C\u0DDA"); // ගේ
@@ -234,7 +240,14 @@ public final class PhoneticParser
               com.lakmal.keycraftsinhala.transliteration.PhoneticRuleSet.findLongestMatch(word, i + 1, CONSONANTS);
           if (nextRule != null && !nextRule.output.equals(ANUSVARA))
           {
-            out.append("\u0DBB").append(VIRAMA).append(ZWJ).append(nextRule.output);
+            out.append("\u0DBB").append(VIRAMA);
+            // Modern compounds built with කර්ම keep ර් and ම unjoined.
+            boolean karma = "m".equals(nextRule.input)
+                && (word.regionMatches(true, i - 2, "kar", 0, 3)
+                    || word.regionMatches(true, i - 3, "kaar", 0, 4));
+            if (!karma)
+              out.append(ZWJ);
+            out.append(nextRule.output);
             i += 1 + nextRule.input.length();
 
             com.lakmal.keycraftsinhala.transliteration.PhoneticRule vowelRule =

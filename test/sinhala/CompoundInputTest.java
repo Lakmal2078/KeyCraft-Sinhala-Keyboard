@@ -26,6 +26,17 @@ public class CompoundInputTest
   }
 
   @Test
+  public void keepsSinhalaConjunctsAcrossWordEndings()
+  {
+    assertEquals("ස්ත්‍රියක්", SinhalaTransliterator.transliterateWord("striyak"));
+    assertEquals("ස්ත්‍රියට", SinhalaTransliterator.transliterateWord("Striyata"));
+    assertEquals("කෘෂිකර්මයේ", SinhalaTransliterator.transliterateWord("krushikarmaye"));
+    assertEquals("කෘෂිකර්මයට", SinhalaTransliterator.transliterateWord("krushikarmayata"));
+    assertEquals("ඕස්ට්‍රේලියාව", SinhalaTransliterator.transliterateWord("ostreliyawa"));
+    assertEquals("අස්ත්‍රයක්", SinhalaTransliterator.getSuggestions("astrayak").get(1));
+  }
+
+  @Test
   public void keepsPunctuationAndSpacesAroundTranslatedWords()
   {
     assertEquals("අම්මා, කොහොමද?", SinhalaTransliterator.transliterate("amma, kohomada?"));

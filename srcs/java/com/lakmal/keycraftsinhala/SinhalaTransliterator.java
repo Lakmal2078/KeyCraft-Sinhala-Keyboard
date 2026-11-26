@@ -896,6 +896,8 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("kriyakaaraka", "ක්‍රියාකාරක");
     COMMON_WORDS.put("kriyakaaratwama", "ක්‍රියාකාරීත්වය");
     COMMON_WORDS.put("kriyawa", "ක්‍රියාව");
+    COMMON_WORDS.put("krushikarma", "කෘෂිකර්ම");
+    COMMON_WORDS.put("krushikarmaya", "කෘෂිකර්මය");
     COMMON_WORDS.put("kruthagasthi", "ක්‍රැකැ");
     COMMON_WORDS.put("kruthya", "කෘත්‍ය");
     COMMON_WORDS.put("kruthyaya", "කෘත්‍යය");
@@ -1228,6 +1230,10 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("sparsha", "ස්පර්‍ෂ");
     COMMON_WORDS.put("speech", "speech");
     COMMON_WORDS.put("sthaanagatha", "ස්ථානගත");
+    COMMON_WORDS.put("sthree", "ස්ත්‍රී");
+    COMMON_WORDS.put("sthri", "ස්ත්‍රී");
+    COMMON_WORDS.put("stree", "ස්ත්‍රී");
+    COMMON_WORDS.put("stri", "ස්ත්‍රී");
     COMMON_WORDS.put("stupa", "ස්තූප");
     COMMON_WORDS.put("sumith", "සුමිත්");
     COMMON_WORDS.put("suthra", "සූත්‍ර");
@@ -1723,6 +1729,10 @@ public final class SinhalaTransliterator
       if (!list.contains(aspirated))
         list.add(aspirated);
     }
+
+    // An unmarked "str" can mean either ස්ට්‍ර or ස්ත්‍ර in an unfamiliar word.
+    if (dictionaryValue == null && lower.contains("str") && primary.contains("ස්ට්‍ර"))
+      list.add(primary.replace("ස්ට්‍ර", "ස්ත්‍ර"));
 
     // Prefix completions use the prebuilt trie instead of scanning the full lexicon.
     if (lower.length() >= 2)

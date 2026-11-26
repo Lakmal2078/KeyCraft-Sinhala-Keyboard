@@ -22,15 +22,18 @@ public final class SinglishNormalizer
   {
     String preserved = preserveCase(input);
     if (preserved.isEmpty()) return "";
-    if (!TransliterationConfig.STRICT_CAPITALIZATION)
-      return preserved.toLowerCase(Locale.ROOT);
     char first = preserved.charAt(0);
-    if (preserved.length() > 1 && Character.isUpperCase(first)
+    if (!TransliterationConfig.STRICT_CAPITALIZATION)
+      preserved = preserved.toLowerCase(Locale.ROOT);
+    else if (preserved.length() > 1 && Character.isUpperCase(first)
         && Character.isLowerCase(preserved.charAt(1))
         && first != 'D' && first != 'T' && first != 'N')
     {
-      return Character.toLowerCase(first) + preserved.substring(1);
+      preserved = Character.toLowerCase(first) + preserved.substring(1);
     }
+    // The inflected forms of ස්ත්‍රී use dental ත්‍ර, as in ස්ත්‍රියක්.
+    if (preserved.startsWith("striy"))
+      return "sthr" + preserved.substring(3);
     return preserved;
   }
 }
