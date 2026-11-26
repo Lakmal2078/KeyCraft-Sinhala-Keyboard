@@ -50,6 +50,18 @@ public class SinhalaTransliteratorTest
   }
 
   @Test
+  public void naUsesTheInherentVowelAndKeepsTheLongVowelSpellingAvailable()
+  {
+    SinhalaLearner learner = new SinhalaLearner((android.content.SharedPreferences) null);
+    learner.recordCorrection("na", "නෑ");
+    assertEquals("න", SinhalaTransliterator.transliterateWord("na", learner));
+    assertEquals("න", SinhalaTransliterator.getSuggestions("na", learner).get(0));
+    assertEquals("ණ", SinhalaTransliterator.transliterateWord("Na"));
+    assertEquals("නෑ", SinhalaTransliterator.transliterateWord("naa"));
+    assertEquals("නෑ", SinhalaTransliterator.transliterateWord("naae"));
+  }
+
+  @Test
   public void suggestionsRespectPhonemicCapitalization()
   {
     assertEquals("ඩ", SinhalaTransliterator.getSuggestions("Da").get(0));

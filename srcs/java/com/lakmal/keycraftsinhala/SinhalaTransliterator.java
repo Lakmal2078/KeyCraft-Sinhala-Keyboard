@@ -408,7 +408,7 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("puluwanda", "පුළුවන්ද");
     COMMON_WORDS.put("ba", "බෑ");
     COMMON_WORDS.put("bae", "බෑ");
-    COMMON_WORDS.put("na", "නෑ");
+    COMMON_WORDS.put("na", "න");
     COMMON_WORDS.put("ne", "නෑ");
     COMMON_WORDS.put("nehe", "නෑ");
     COMMON_WORDS.put("ow", "ඔව්");
