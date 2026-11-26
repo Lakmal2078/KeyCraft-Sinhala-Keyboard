@@ -328,6 +328,55 @@ public class KeyEventHandlerTest
     assertEquals("අම්ම", document.toString());
   }
 
+  @Test public void liveBackspaceAndRetypingUseTheWholeWord()
+  {
+    liveComposition();
+    type("nirmanaya");
+    assertEquals("නිර්මාණය", document.toString());
+    handler.key_up(KeyValue.getKeyByName("backspace"), Pointers.Modifiers.EMPTY);
+    assertEquals("නිර්මාණ", document.toString());
+    type("yak");
+    assertEquals("නිර්මාණයක්", document.toString());
+    handler.handle_space_bar();
+    assertEquals("නිර්මාණයක් ", document.toString());
+  }
+
+  @Test public void liveBackspaceLetsTheUserReplaceAVowelSign()
+  {
+    config.sinhala_transliteration = true;
+    type("amma");
+    handler.key_up(KeyValue.getKeyByName("backspace"), Pointers.Modifiers.EMPTY);
+    verify(connection).setComposingText("අම්ම", 1);
+    type("i");
+    verify(connection).setComposingText("අම්මි", 1);
+    handler.handle_space_bar();
+    assertEquals("අම්මි ", document.toString());
+  }
+
+  @Test public void liveBackspaceLetsTheUserRetypeAVowelInAnIrregularSpelling()
+  {
+    liveComposition();
+    type("nirmanaya");
+    handler.handle_backspace();
+    handler.handle_backspace();
+    handler.handle_backspace();
+    assertEquals("නිර්ම", document.toString());
+    type("aa");
+    assertEquals("නිර්මා", document.toString());
+  }
+
+  @Test public void literalSuggestionsUseTheCorrectSpellingAfterBackspace()
+  {
+    liveComposition();
+    config.literal_singlish = true;
+    type("nirmanayax");
+    handler.handle_backspace();
+    assertEquals("nirmanaya", document.toString());
+    assertEquals("නිර්මාණය", suggestions.suggestions[0]);
+    handler.suggestion_entered(suggestions.suggestions[0], false);
+    assertEquals("නිර්මාණය", document.toString());
+  }
+
   @Test public void liveEditedSuggestionPreservesPrefix()
   {
     type("x, ");

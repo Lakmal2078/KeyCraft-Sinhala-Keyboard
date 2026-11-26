@@ -1011,7 +1011,12 @@ public final class SinhalaTransliterator
     COMMON_WORDS.put("nirbhitha", "නිර්‍භීත");
     COMMON_WORDS.put("nirdeshaya", "නිර්‍දේශය");
     COMMON_WORDS.put("nirdosha", "නිර්‍දෝෂ");
-    COMMON_WORDS.put("nirmaana", "නිර්‍මාණ");
+    COMMON_WORDS.put("nirmaana", "නිර්මාණ");
+    COMMON_WORDS.put("nirmana", "නිර්මාණ");
+    COMMON_WORDS.put("nirmaanaya", "නිර්මාණය");
+    COMMON_WORDS.put("nirmanaya", "නිර්මාණය");
+    COMMON_WORDS.put("nirmaanayak", "නිර්මාණයක්");
+    COMMON_WORDS.put("nirmaanaye", "නිර්මාණයේ");
     COMMON_WORDS.put("nirmala", "නිර්‍මල");
     COMMON_WORDS.put("nirnaya", "නිර්‍ණය");
     COMMON_WORDS.put("nirvaana", "නිර්‍වාණ");

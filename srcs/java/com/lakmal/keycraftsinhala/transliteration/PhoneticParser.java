@@ -348,7 +348,14 @@ public final class PhoneticParser
     return out.toString();
   }
 
-  private static boolean isVowel(char c)
+  /** Returns the continuation when the editor already holds a bare consonant. */
+  public static String parseAfterConsonant(String word)
+  {
+    PhoneticRule vowel = PhoneticRuleSet.findLongestMatch(word, 0, VOWELS_DEPENDENT);
+    return vowel == null ? null : vowel.output + parse(word.substring(vowel.input.length()));
+  }
+
+  public static boolean isVowel(char c)
   {
     c = Character.toLowerCase(c);
     return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'æ' || c == 'ǣ';

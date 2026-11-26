@@ -18,6 +18,16 @@ public class SinhalaTransliteratorTest
   }
 
   @Test
+  public void nirmanayaAndItsInflectionsUseCanonicalSinhala()
+  {
+    assertEquals("නිර්මාණ", SinhalaTransliterator.transliterateWord("nirmana"));
+    assertEquals("නිර්මාණය", SinhalaTransliterator.transliterateWord("nirmanaya"));
+    assertEquals("නිර්මාණය", SinhalaTransliterator.transliterateWord("nirmaanaya"));
+    assertEquals("නිර්මාණයක්", SinhalaTransliterator.transliterateWord("nirmanayak"));
+    assertEquals("නිර්මාණයේ", SinhalaTransliterator.transliterateWord("nirmanaye"));
+  }
+
+  @Test
   public void intervocalicDhSupportsEverydaySinglish()
   {
     assertEquals("නිවරදි", SinhalaTransliterator.transliterateWord("niwaradhi"));

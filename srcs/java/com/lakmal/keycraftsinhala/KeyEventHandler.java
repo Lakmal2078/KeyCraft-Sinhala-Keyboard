@@ -11,6 +11,7 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import java.util.Iterator;
 import com.lakmal.keycraftsinhala.suggestions.Suggestions;
+import com.lakmal.keycraftsinhala.transliteration.PhoneticParser;
 
 public final class KeyEventHandler
   implements Config.IKeyEventHandler,
@@ -36,9 +37,10 @@ public final class KeyEventHandler
   LastAction _last_action = null;
   LastAction _next_last_action = null;
   StringBuilder _sinhala_buffer = new StringBuilder();
-  // After a rendered edit, the surviving Sinhala prefix is authoritative.
-  // Only newly typed Latin characters may be transliterated.
+  // Keep rendered text that no longer matches a prefix of the phonetic input.
   private String _edited_sinhala_prefix = "";
+  // A bare consonant can still have a phonetic spelling that ends in a virama.
+  private boolean _hide_final_virama = false;
 
   private boolean has_sinhala_composition()
   {
@@ -101,6 +103,7 @@ public final class KeyEventHandler
   private void reset_sinhala_composing_state()
   {
     _edited_sinhala_prefix = "";
+    _hide_final_virama = false;
     _sinhala_committed_text = "";
     _max_sinhala_composing_len = 0;
     _pending_commit_delta_sum = 0;
@@ -329,7 +332,7 @@ public final class KeyEventHandler
     }
     if (has_sinhala_composition() && conn != null)
     {
-      String typedSinglish = _edited_sinhala_prefix.isEmpty() ? _sinhala_buffer.toString() : composingPreview();
+      String typedSinglish = sinhala_suggestion_input();
       String rawText = text.trim();
       if (add_space_after)
         text = text + " ";
@@ -684,13 +687,51 @@ public final class KeyEventHandler
 
   private String composingPreview()
   {
-    return _edited_sinhala_prefix + (_config.literal_singlish ? _sinhala_buffer.toString() : transliterate_sinhala_buffer());
+    String preview = composingPreview(_sinhala_buffer.toString());
+    return _hide_final_virama ? preview.substring(0, preview.length() - 1) : preview;
   }
 
-  private String transliterate_sinhala_buffer()
+  private String composingPreview(String input)
   {
+    if (_config.literal_singlish || input.isEmpty())
+      return _edited_sinhala_prefix + input;
+
+    if (!_edited_sinhala_prefix.isEmpty()
+        && SinhalaText.consonant(_edited_sinhala_prefix.charAt(_edited_sinhala_prefix.length() - 1)))
+    {
+      String continuation = PhoneticParser.parseAfterConsonant(input);
+      if (continuation != null)
+        return _edited_sinhala_prefix + continuation;
+    }
     SinhalaLearner learner = _config.editor_config.is_sensitive_input ? null : _sinhala_learner;
-    return SinhalaTransliterator.transliterateWord(_sinhala_buffer.toString(), learner);
+    return _edited_sinhala_prefix + SinhalaTransliterator.transliterateWord(input, learner);
+  }
+
+  private String sinhala_suggestion_input()
+  {
+    return _edited_sinhala_prefix.isEmpty() && !_hide_final_virama
+        ? _sinhala_buffer.toString() : composingPreview();
+  }
+
+  private void retain_sinhala_prefix(String remaining)
+  {
+    _hide_final_virama = false;
+    if (!remaining.isEmpty() && remaining.startsWith(_edited_sinhala_prefix))
+    {
+      String withVirama = remaining + '්';
+      for (int length = _sinhala_buffer.length(); length > 0; length--)
+      {
+        String preview = composingPreview(_sinhala_buffer.substring(0, length));
+        if (preview.equals(remaining) || preview.equals(withVirama))
+        {
+          _sinhala_buffer.setLength(length);
+          _hide_final_virama = preview.equals(withVirama);
+          return;
+        }
+      }
+    }
+    _sinhala_buffer.setLength(0);
+    _edited_sinhala_prefix = remaining;
   }
 
   private void commit_sinhala_replacement(InputConnection conn, String text)
@@ -756,7 +797,8 @@ public final class KeyEventHandler
     // A function name is composed as Sinhala until the opening bracket makes
     // its calculator intent explicit. Restore its literal spelling then.
     if (is_sinhala && _config.quick_calculator_enabled && text.equals("(")
-        && _edited_sinhala_prefix.isEmpty() && QuickCalculator.isFunction(_sinhala_buffer.toString()))
+        && _edited_sinhala_prefix.isEmpty() && !_hide_final_virama
+        && QuickCalculator.isFunction(_sinhala_buffer.toString()))
     {
       String function = _sinhala_buffer.toString();
       commit_sinhala_replacement(conn, function);
@@ -766,11 +808,17 @@ public final class KeyEventHandler
 
     if (is_sinhala && !snippet && is_ascii_letters(text))
     {
+      if (_hide_final_virama && !PhoneticParser.isVowel(text.charAt(0)))
+      {
+        _edited_sinhala_prefix = composingPreview();
+        _sinhala_buffer.setLength(0);
+      }
+      _hide_final_virama = false;
       _sinhala_buffer.append(text);
       String transliterated = composingPreview();
       update_sinhala_composing(conn, transliterated);
       if (_config.suggestions_enabled)
-        _suggestions.currently_typed_word(_edited_sinhala_prefix.isEmpty() ? _sinhala_buffer.toString() : composingPreview());
+        _suggestions.currently_typed_word(sinhala_suggestion_input());
       _next_last_action = LastAction.OTHER;
       return;
     }
@@ -1258,39 +1306,22 @@ public final class KeyEventHandler
     InputConnection conn = _recv.getCurrentInputConnection();
     if (has_sinhala_composition() && conn != null)
     {
-      if (!_config.literal_singlish || !_edited_sinhala_prefix.isEmpty())
+      if (_config.literal_singlish)
+        _sinhala_buffer.deleteCharAt(_sinhala_buffer.length() - 1);
+      else
       {
         String visible = composingPreview();
         int count = SinhalaText.backspaceLength(visible);
         if (count == 0 && !visible.isEmpty())
           count = Character.charCount(visible.codePointBefore(visible.length()));
-        String remaining = visible.substring(0, visible.length() - count);
-        // Discard the obsolete phonetic spelling; it cannot represent every
-        // intermediate Sinhala editing state (e.g. a bare final consonant).
-        _sinhala_buffer.setLength(0);
-        _edited_sinhala_prefix = remaining;
-        if (remaining.isEmpty())
-        {
-          clear_sinhala_composing(conn);
-          _suggestions.clear();
-          _recv.set_suggestions(_suggestions);
-        }
-        else
-        {
-          update_sinhala_composing(conn, remaining);
-          if (_config.suggestions_enabled)
-            _suggestions.currently_typed_word(remaining);
-        }
-        _next_last_action = LastAction.OTHER;
-        return;
+        retain_sinhala_prefix(visible.substring(0, visible.length() - count));
       }
-      _sinhala_buffer.deleteCharAt(_sinhala_buffer.length() - 1);
       if (has_sinhala_composition())
       {
         String transliterated = composingPreview();
         update_sinhala_composing(conn, transliterated);
         if (_config.suggestions_enabled)
-          _suggestions.currently_typed_word(_edited_sinhala_prefix.isEmpty() ? _sinhala_buffer.toString() : composingPreview());
+          _suggestions.currently_typed_word(sinhala_suggestion_input());
       }
       else
       {

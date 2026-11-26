@@ -820,7 +820,7 @@ public class SinhalaCorpusTest
       tests.add(new TestCase("Repaya", "nirdosha", "නිර්‍දෝෂ"));
       tests.add(new TestCase("Repaya", "nirbhitha", "නිර්‍භීත"));
       tests.add(new TestCase("Repaya", "nirmala", "නිර්‍මල"));
-      tests.add(new TestCase("Repaya", "nirmaana", "නිර්‍මාණ"));
+      tests.add(new TestCase("Repaya", "nirmaana", "නිර්මාණ"));
       tests.add(new TestCase("Repaya", "nirwatha", "නිර්‍වත"));
       tests.add(new TestCase("Repaya", "nirnaya", "නිර්‍ණය"));
       tests.add(new TestCase("Repaya", "nirarthaka", "නිර්‍ථක"));
