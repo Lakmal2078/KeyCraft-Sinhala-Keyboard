@@ -8,20 +8,28 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.function.Consumer;
 import com.lakmal.keycraftsinhala.Config;
 import com.lakmal.keycraftsinhala.KeyValue;
 import com.lakmal.keycraftsinhala.Pointers;
 import com.lakmal.keycraftsinhala.R;
-import com.lakmal.keycraftsinhala.dict.SupportedDictionaries;
 
 public class CandidatesView extends LinearLayout
 {
-  static final int NUM_CANDIDATES = 4;
+  static final int NUM_CANDIDATES = Suggestions.VISIBLE_COUNT + 1;
+  private static final int EMOJI_INDEX = Suggestions.VISIBLE_COUNT;
+
+  private TextView _more_toggle;
+  private HorizontalScrollView _extra_scroll;
+  private LinearLayout _extra_items;
+  private final List<String> _extra_candidates = new ArrayList<>();
+  private Consumer<String> _candidate_listener;
+  private float _text_size;
 
   /** Candidates currently visible. Entries can be [null] when there are less
       than [NUM_CANDIDATES] suggestions.
@@ -49,34 +57,38 @@ public class CandidatesView extends LinearLayout
     setup_item_view(0, R.id.candidates_middle);
     setup_item_view(1, R.id.candidates_right);
     setup_item_view(2, R.id.candidates_left);
-    setup_item_view(3, R.id.candidates_emoji);
+    setup_item_view(EMOJI_INDEX, R.id.candidates_emoji);
+    _more_toggle = findViewById(R.id.candidates_more_toggle);
+    _extra_scroll = findViewById(R.id.candidates_extra_scroll);
+    _extra_items = findViewById(R.id.candidates_extra_items);
+    _more_toggle.setOnClickListener(v -> show_extra_candidates(_extra_scroll.getVisibility() != View.VISIBLE));
+  }
+
+  public void setCandidateListener(Consumer<String> listener)
+  {
+    _candidate_listener = listener;
   }
 
   public void set_candidates(Suggestions s)
   {
     int s_count = s.count;
-    for (int i = 0; i < Suggestions.MAX_COUNT; i++)
+    for (int i = 0; i < Suggestions.VISIBLE_COUNT; i++)
       _items[i] = (i < s_count) ? s.suggestions[i] : null;
-    _items[3] = s.emoji_suggestion;
+    _items[EMOJI_INDEX] = s.emoji_suggestion;
+    _extra_candidates.clear();
+    for (int i = Suggestions.VISIBLE_COUNT; i < s_count; i++)
+      _extra_candidates.add(s.suggestions[i]);
     // Hide the status message when showing candidates.
     if (s_count != 0 && _status_no_dict != null)
       _status_no_dict.setVisibility(View.GONE);
     for (int i = 0; i < _item_views.length; i++)
     {
       TextView v = _item_views[i];
-      if (_items[i] != null)
-      {
-        v.setText(_items[i]);
-        v.setContentDescription(accessibleDescriptionForItem(
-            getContext(), i, _items[i], s.clipboard_full_text));
-        v.setVisibility(View.VISIBLE);
-      }
-      else
-      {
-        v.setContentDescription(null);
-        v.setVisibility(View.GONE);
-      }
+      v.setText(_items[i]);
+      v.setContentDescription(accessibleDescriptionForItem(
+          getContext(), i, _items[i], s.clipboard_full_text));
     }
+    show_extra_candidates(false);
   }
 
   public static String accessibleDescriptionForItem(Context ctx, int itemIndex,
@@ -84,7 +96,7 @@ public class CandidatesView extends LinearLayout
   {
     if (itemText == null || itemText.isEmpty())
       return null;
-    if (itemIndex == 3)
+    if (itemIndex == EMOJI_INDEX)
     {
       if (ctx != null)
       {
@@ -119,14 +131,58 @@ public class CandidatesView extends LinearLayout
     return null;
   }
 
+  private void show_extra_candidates(boolean show)
+  {
+    _extra_items.removeAllViews();
+    _extra_scroll.setVisibility(show ? View.VISIBLE : View.GONE);
+    _more_toggle.setVisibility(_extra_candidates.isEmpty() ? View.GONE : View.VISIBLE);
+    _more_toggle.setText(show ? R.string.candidates_fewer_symbol : R.string.candidates_more_symbol);
+    _more_toggle.setContentDescription(getResources().getText(
+        show ? R.string.candidates_show_fewer : R.string.candidates_show_more));
+    for (int i = 0; i < _item_views.length; i++)
+      _item_views[i].setVisibility(!show && _items[i] != null ? View.VISIBLE : View.GONE);
+
+    if (show)
+    {
+      for (String candidate : _extra_candidates)
+      {
+        TextView item = new TextView(getContext(), null, 0, R.style.candidates_item);
+        item.setText(candidate);
+        item.setTextColor(_item_views[1].getTextColors());
+        if (_text_size > 0)
+          item.setTextSize(TypedValue.COMPLEX_UNIT_PX, _text_size);
+        item.setSingleLine(true);
+        item.setMinWidth(Math.round(48 * getResources().getDisplayMetrics().density));
+        item.setFocusable(true);
+        item.setOnClickListener(v -> {
+          show_extra_candidates(false);
+          select_candidate(candidate);
+        });
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        params.setMarginStart(getResources().getDimensionPixelSize(R.dimen.candidates_gap));
+        _extra_items.addView(item, params);
+      }
+      _extra_scroll.scrollTo(0, 0);
+    }
+  }
+
   void clear_candidates()
   {
     for (int i = 0; i < _item_views.length; i++)
     {
       _items[i] = null;
+      _item_views[i].setText(null);
       _item_views[i].setContentDescription(null);
-      _item_views[i].setVisibility(View.GONE);
     }
+    _extra_candidates.clear();
+    show_extra_candidates(false);
+  }
+
+  private void select_candidate(String candidate)
+  {
+    if (candidate != null && _candidate_listener != null)
+      _candidate_listener.accept(candidate);
   }
 
   public void refresh_config(Config config)
@@ -146,6 +202,7 @@ public class CandidatesView extends LinearLayout
       View toggle = findViewById(R.id.candidates_toolbar_toggle);
       if (toggle instanceof TextView)
         ((TextView)toggle).setTextColor(textColor);
+      _more_toggle.setTextColor(textColor);
     }
     else
     {
@@ -164,16 +221,16 @@ public class CandidatesView extends LinearLayout
     // The contextual toolbar and candidate strip share a fixed 48dp viewport.
     // Match candidate text size to the keyboard row without changing bar height.
     // Match the size of labels on the keyboard.
-    float text_size = row_height * config.characterSize * config.labelTextSize;
+    _text_size = row_height * config.characterSize * config.labelTextSize;
     for (int i = 0; i < NUM_CANDIDATES; i++)
     {
       TextView v = _item_views[i];
       // Set text size and enable auto size if supported.
       if (VERSION.SDK_INT < 26)
-        v.setTextSize(TypedValue.COMPLEX_UNIT_PX, text_size);
+        v.setTextSize(TypedValue.COMPLEX_UNIT_PX, _text_size);
       else
         v.setAutoSizeTextTypeUniformWithConfiguration(
-            Math.max(1, (int)(text_size / 2.)), Math.max(2, (int)text_size), 1, TypedValue.COMPLEX_UNIT_PX);
+            Math.max(1, (int)(_text_size / 2.)), Math.max(2, (int)_text_size), 1, TypedValue.COMPLEX_UNIT_PX);
     }
   }
 
@@ -188,16 +245,7 @@ public class CandidatesView extends LinearLayout
     v.setSingleLine(true);
     v.setEllipsize(android.text.TextUtils.TruncateAt.END);
     v.setFocusable(true);
-    v.setOnClickListener(new View.OnClickListener()
-        {
-          @Override
-          public void onClick(View _v)
-          {
-            String it = _items[item_index];
-            if (it != null)
-              Config.globalConfig().handler.suggestion_entered(it);
-          }
-        });
+    v.setOnClickListener(view -> select_candidate(_items[item_index]));
     v.setVisibility(View.GONE);
     _item_views[item_index] = v;
   }

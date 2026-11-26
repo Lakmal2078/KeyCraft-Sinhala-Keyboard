@@ -43,7 +43,8 @@ public final class Suggestions
   /** Clipboard text whose preview was dismissed by the user after pasting. */
   private String dismissed_clipboard_text = null;
   /** Number of suggestions in [suggestions]. */
-  public static final int MAX_COUNT = 3;
+  public static final int VISIBLE_COUNT = 3;
+  public static final int MAX_COUNT = 12;
   /** Whether the current suggestions represent predicted next words rather than active input completions. */
   public boolean is_prediction = false;
 
@@ -117,12 +118,13 @@ public final class Suggestions
     {
       clear();
       Cdict dict = "si".equals(_config.current_dictionary_name) ? _config.current_dictionary : sinhalaDictionary;
+      int[] suffixes = NO_RESULTS;
       if (dict != null)
       {
         Cdict.Result match = dict.find(word);
         if (match.found) addUniqueSuggestion(dict.word(match.index));
         if (personalWords != null && personalWords.contains(word)) addUniqueSuggestion(word);
-        int[] suffixes = dict.suffixes(match, MAX_COUNT);
+        suffixes = dict.suffixes(match, MAX_COUNT);
         for (int index : suffixes)
         {
           if (count >= 2) break;
@@ -133,6 +135,8 @@ public final class Suggestions
         if (next.startsWith(word)) addUniqueSuggestion(next);
       if (personalWords != null)
         for (String personal : personalWords.matching(word)) addUniqueSuggestion(personal);
+      for (int index : suffixes)
+        addUniqueSuggestion(dict.word(index));
       _callback.set_suggestions(this);
       return;
     }
@@ -179,14 +183,7 @@ public final class Suggestions
         }
         for (int i = 0; i < list.size() && count < MAX_COUNT; i++)
           addUniqueSuggestion(list.get(i));
-        // Keep the literal spelling reachable even for ambiguous prefixes.
-        if (!containsSuggestion(word))
-        {
-          if (count < MAX_COUNT)
-            suggestions[count++] = word;
-          else
-            suggestions[count - 1] = word;
-        }
+        keepLiteralSpellingVisible(word);
         emoji_suggestion = query_emoji(word);
         _callback.set_suggestions(this);
         return;
@@ -201,6 +198,26 @@ public final class Suggestions
     else
       query_suggestions(word);
     _callback.set_suggestions(this);
+  }
+
+  private void keepLiteralSpellingVisible(String word)
+  {
+    if (!containsSuggestion(word))
+    {
+      if (count == MAX_COUNT)
+        suggestions[count - 1] = word;
+      else
+        suggestions[count++] = word;
+    }
+    int index = 0;
+    while (!word.equals(suggestions[index]))
+      index++;
+    int lastVisible = VISIBLE_COUNT - 1;
+    if (index > lastVisible)
+    {
+      System.arraycopy(suggestions, lastVisible, suggestions, lastVisible + 1, index - lastVisible);
+      suggestions[lastVisible] = word;
+    }
   }
 
   private void addUniqueSuggestion(String candidate)
@@ -281,7 +298,7 @@ public final class Suggestions
       addUniqueSuggestion(dict.word(r.index));
     int[] suffixes = dict.suffixes(r, MAX_COUNT * 2);
     // Disable distance search for small words
-    int[] dist = (word.length() < 3 || count + 1 >= MAX_COUNT) ? NO_RESULTS :
+    int[] dist = word.length() < 3 ? NO_RESULTS :
       dict.distance(word, 1, MAX_COUNT * 2);
     int limit = Math.max(suffixes.length, dist.length);
     for (int j = 0; j < limit && count < MAX_COUNT; j++)

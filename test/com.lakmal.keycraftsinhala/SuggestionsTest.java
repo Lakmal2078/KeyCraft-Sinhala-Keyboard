@@ -54,7 +54,9 @@ public class SuggestionsTest
     suggestions.currently_typed_word("la");
     assertTrue(Arrays.asList(suggestions.suggestions).contains("la"));
     assertNotEquals("la", suggestions.suggestions[0]);
-    assertEquals(3, suggestions.count);
+    assertEquals("la", suggestions.suggestions[Suggestions.VISIBLE_COUNT - 1]);
+    assertTrue(suggestions.count > Suggestions.VISIBLE_COUNT);
+    assertNotNull(suggestions.suggestions[Suggestions.VISIBLE_COUNT]);
   }
 
   @Test

@@ -315,6 +315,8 @@
   <string name="quick_toolbar_clipboard_desc">පිටපත් කළ පෙළ ඉතිහාසය</string>
   <string name="quick_toolbar_theme_desc">යතුරුපුවරු තේමාව තෝරන්න</string>
   <string name="candidates_toolbar_toggle_text">‹</string>
+  <string name="candidates_show_more">තවත් යෝජනා පෙන්වන්න</string>
+  <string name="candidates_show_fewer">මුල් යෝජනා තුන පෙන්වන්න</string>
   <string name="candidates_show_toolbar_desc">ක්ෂණික ක්‍රියා පෙන්වන්න</string>
   <string name="emoji_search_keys_hint">පහතින් අකුරු තට්ටු කරන්න හෝ අලවන්න…</string>
   <string name="emoji_search_paste">පසුරු පුවරුවේ පෙළ සෙවුමට අලවන්න</string>

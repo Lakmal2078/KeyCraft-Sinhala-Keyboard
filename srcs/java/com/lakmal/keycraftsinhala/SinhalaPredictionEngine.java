@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public final class SinhalaPredictionEngine
 {
-  public static final int MAX_PREDICTIONS = 3;
+  public static final int MAX_PREDICTIONS = 12;
 
   private static final Map<String, List<String>> TRIGRAM_MAP = new HashMap<>();
   private static final Map<String, List<String>> BIGRAM_MAP = new HashMap<>();

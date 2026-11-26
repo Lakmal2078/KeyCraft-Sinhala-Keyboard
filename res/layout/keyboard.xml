@@ -75,6 +75,27 @@
         <TextView android:id="@+id/candidates_left" style="@style/candidates_item"/>
         <TextView android:id="@+id/candidates_middle" style="@style/candidates_item"/>
         <TextView android:id="@+id/candidates_right" style="@style/candidates_item"/>
+        <HorizontalScrollView
+            android:id="@+id/candidates_extra_scroll"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:visibility="gone">
+          <LinearLayout
+              android:id="@+id/candidates_extra_items"
+              android:layout_width="wrap_content"
+              android:layout_height="match_parent"
+              android:orientation="horizontal"/>
+        </HorizontalScrollView>
+        <Button
+            android:id="@+id/candidates_more_toggle"
+            style="@style/candidates_toolbar_toggle"
+            android:padding="0dp"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:text="@string/candidates_more_symbol"
+            android:contentDescription="@string/candidates_show_more"
+            android:visibility="gone"/>
       </com.lakmal.keycraftsinhala.suggestions.CandidatesView>
     </LinearLayout>
 

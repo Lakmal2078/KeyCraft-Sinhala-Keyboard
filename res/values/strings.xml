@@ -316,6 +316,10 @@
   <string name="quick_toolbar_clipboard_desc">Clipboard history</string>
   <string name="quick_toolbar_theme_desc">Choose keyboard theme</string>
   <string name="candidates_toolbar_toggle_text">‹</string>
+  <string name="candidates_more_symbol" translatable="false">…</string>
+  <string name="candidates_fewer_symbol" translatable="false">‹</string>
+  <string name="candidates_show_more">Show more suggestions</string>
+  <string name="candidates_show_fewer">Show first three suggestions</string>
   <string name="candidates_show_toolbar_desc">Show quick actions</string>
   <string name="quick_toolbar_suggestions_desc">Return to word suggestions</string>
   <string name="quick_toolbar_one_hand_desc">Toggle one-handed mode</string>

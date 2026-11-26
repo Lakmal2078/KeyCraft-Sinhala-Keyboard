@@ -195,6 +195,7 @@ public class Keyboard2 extends InputMethodService
     _floating_handle = _keyboard_container_view.findViewById(R.id.keyboard_floating_handle);
     _keyboard_layout_view = (Keyboard2View)_keyboard_container_view.findViewById(R.id.keyboard_view);
     _candidates_view = (CandidatesView)_keyboard_container_view.findViewById(R.id.candidates_view);
+    _candidates_view.setCandidateListener(candidate -> _keyeventhandler.suggestion_entered(candidate));
     _quick_toolbar = (ViewGroup)_keyboard_container_view.findViewById(R.id.quick_toolbar);
     _top_strip_container = (LinearLayout)_keyboard_container_view.findViewById(R.id.top_strip_container);
     setup_quick_toolbar();
