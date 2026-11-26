@@ -232,12 +232,9 @@ public class AuditRegressionDeviceTest
   public void SinhalaLearnerPersistsAndClearActionRemovesDiskAndMemoryData() throws Exception
   {
     Context context = ApplicationProvider.getApplicationContext();
-    Context storageContext = Build.VERSION.SDK_INT >= 24
-        ? context.createDeviceProtectedStorageContext() : context;
-    SharedPreferences prefs =
-        DirectBootAwarePreferences.get_protected_prefs(context, "sinhala_learned_bigrams");
-    File preferencesFile = new File(storageContext.getDataDir(),
-        "shared_prefs/sinhala_learned_bigrams.xml");
+    String preferenceName = "sinhala_learned_bigrams";
+    SharedPreferences prefs = context.getSharedPreferences(preferenceName, Context.MODE_PRIVATE);
+    File preferencesFile = new File(context.getDataDir(), "shared_prefs/" + preferenceName + ".xml");
     String transitionKey = "පරීක්ෂණය|සාර්ථකයි";
     Map<String, ?> previousValues = new HashMap<>(prefs.getAll());
     try
