@@ -213,7 +213,7 @@ public final class ClipboardHistoryService
       return;
     clear_expired_and_get_history();
     int size = _history.size();
-    if (clip.equals("") || (size > 0 && _history.get(0).content.equals(clip)))
+    if (clip == null || isLikelyOtp(clip) || clip.equals("") || (size > 0 && _history.get(0).content.equals(clip)))
       return;
     if (size >= MAX_HISTORY_SIZE)
       _history.remove(size - 1);
@@ -329,6 +329,21 @@ public final class ClipboardHistoryService
         && shouldRejectSensitiveClip(VERSION.SDK_INT, isMarkedSensitive(clip.getDescription())))
       return null;
     return clip;
+  }
+
+  /** Conservative heuristic: standalone 4–8 decimal digits, optionally separated. */
+  static boolean isLikelyOtp(String text)
+  {
+    if (text == null) return false;
+    String value = text.trim();
+    int digits = 0;
+    for (int i = 0; i < value.length(); i++)
+    {
+      char c = value.charAt(i);
+      if (Character.isDigit(c)) digits++;
+      else if (c != ' ' && c != '-') return false;
+    }
+    return digits >= 4 && digits <= 8;
   }
 
   /** True only when the platform exposes and marks a clip as sensitive. */

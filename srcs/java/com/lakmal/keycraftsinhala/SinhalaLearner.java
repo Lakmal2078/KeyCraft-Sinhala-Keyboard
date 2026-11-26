@@ -75,7 +75,7 @@ public final class SinhalaLearner
   public SinhalaLearner(Context context)
   {
     _prefs = context != null
-        ? DirectBootAwarePreferences.get_protected_prefs(context, PREF_NAME)
+        ? DirectBootAwarePreferences.get_learned_prefs(context, PREF_NAME)
         : null;
     clearObsoleteTransliterationCorrections();
     loadFromPreferences();
@@ -112,6 +112,8 @@ public final class SinhalaLearner
         .putBoolean(migrationKey, true)
         .apply();
   }
+
+  boolean hasPersistentStorage() { return _prefs != null; }
 
   private void registerInstance()
   {
@@ -305,7 +307,7 @@ public final class SinhalaLearner
     if (context == null)
       return false;
     SharedPreferences prefs =
-        DirectBootAwarePreferences.get_protected_prefs(context, PREF_NAME);
+        DirectBootAwarePreferences.get_learned_prefs(context, PREF_NAME);
     return clearAllLearnedData(prefs);
   }
 

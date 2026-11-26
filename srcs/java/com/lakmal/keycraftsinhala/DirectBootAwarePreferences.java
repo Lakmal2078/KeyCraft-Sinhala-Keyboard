@@ -42,6 +42,35 @@ public final class DirectBootAwarePreferences
     return context.getSharedPreferences(pref_name, Context.MODE_PRIVATE);
   }
 
+  /** Personal learning is unavailable until the credential store is unlocked. */
+  static synchronized SharedPreferences get_learned_prefs(Context context, String name)
+  {
+    android.os.UserManager user = context.getSystemService(android.os.UserManager.class);
+    if (user == null || !user.isUserUnlocked()) return null;
+    Context credential = context.getApplicationContext();
+    if (credential == null || credential.isDeviceProtectedStorage()) return null;
+    Context device = context.createDeviceProtectedStorageContext();
+    SharedPreferences legacy = device.getSharedPreferences(name, Context.MODE_PRIVATE);
+    SharedPreferences target = credential.getSharedPreferences(name, Context.MODE_PRIVATE);
+    if (!legacy.getAll().isEmpty())
+    {
+      // Never overwrite a newer credential-store value on retry.
+      SharedPreferences.Editor editor = target.edit();
+      for (Map.Entry<String, ?> entry : legacy.getAll().entrySet())
+      {
+        String key = entry.getKey();
+        if (target.contains(key)) continue;
+        Object value = entry.getValue();
+        if (value instanceof Integer) editor.putInt(key, (Integer)value);
+        else if (value instanceof String) editor.putString(key, (String)value);
+        else if (value instanceof Boolean) editor.putBoolean(key, (Boolean)value);
+        else return null;
+      }
+      if (!editor.commit() || !legacy.edit().clear().commit()) return null;
+    }
+    return target;
+  }
+
   static void check_need_migration(Context app_context,
       SharedPreferences protected_prefs)
   {

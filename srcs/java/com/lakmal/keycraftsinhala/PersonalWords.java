@@ -18,7 +18,11 @@ public final class PersonalWords
   static synchronized PersonalWords open(Context context)
   {
     if (instance == null)
-      instance = new PersonalWords(DirectBootAwarePreferences.get_protected_prefs(context, "personal_sinhala_words"));
+      {
+      SharedPreferences prefs = DirectBootAwarePreferences.get_learned_prefs(context, "personal_sinhala_words");
+      if (prefs == null) return new PersonalWords(null);
+      instance = new PersonalWords(prefs);
+    }
     return instance;
   }
 

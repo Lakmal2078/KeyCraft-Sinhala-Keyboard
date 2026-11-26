@@ -45,7 +45,8 @@ public final class KeyEventHandler
     return _sinhala_buffer.length() > 0 || !_edited_sinhala_prefix.isEmpty();
   }
   SinhalaLearner _sinhala_learner;
-  final PersonalWords personalWords;
+  PersonalWords personalWords;
+  private final Context learningContext;
   String _last_committed_sinhala = null;
   String _sinhala_committed_text = "";
   int _max_sinhala_composing_len = 0;
@@ -59,6 +60,7 @@ public final class KeyEventHandler
 
   public KeyEventHandler(Config conf, IReceiver recv, Suggestions sg, Context context)
   {
+    learningContext = context;
     _config = conf;
     _recv = recv;
     Handler handler = recv.getHandler();
@@ -145,6 +147,12 @@ public final class KeyEventHandler
     // This method also runs when preferences are refreshed during active input.
     // Close any existing composition before resetting its backing state.
     finish_composing();
+    if (learningContext != null && !_sinhala_learner.hasPersistentStorage())
+    {
+      setSinhalaLearner(new SinhalaLearner(learningContext));
+      personalWords = PersonalWords.open(learningContext);
+      _suggestions.personalWords = personalWords;
+    }
     InputConnection ic = _recv.getCurrentInputConnection();
     _autocap.started(_config, ic);
     _suggestions.started();
