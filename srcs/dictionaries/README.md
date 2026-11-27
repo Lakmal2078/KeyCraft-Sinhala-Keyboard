@@ -13,9 +13,27 @@ keep Sinhala dictionary generation independent of network access.
 - GitHub blob SHA for the imported `si_LK.dic`:
   `11a46f977ddc4b342ac0df7a30d4dc5eb48565d2`.
   SHA-256: `d6ce8cef2bbf184459bb3073d2ddc246afa914efaf8fc438b32e8d7724abfcfd`
-- `gen_sinhala_dict.py` combines this word list with the project’s Sinhala
-  transliteration vocabulary and embedded common words to generate
-  `assets/dict/si.dict`.
+- `si_legacy_keycraft.txt` is the frozen snapshot of the Sinhala literals used
+  by the previously bundled dictionary. It comes from this project's GPL-3.0
+  `SinhalaTransliterator.java` at commit
+  `55795f69cfc6d2da4e26fdeda07cd6debd3b245c`. With the existing embedded core words
+  and LibreOffice source, it reproduces the bundled `si.dict` byte-for-byte.
+- Add newly reviewed entries to `si_reviewed.tsv`. Keep the source reference,
+  redistribution license, and human review reference with each spelling.
+  A row that overlaps the old vocabulary can add aliases or raise priority.
+  The trie contains one NFC entry, weighted at the higher priority.
+  The final TSV column is `status`. Only `APPROVED` rows contribute to either
+  generated asset, and those rows require all provenance fields. `PENDING`
+  and `REJECTED` rows still undergo spelling and format validation.
+- `si_existing_priorities.tsv` adjusts editorial priorities for a small set
+  of established everyday words. The generator verifies that each word
+  already exists in the bundled sources. Use the reviewed TSV for additions.
+- Run `python3 gen_sinhala_dict.py` to rebuild `assets/dict/si.dict` and
+  `assets/dict/si_aliases.tsv` offline. The default build also refreshes the
+  bundled Sinhala SHA-256 pin, which `--check` verifies. Aliases add candidates for exact Latin
+  input in Singlish literal mode. The generator checks reference syntax. The
+  reviewer verifies the references, spelling, and redistribution permission.
+
 
 ## English (United States)
 

@@ -17,9 +17,39 @@ Select the Sinhala layout in Settings for direct letter input. Shift selects vow
 
 Enter consonants before dependent vowels, including visually leading signs such as ෙ. For example ක followed by ෙ produces කෙ. A second vowel sign replaces the first. Type a virama followed by another consonant for ක්ක or ත්ත. The layout offers explicit joiner keys for joined forms. Backspace removes a final sign first, then unwinds the last consonant of a cluster and its connector. Clipboard paste inserts the original text.
 
-The candidate strip shows up to three words. For example, `niwaradhi` suggests නිවරදි, and `aayuboovan` suggests ආයුබෝවන්. Spellings can be ambiguous. The bundled Sinhala dictionary at `assets/dict/si.dict` is a compiled Cdict trie. Its generator combines Sinhala words with integer frequency weights. The next-word engine uses one- and two-word contexts and locally learned transitions.
+The candidate strip initially shows up to three words. Expand it to see more suggestions. When you move the cursor within Sinhala text or press Backspace, suggestions follow the complete Sinhala clusters before the cursor. For example, `niwaradhi` suggests නිවරදි, and `aayuboovan` suggests ආයුබෝවන්. Spellings can be ambiguous. The bundled Sinhala dictionary at `assets/dict/si.dict` is a compiled Cdict trie. Its generator combines Sinhala words with integer frequency weights. The next-word engine uses one- and two-word contexts and locally learned transitions.
 
 **Personal Sinhala dictionary** in Settings lists saved words. Tap **Add word** to save one or tap an entry to remove it. The keyboard counts accepted Sinhala words and direct entries completed with Space, up to 256 words. The app stores these counts locally, outside Android backup. Sensitive fields skip learning. Swipe gestures and double-space punctuation have separate switches. Double-space punctuation is off by default.
+
+## සිංහල වචන එක් කිරීම
+
+නව වචනයක් එක් කිරීමට [si_reviewed.tsv](srcs/dictionaries/si_reviewed.tsv) වෙත
+UTF-8 TSV පේළියක් යොදන්න. තීරු පිළිවෙළට වචනය, ප්‍රමුඛතාව, Singlish aliases,
+මූලාශ්‍රය, බලපත්‍රය, human review reference එක සහ review status එක සටහන් කරන්න. වචනයේ spelling
+සහ මූලාශ්‍රයේ බෙදාහැරීමේ අවසරය review එකේදී තහවුරු කරන්න.
+
+- `word` තීරුවට එක් සිංහල වචනයක් යොදන්න. Generator එක NFC වලට normalize කර
+  සමාන වචන, වැරදි අක්ෂර සහ අසම්පූර්ණ පිල්ලම් හෝ joiner අනුක්‍රම ප්‍රතික්ෂේප කරයි.
+- `priority` හිස් තැබුවොත් 12 යොදාගනී. පරාසය 1–15 වේ.
+  `singlish_aliases` හිස් හෝ comma වලින් වෙන් කළ lowercase ASCII aliases වේ.
+  එක් alias එකකට එක් සිංහල වචනයක් යොදන්න.
+- `source` සහ `review` සඳහා `https://` හෝ `repo:` යොමුවක් ද,
+  `license` සඳහා SPDX identifier එකක් ද යොදන්න.
+- `status` සඳහා `PENDING`, `APPROVED` හෝ `REJECTED` යොදන්න.
+  Draft entries review queue එකේ තබන්න. Batch එකක් අනුමත කළ පසු, එහි rows
+  `si_reviewed.tsv` වෙත ගෙන ගොස් source, license සහ reviewer reference සමඟ
+  `APPROVED` යොදන්න. Dictionary එකට සහ alias asset එකට එක් වන්නේ එම rows පමණි.
+- `python3 gen_sinhala_dict.py` මගින් offline assets නැවත සාදා
+  `python3 gen_sinhala_dict.py --check`, `python3 scripts/run_sinhala_python_tests.py`
+  සහ `./gradlew testDebugUnitTest` ධාවනය කරන්න. TSV වෙනස සහ generated assets
+  එකම review එකට ඉදිරිපත් කරන්න.
+
+Direct Sinhala යෝජනාවල exact match එක මුලින් ලැබේ. සුරැකි වචනවල frequency සමාන
+විට app process එක තුළ වඩා මෑතදී භාවිත කළ වචනය ඉදිරියට එයි. Singlish literal mode
+එකේ Latin spelling එක පෙනෙන අතර, reviewed alias ලැබුණොත් Sinhala candidate එකක්
+ලෙස තෝරාගත හැක. [ශබ්දකෝෂ මූලාශ්‍ර සහ බලපත්‍ර](srcs/dictionaries/README.md).
+
+Suggestion quality සඳහා [වාක්‍ය 100ක Top‑3 benchmark එක](docs/SINHALA_TOP3_BENCHMARK.md) බලන්න.
 
 ## Repository structure
 
@@ -74,7 +104,7 @@ Run `./gradlew testDebugUnitTest` for JVM tests, `python3 scripts/run_sinhala_py
 
 ## Install
 
-Version 1.4.2 requires Android 10 (API 29) or later.
+Version 1.4.3 requires Android 10 (API 29) or later.
 
 1. Download the latest APK from the [GitHub Releases](https://github.com/Lakmal2078/KeyCraft-Sinhala-Keyboard/releases) page, or build it using the instructions above.
 2. Open the APK on your Android device and approve installation from that source if Android asks.

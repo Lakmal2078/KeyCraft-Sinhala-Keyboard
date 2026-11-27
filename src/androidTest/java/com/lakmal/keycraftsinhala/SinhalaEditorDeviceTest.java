@@ -18,6 +18,47 @@ public class SinhalaEditorDeviceTest
 {
   @Test public void inputConnectionPreservesSuffixAndUnwindsConjunct()
   {
+    withEditor((editor, handler) -> {
+      handler.key_up(KeyValue.makeCharKey('ක'), Pointers.Modifiers.EMPTY);
+      assertEquals("ක!", editor.getText().toString());
+      handler.key_up(KeyValue.makeCharKey('ෙ'), Pointers.Modifiers.EMPTY);
+      assertEquals("කෙ!", editor.getText().toString());
+      handler.send_text("ේ");
+      assertEquals("කේ!", editor.getText().toString());
+      handler.send_text("්");
+      handler.send_text("ක");
+      assertEquals("ක්ක!", editor.getText().toString());
+      handler.handle_backspace();
+      assertEquals("ක!", editor.getText().toString());
+      assertEquals(1, editor.getSelectionStart());
+    });
+  }
+
+  @Test public void backspaceRefreshesSuggestionsFromRealEditorAtMidWordCursor()
+  {
+    withEditor((editor, handler) -> {
+      handler.send_text("අ");
+      handler.send_text("ප");
+      handler.send_text("ි");
+      assertEquals("අපි", handler._suggestions.suggestions[0]);
+
+      editor.setSelection(2);
+      handler.selection_updated(3, 2, 2);
+      handler.handle_backspace();
+      assertEquals("අ!", editor.getText().toString());
+      assertEquals(1, editor.getSelectionStart());
+      assertTrue(handler._suggestions.count > 0);
+      for (int i = 0; i < handler._suggestions.count; i++)
+        assertTrue(handler._suggestions.suggestions[i].startsWith("අ"));
+
+      handler.handle_backspace();
+      assertEquals("!", editor.getText().toString());
+      assertEquals(0, handler._suggestions.count);
+    });
+  }
+
+  private void withEditor(java.util.function.BiConsumer<EditText, KeyEventHandler> test)
+  {
     InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
       EditText editor = new EditText(ApplicationProvider.getApplicationContext());
       editor.setText("!");
@@ -43,20 +84,10 @@ public class SinhalaEditorDeviceTest
         public boolean isSinhalaLayout() { return true; }
         public void set_suggestions(Suggestions suggestions) {}
       };
-      KeyEventHandler handler = new KeyEventHandler(config, receiver, new Suggestions(receiver, config));
+      KeyEventHandler handler = new KeyEventHandler(config, receiver,
+          new Suggestions(receiver, config), editor.getContext());
       handler.started();
-      handler.key_up(KeyValue.makeCharKey('ක'), Pointers.Modifiers.EMPTY);
-      assertEquals("ක!", editor.getText().toString());
-      handler.key_up(KeyValue.makeCharKey('ෙ'), Pointers.Modifiers.EMPTY);
-      assertEquals("කෙ!", editor.getText().toString());
-      handler.send_text("ේ");
-      assertEquals("කේ!", editor.getText().toString());
-      handler.send_text("්");
-      handler.send_text("ක");
-      assertEquals("ක්ක!", editor.getText().toString());
-      handler.handle_backspace();
-      assertEquals("ක!", editor.getText().toString());
-      assertEquals(1, editor.getSelectionStart());
+      test.accept(editor, handler);
     });
   }
 }

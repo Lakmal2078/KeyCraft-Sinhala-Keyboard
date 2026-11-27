@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.ToIntFunction;
 
 /**
  * Pure Java implementation of libcdict Radix Tree dictionary reader.
@@ -333,20 +336,39 @@ public class Cdict {
   }
 
   public int[] suffixes(Result result, int count) {
+    return suffixes(result, count, null);
+  }
+
+  /**
+   * Rank prefix matches by dictionary priority, then by the supplied completion
+   * cost, then by stable dictionary order. A negative cost excludes a match.
+   */
+  public int[] suffixes(Result result, int count, ToIntFunction<String> completionCost) {
     if (result == null || result.prefix_ptr == 0 || count <= 0) {
       return new int[0];
     }
     int parent = (int) (result.prefix_ptr >>> 32);
     int ptr = (int) result.prefix_ptr;
-    List<WordFreq> list = new ArrayList<>();
-    collect_suffixes(parent, ptr, result.original_index, list);
-    Collections.sort(list, WORD_FREQ_COMPARATOR);
-    int n = Math.min(count, list.size());
-    int[] out = new int[n];
-    for (int i = 0; i < n; i++) {
-      out[i] = list.get(i).index;
+    Map<Integer, WordFreq> matches = new HashMap<>();
+    collect_suffixes(parent, ptr, result.original_index, matches);
+    List<WordFreq> list = new ArrayList<>(matches.size());
+    for (WordFreq candidate : matches.values()) {
+      if (completionCost != null) {
+        candidate.cost = completionCost.applyAsInt(word(candidate.index));
+        if (candidate.cost < 0) continue;
+      }
+      list.add(candidate);
     }
-    return out;
+    Collections.sort(list, WORD_FREQ_COMPARATOR);
+    return firstIndices(list, count);
+  }
+
+  private static int[] firstIndices(List<WordFreq> words, int count) {
+    int[] indices = new int[Math.min(count, words.size())];
+    for (int i = 0; i < indices.length; i++) {
+      indices[i] = words.get(i).index;
+    }
+    return indices;
   }
 
   public int[] distance(String word, int dist, int count) {
@@ -354,20 +376,17 @@ public class Cdict {
       return new int[0];
     }
     byte[] wBytes = word.getBytes(StandardCharsets.UTF_8);
-    List<WordFreq> list = new ArrayList<>();
-    collect_distance(_root_node, 0, wBytes, 0, wBytes.length, 0, dist, list);
+    Map<Integer, WordFreq> matches = new HashMap<>();
+    collect_distance(_root_node, 0, wBytes, 0, wBytes.length, 0, dist, matches);
+    List<WordFreq> list = new ArrayList<>(matches.values());
     Collections.sort(list, WORD_FREQ_COMPARATOR);
-    int n = Math.min(count, list.size());
-    int[] out = new int[n];
-    for (int i = 0; i < n; i++) {
-      out[i] = list.get(i).index;
-    }
-    return out;
+    return firstIndices(list, count);
   }
 
   private static final class WordFreq {
     final int freq;
     final int index;
+    int cost;
 
     WordFreq(int freq, int index) {
       this.freq = freq;
@@ -378,21 +397,19 @@ public class Cdict {
   private static final Comparator<WordFreq> WORD_FREQ_COMPARATOR = (a, b) -> {
     int d = b.freq - a.freq;
     if (d != 0) return d;
-    return a.index - b.index;
+    int costOrder = Integer.compare(a.cost, b.cost);
+    return costOrder != 0 ? costOrder : Integer.compare(a.index, b.index);
   };
 
-  private void add_resolved_word(List<WordFreq> dst, int index) {
+  private void add_resolved_word(Map<Integer, WordFreq> dst, int index) {
     int alias = resolve_alias(index);
     if (alias >= 0) {
       index = alias;
     }
-    for (WordFreq wf : dst) {
-      if (wf.index == index) return;
-    }
-    dst.add(new WordFreq(freq(index), index));
+    dst.computeIfAbsent(index, key -> new WordFreq(freq(key), key));
   }
 
-  private void collect_suffixes(int parent_node, int ptr, int index, List<WordFreq> dst) {
+  private void collect_suffixes(int parent_node, int ptr, int index, Map<Integer, WordFreq> dst) {
     int node = parent_node + (ptr & ~1);
     if ((ptr & 1) != 0) {
       add_resolved_word(dst, index);
@@ -411,7 +428,7 @@ public class Cdict {
   }
 
   private void collect_distance(int parent_node, int ptr, byte[] word, int word_idx,
-                                int word_end, int index, int dist, List<WordFreq> dst) {
+                                int word_end, int index, int dist, Map<Integer, WordFreq> dst) {
     if (dist == 0) {
       Result r = find_node(parent_node, ptr, word, word_idx, word_end, index);
       if (r.found) {

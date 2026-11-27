@@ -3,14 +3,15 @@
 gen_sinhala_dict.py
 
 Compiles a comprehensive Sinhala dictionary in libcdict (Cdict) binary format
-for Unexpected Keyboard.
+for KeyCraft Sinhala Keyboard.
 """
 
-import gzip
-import os
+import argparse
+import csv
+import hashlib
+from pathlib import Path
 import re
 import struct
-import sys
 import unicodedata
 
 # Core high-frequency Sinhala words supplementing the bundled source dictionary
@@ -81,29 +82,88 @@ def clean_sinhala_word(word):
     return word
 
 
-def load_words_from_transliterator(file_path):
-    """Extract Sinhala tokens from mapping strings, including multi-word phrases."""
-    words = set()
-    if os.path.exists(file_path):
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        # Capture the complete quoted value first, then split it into Sinhala
-        # tokens. The old pattern required a whole value to be Sinhala-only and
-        # silently skipped mappings such as \"සවුදි අරාබිය\".
-        for quoted in re.finditer(r'"([^"\\]*(?:\\.[^"\\]*)*)"', content):
-            value = quoted.group(1)
-            for match in SINHALA_WORD_RE.finditer(value):
-                word = clean_sinhala_word(match.group(0))
-                if word:
-                    words.add(word)
-    return words
+ROOT = Path(__file__).resolve().parent
+SOURCE_DIR = ROOT / "srcs/dictionaries"
+BUNDLED_DIR = ROOT / "assets/dict"
+DIGEST_SOURCE = ROOT / "srcs/java/com/lakmal/keycraftsinhala/dict/SinhalaDictionaryDigest.java"
+REVIEWED_FIELDS = ("word", "priority", "singlish_aliases", "source", "license", "review", "status")
+
+
+def valid_reviewed_word(word):
+    """Validate the single-token format used by reviewed additions."""
+    def letter(ch):
+        return "\u0D85" <= ch <= "\u0DC6" and unicodedata.category(ch) == "Lo"
+
+    def consonant(ch):
+        return ch >= "\u0D9A" and letter(ch)
+
+    if clean_sinhala_word(word) != word or not word or not letter(word[0]):
+        return False
+    for i, ch in enumerate(word[1:], 1):
+        previous = word[i - 1]
+        if letter(ch):
+            continue
+        if ch == "\u200D":
+            if previous != "\u0DCA" or i + 1 == len(word) or not consonant(word[i + 1]):
+                return False
+        elif ch == "\u0DCA" or unicodedata.name(ch, "").startswith("SINHALA VOWEL SIGN"):
+            if not consonant(previous):
+                return False
+        elif ch in "\u0D81\u0D82\u0D83":
+            if not letter(previous) and not unicodedata.name(previous, "").startswith("SINHALA VOWEL SIGN"):
+                return False
+        else:
+            return False
+    return True
+
+
+def load_reviewed_words(path):
+    """Read reviewed entries, keeping spelling and alias validation fail-closed."""
+    words, aliases, seen = {}, {}, set()
+    with path.open(encoding="utf-8", newline="") as source:
+        rows = csv.DictReader(source, delimiter="\t", quoting=csv.QUOTE_NONE)
+        if tuple(rows.fieldnames or ()) != REVIEWED_FIELDS:
+            raise ValueError(f"{path}: expected header {' '.join(REVIEWED_FIELDS)}")
+        for row in rows:
+            location = f"{path}:{rows.line_num}"
+            if None in row or any(value is None for value in row.values()):
+                raise ValueError(f"{location}: expected {len(REVIEWED_FIELDS)} tab-separated fields")
+            word = unicodedata.normalize("NFC", row["word"])
+            if not valid_reviewed_word(word):
+                raise ValueError(f"{location}: invalid Sinhala token {row['word']!r}")
+            if word in seen:
+                raise ValueError(f"{location}: duplicate NFC word {word!r}")
+            priority = row["priority"] or "12"
+            if not re.fullmatch(r"[1-9]|1[0-5]", priority):
+                raise ValueError(f"{location}: priority must be 1–15")
+            seen.add(word)
+            status = row["status"]
+            if status not in {"PENDING", "APPROVED", "REJECTED"}:
+                raise ValueError(f"{location}: invalid review status {status!r}")
+            approved = status == "APPROVED"
+            for field in ("source", "review"):
+                if (approved or row[field]) and not re.fullmatch(r"(?:https://|repo:)[^\s]+", row[field]):
+                    raise ValueError(f"{location}: {field} must contain a reference")
+            if (approved or row["license"]) and not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.+-]*", row["license"]):
+                raise ValueError(f"{location}: an SPDX license identifier is required")
+            row_aliases = row["singlish_aliases"].split(",") if row["singlish_aliases"] else []
+            if len(set(row_aliases)) != len(row_aliases):
+                raise ValueError(f"{location}: duplicate Singlish alias")
+            for alias in row_aliases:
+                if not re.fullmatch(r"[a-z]{2,30}", alias):
+                    raise ValueError(f"{location}: invalid Singlish alias {alias!r}")
+                if approved:
+                    if alias in aliases:
+                        raise ValueError(f"{location}: duplicate Singlish alias {alias!r}")
+                    aliases[alias] = word
+            if approved:
+                words[word] = int(priority)
+    return words, aliases
 
 
 def load_words_from_libreoffice():
     """Load the vendored, licensed Sinhala word list without network access."""
-    source_path = os.path.join(
-        os.path.dirname(__file__), "srcs/dictionaries/si_LK.dic"
-    )
+    source_path = SOURCE_DIR / "si_LK.dic"
     words = set()
     with open(source_path, "r", encoding="utf-8") as source:
         next(source, None)  # Hunspell word-count header
@@ -304,39 +364,65 @@ def build_trie_dict(word_freq_map, dict_name="main"):
     return final_data
 
 
+def apply_existing_priorities(word_freq, path):
+    """Raise editorial priority without admitting any new vocabulary."""
+    seen = set()
+    for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        fields = line.split("\t")
+        if len(fields) != 2 or not re.fullmatch(r"[1-9]|1[0-5]", fields[1]):
+            raise ValueError(f"{path}:{i}: expected an existing word and priority 1–15")
+        word, priority = fields
+        if word not in word_freq or word in seen:
+            raise ValueError(f"{path}:{i}: not a unique existing dictionary entry: {word!r}")
+        seen.add(word)
+        word_freq[word] = max(int(priority), word_freq[word])
+
+
+def build_outputs(reviewed_path):
+    word_freq = dict.fromkeys(load_words_from_libreoffice(), 8)
+    word_freq.update(CORE_SINHALA_WORDS)
+    legacy_words = (SOURCE_DIR / "si_legacy_keycraft.txt").read_text(encoding="utf-8").splitlines()
+    word_freq.update(dict.fromkeys(legacy_words, 15))
+    apply_existing_priorities(word_freq, SOURCE_DIR / "si_existing_priorities.tsv")
+    reviewed_words, aliases = load_reviewed_words(reviewed_path)
+    for word, priority in reviewed_words.items():
+        word_freq[word] = max(priority, word_freq.get(word, 0))
+    return {
+        "si.dict": build_trie_dict(word_freq),
+        "si_aliases.tsv": "".join(f"{alias}\t{aliases[alias]}\n" for alias in sorted(aliases)).encode("utf-8"),
+    }
+
+
 def main():
-    sys.setrecursionlimit(150000)
-    word_freq = {}
-
-    # 1. Base core words
-    for w, f in CORE_SINHALA_WORDS:
-        word_freq[w] = f
-
-    # 2. Transliterator words
-    trans_path = os.path.join(os.path.dirname(__file__), "srcs/java/com/lakmal/keycraftsinhala/SinhalaTransliterator.java")
-    trans_words = load_words_from_transliterator(trans_path)
-    for w in trans_words:
-        word_freq[w] = 15
-
-    # 3. LibreOffice Sinhala dictionary
-    lo_words = load_words_from_libreoffice()
-    for w in lo_words:
-        if w not in word_freq:
-            word_freq[w] = 8
-
-    print(f"Total vocabulary size: {len(word_freq)} words.")
-    dict_bytes = build_trie_dict(word_freq, "main")
-    output_dir = os.path.join(os.path.dirname(__file__), "assets/dict")
-    os.makedirs(output_dir, exist_ok=True)
-    out_file = os.path.join(output_dir, "si.dict")
-
-    with open(out_file, "wb") as f:
-        f.write(dict_bytes)
-
-    compressed = gzip.compress(dict_bytes)
-    print(f"Generated {out_file}")
-    print(f"Uncompressed size: {len(dict_bytes)} bytes")
-    print(f"Gzip compressed size: {len(compressed)} bytes")
+    parser = argparse.ArgumentParser(description="Build or check the offline KeyCraft Sinhala dictionary.")
+    parser.add_argument("--reviewed", type=Path, default=SOURCE_DIR / "si_reviewed.tsv")
+    parser.add_argument("--output-dir", type=Path, default=BUNDLED_DIR)
+    parser.add_argument("--check", action="store_true", help="Compare generated files without writing them.")
+    args = parser.parse_args()
+    try:
+        assets = build_outputs(args.reviewed)
+        outputs = {args.output_dir / name: data for name, data in assets.items()}
+        if args.output_dir.resolve() == BUNDLED_DIR:
+            digest = hashlib.sha256(assets["si.dict"]).hexdigest()
+            outputs[DIGEST_SOURCE] = (
+                "// Generated by gen_sinhala_dict.py.\n"
+                "package com.lakmal.keycraftsinhala.dict;\n\n"
+                "final class SinhalaDictionaryDigest\n"
+                "{\n"
+                f'  static final String SHA256 = "{digest}";\n'
+                "}\n"
+            ).encode("ascii")
+        if not args.check:
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+        for destination, data in outputs.items():
+            if args.check:
+                if not destination.is_file() or destination.read_bytes() != data:
+                    raise ValueError(f"{destination} is out of date. Run python3 gen_sinhala_dict.py.")
+            else:
+                destination.write_bytes(data)
+                print(f"Generated {destination} ({len(data)} bytes)")
+    except (OSError, ValueError) as error:
+        parser.exit(1, f"{error}\n")
 
 
 if __name__ == "__main__":

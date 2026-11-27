@@ -82,6 +82,21 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew test
+      - name: Report Sinhala Top-3 benchmark
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          reports = sorted(Path("build/test-results/testDebugUnitTest")
+                           .glob("TEST-*SinhalaTopThreeBenchmarkTest.xml"))
+          if not reports:
+              raise SystemExit("Sinhala Top-3 benchmark report is missing")
+          output = ET.parse(reports[0]).getroot().findtext("system-out", "")
+          for line in output.splitlines():
+              if line.startswith(("TOP3\t", "TOP3_DELTA\t")):
+                  print(line)
+          PY
 
       - name: Enable KVM access for the emulator
         run: |

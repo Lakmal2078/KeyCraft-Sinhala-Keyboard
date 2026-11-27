@@ -69,3 +69,5 @@ jobs:
         run: |
           python3 gen_sinhala_phonetic_layout.py
           git diff --exit-code -- srcs/layouts/sinhala_phonetic.xml
+      - name: Verify generated Sinhala dictionary and aliases
+        run: python3 gen_sinhala_dict.py --check

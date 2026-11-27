@@ -1,0 +1,101 @@
+mode	group	before	input	expected	after
+direct	everyday	අද අපි	ගෙද	ගෙදර	යමු.
+direct	everyday	ඇය උදේ	පාස	පාසල	බලා ගියා.
+direct	everyday	මට	වතු	වතුර	ටිකක් දෙන්න.
+direct	everyday	මම කඩෙන්	පා	පාන්	ගත්තා.
+direct	everyday	ඔයාගේ	පො	පොත	මේසය උඩ තියෙනවා.
+direct	everyday	අම්මා	කෑ	කෑම	හදනවා.
+direct	everyday	මට	පණි	පණිවිඩය	ලැබුණා.
+direct	everyday	අපි	දුරක	දුරකථනය	හදවමු.
+direct	everyday	අද	වැ	වැඩ	ගොඩක් තියෙනවා.
+direct	everyday	මම	සල්	සල්ලි	ගෙනාවා.
+direct	everyday	ඔයාට	පුළු	පුළුවන්ද	එන්න?
+direct	everyday	අද හවස	වහි	වහිනවා	වගේ.
+direct	everyday	මම මේක	පරි	පරිස්සමෙන්	තියාගන්නම්.
+direct	everyday	මේ	ප්‍රශ්	ප්‍රශ්නය	හෙට කතා කරමු.
+direct	everyday	මල්ලි	ක්‍රි	ක්‍රිකට්	ගහනවා.
+direct	everyday	අපේ	ගුරු	ගුරුවරිය	අද ආවා.
+direct	everyday	ඇය	පුස්ත	පුස්තකාලයට	ගියා.
+direct	everyday	මට	බී	බීම	එපා.
+direct	everyday	අද	වෙළ	වෙළඳපොළේ	සෙනඟ වැඩියි.
+direct	everyday	මම	කාර්	කාර්යාලයට	යනවා.
+direct	places_names	අපි	කොළ	කොළඹ	යනවා.
+direct	places_names	ඇය	මහනු	මහනුවර	නතර වුණා.
+direct	places_names	උදේ	ගා	ගාල්ල	බලා පිටත් වුණා.
+direct	places_names	මේ බස් එක	මාත	මාතර	යනවද?
+direct	places_names	අපි ඊයේ	අනුරා	අනුරාධපුරය	බලන්න ගියා.
+direct	places_names	මේ පාරෙන්	සූරිය	සූරියවැව	යන්න පුළුවන්ද?
+direct	places_names	ඔවුන්	දඹදෙ	දඹදෙණිය	බලන්න ගියා.
+direct	places_names	අපි	හම්බන්	හම්බන්තොට	හමුවෙමු.
+direct	places_names	මගේ යාළුවා	තිළි	තිළිණ	අද එනවා.
+direct	places_names	අපි	අමා	අමායා	එක්ක කතා කළා.
+direct	chat_apps	ෆොටෝ එක	වට්ස්	වට්ස්ඇප්	එකෙන් එවන්න.
+direct	chat_apps	ලිපිය	ඩවුන්	ඩවුන්ලෝඩ්	කරගන්න.
+direct	chat_apps	ෆයිල් එක	අප්ලෝ	අප්ලෝඩ්	කළා.
+direct	chat_apps	මම දැන්	ඔන්ල	ඔන්ලයින්	ඉන්නවා.
+direct	chat_apps	මට	ඊමේ	ඊමේල්	එක ආවා.
+direct	chat_apps	ඔයාට	ස්තු	ස්තුතියි	උදව් කළාට.
+direct	chat_apps	දැන් ඒක	හො	හොඳයි	වගේ.
+direct	chat_apps	මේ උත්තරය	නිව	නිවරදි	කියලා ලිව්වා.
+direct	chat_apps	එයා	යූටි	යූටියුබ්	එකේ වීඩියෝ එකක් බැලුවා.
+direct	chat_apps	මට ඒ	ලින්	ලින්ක්	එක එවන්න.
+singlish	everyday	මම අද	gedar	ගෙදර	ඉන්නවා.
+singlish	everyday	අපි හෙට	gamana	ගමන	යමු.
+singlish	everyday	මට	wathura	වතුර	ටිකක් ඕනේ.
+singlish	everyday	මම	kema	කෑම	කාගෙන එන්නම්.
+singlish	everyday	මේක	niwaradhi	නිවැරදි	දැයි බලන්න.
+singlish	everyday	ඇය	lassan	ලස්සන	මලක් ගත්තා.
+singlish	everyday	අපි	paasal	පාසල	ළඟ හමුවෙමු.
+singlish	everyday	මම	potha	පොත	කියවලා ඉවරයි.
+singlish	everyday	මම කැමතියි	sinhala	සිංහල	ඉගෙන ගන්න.
+singlish	everyday	අපේ	ammaa	අම්මා	ආවා.
+singlish	everyday	මගේ	thaaththaa	තාත්තා	අද ගෙදර.
+singlish	everyday	අපි	iskole	ඉස්කෝලේ	ළඟ ඉන්නවා.
+singlish	everyday	මට	parissam	පරිස්සමෙන්	ඉන්න කිව්වා.
+singlish	everyday	අද අපිට	wadak	වැඩක්	තියෙනවා.
+singlish	everyday	ඔයා	kohomad	කොහොමද	ඉන්නේ?
+singlish	everyday	අපි	udasanak	උදෑසනක්	එකට ගත කළා.
+singlish	everyday	ඔයාට සුබ	rathriyak	රාත්‍රියක්	වේවා.
+singlish	everyday	මට ඒක	puluwand	පුළුවන්ද	කරන්න?
+singlish	everyday	ඇයට	karunakarala	කරුණාකරලා	කියන්න.
+singlish	everyday	අපි ඒ ගැන	saakachchaawa	සාකච්ඡාව	පටන් ගමු.
+singlish	places_names	ඔවුන්	kolamba	කොළඹ	ගියා.
+singlish	places_names	අපි	mahanuwara	මහනුවර	හමුවෙමු.
+singlish	places_names	අද	gaalla	ගාල්ල	බලා යමු.
+singlish	places_names	මේ පාර	maathara	මාතර	යන එකද?
+singlish	places_names	අපි	suriyawaewa	සූරියවැව	ළඟ නතර වුණා.
+singlish	places_names	හෙට අපි	dambadeniya	දඹදෙණිය	යනවා.
+singlish	places_names	ඇය	monaraagala	මොනරාගල	වැඩ කරනවා.
+singlish	places_names	අද අපි	trincomalee	ත්‍රිකුණාමලය	ගැන කතා කළා.
+singlish	places_names	මගේ යාළුවා	kasun	කසුන්	මට කතා කළා.
+singlish	places_names	අපි	lahiru	ළහිරු	එක්ක පිටත් වුණා.
+singlish	chat_apps	ඔයාට	sthuthiyi	ස්තුතියි	උත්තර දුන්නාට.
+singlish	chat_apps	මට	watsapp	වට්ස්ඇප්	එකෙන් කියන්න.
+singlish	chat_apps	වීඩියෝ එක	download	ඩවුන්ලෝඩ්	කරලා බලන්න.
+singlish	chat_apps	ෆොටෝ එක	upload	අප්ලෝඩ්	කරන්න.
+singlish	chat_apps	ඔයා	online	ඔන්ලයින්	ඉන්නවද?
+singlish	chat_apps	එයා	email	ඊමේල්	එක යැව්වා.
+singlish	chat_apps	මේ	link	ලින්ක්	එක බලන්න.
+singlish	chat_apps	මට	aayuboovan	ආයුබෝවන්	කියලා ලිව්වා.
+singlish	chat_apps	ඒක	elakiri	එළකිරි	කියලා එයා කිව්වා.
+singlish	chat_apps	මට	hondai	හොඳයි	කියලා reply එකක් ආවා.
+next	everyday	සුබ		උදෑසනක්	වේවා!
+next	everyday	බොහොම		ස්තූතියි	උදව් කළාට.
+next	everyday	මම		යනවා	ගෙදර.
+next	everyday	අපි		යමු	වෙරළට.
+next	everyday	ගෙදර		යන්න	කලින් මට කියන්න.
+next	everyday	ඔයා		කොහෙද	ඉන්නේ?
+next	everyday	මට		පුළුවන්	මේක කරන්න.
+next	everyday	හෙට		උදේ	එන්න.
+next	everyday	කෑම		කන්න	එන්න.
+next	everyday	වතුර		බොන්න	අමතක කරන්න එපා.
+next	everyday	මේක		කරන්න	පුළුවන්ද?
+next	everyday	ඊයේ		වැස්සා	හොඳටම.
+next	everyday	අද හවස		හමුවෙමු	කඩේ ළඟ.
+next	everyday	මම දැන්		එනවා	ස්ටේෂන් එකට.
+next	everyday	හරි		හොඳයි	අපි ඒක කරමු.
+next	everyday	බස් එක		එනවා	දැන්.
+next	everyday	ඇය පොත		කියවනවා	කාමරේ.
+next	everyday	අපිට ගොඩක්		වැඩ	තියෙනවා.
+next	everyday	කොළඹ බලා		යන	දුම්රිය පමා වෙනවා.
+next	everyday	වැස්ස නිසා		පාසල	වහලා.

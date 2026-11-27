@@ -209,7 +209,7 @@ public final class KeyEventHandler
     }
     _autocap.selection_updated(oldSelStart, newSelStart);
     if (!has_sinhala_composition())
-      _typedword.selection_updated(oldSelStart, newSelStart, newSelEnd);
+      _typedword.selection_updated(newSelStart, newSelEnd);
   }
 
   public void selection_updated(int oldSelStart, int newSelStart, int newSelEnd)
@@ -460,21 +460,15 @@ public final class KeyEventHandler
       return;
     }
     int cursor = word.length() + _typedword.cursor_relative();
-    if (cursor >= 0 && cursor <= word.length() && !word.startsWith("//") && !word.startsWith(".."))
-    {
-      int left = cursor, right = cursor;
-      while (left > 0 && SinhalaText.wordPart(word.charAt(left-1))) left--;
-      while (right < word.length() && SinhalaText.wordPart(word.charAt(right))) right++;
-      if (right > left && word.charAt(left) >= 'අ' && word.charAt(left) <= 'ෆ')
-        word = word.substring(left, right);
-    }
-    _suggestions.currently_typed_word(word);
+    _suggestions.currently_typed_word(SinhalaText.suggestionPrefix(word, cursor));
   }
 
   public void dictionary_changed()
   {
-    // Refresh the suggestions immediately after dictionary changed.
-    _suggestions.currently_typed_word(_typedword.get());
+    if (has_sinhala_composition())
+      _suggestions.currently_typed_word(sinhala_suggestion_input());
+    else
+      currently_typed_word(_typedword.get());
   }
 
   /** Update [_mods] to be consistent with the [mods], sending key events if
@@ -558,7 +552,7 @@ public final class KeyEventHandler
     if (eventAction == KeyEvent.ACTION_UP)
     {
       _autocap.event_sent(eventCode, metaState);
-      _typedword.event_sent(eventCode, metaState);
+      _typedword.delayed_refresh();
     }
   }
 
@@ -1326,8 +1320,7 @@ public final class KeyEventHandler
       else
       {
         clear_sinhala_composing(conn);
-        _suggestions.clear();
-        _recv.set_suggestions(_suggestions);
+        _typedword.refresh_current_word();
       }
       _next_last_action = LastAction.OTHER;
       return;
@@ -1338,6 +1331,7 @@ public final class KeyEventHandler
     {
       replace_surrounding_text(last_replacement_word_len, 0, last_replaced_word + (replacementAddedSpace ? " " : ""));
       last_replaced_word = null;
+      _typedword.refresh_current_word();
       _next_last_action = LastAction.SUGGESTION_UNDO;
     }
     else
@@ -1346,18 +1340,15 @@ public final class KeyEventHandler
       {
         CharSequence before = conn.getTextBeforeCursor(8, 0);
         int count = before == null ? 0 : SinhalaText.backspaceLength(before);
-        int forward = 0;
-        if (count == 1 && before != null && SinhalaText.consonant(before.charAt(before.length()-1)))
+        if (count > 0)
         {
-          CharSequence after = conn.getTextAfterCursor(8, 0);
-          if (after != null)
-            while (forward < after.length() && (SinhalaText.mark(after.charAt(forward))
-                || after.charAt(forward) == 0x200D || after.charAt(forward) == 0x200C)) forward++;
-        }
-        if (count > 0 && conn.deleteSurroundingText(count, forward))
-        {
-          _typedword.remove_surrounding_text(count, forward);
-          return;
+          int forward = SinhalaText.backspaceFollowingLength(before, count,
+              conn.getTextAfterCursor(8, 0));
+          if (conn.deleteSurroundingText(count, forward))
+          {
+            _typedword.backspace_deleted(count);
+            return;
+          }
         }
       }
       send_key_down_up(KeyEvent.KEYCODE_DEL);

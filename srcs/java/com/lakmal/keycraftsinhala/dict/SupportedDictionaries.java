@@ -16,7 +16,7 @@ public class SupportedDictionaries
   {
     Map<String, String> hashes = new HashMap<>();
     hashes.put("en_US", "1e41164c29ca4fa1e338d7f0feab8bf64d3a6893c4ae510cede1b14ae9025b6d");
-    hashes.put("si", "1e1bef532de5cfc34c0b492b938159fb17bac97a58f92a8aae3ac80bb856a59a");
+    hashes.put("si", SinhalaDictionaryDigest.SHA256);
     PINNED_SHA256 = Collections.unmodifiableMap(hashes);
   }
 

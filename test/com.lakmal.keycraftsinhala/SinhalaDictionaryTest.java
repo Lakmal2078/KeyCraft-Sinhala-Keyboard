@@ -47,6 +47,37 @@ public class SinhalaDictionaryTest
   }
 
   @Test
+  public void approvedVocabularyRoundTripsAndAppearsInPrefixSuggestions() throws Exception
+  {
+    Cdict dict = Cdict.of_bytes(Files.readAllBytes(Paths.get("assets/dict/si.dict")))[0];
+    Config config = new Config();
+    config.current_dictionary = dict;
+    config.current_dictionary_name = "si";
+    config.suggestions_enabled = true;
+    config.editor_config.should_show_candidates_view = true;
+    com.lakmal.keycraftsinhala.suggestions.Suggestions suggestions =
+        new com.lakmal.keycraftsinhala.suggestions.Suggestions(ignored -> {}, config);
+    suggestions.started();
+    java.util.List<String> rows = Files.readAllLines(Paths.get("srcs/dictionaries/si_reviewed.tsv"));
+    for (String row : rows.subList(1, rows.size()))
+    {
+      if (row.isEmpty()) continue;
+      String[] fields = row.split("\\t", -1);
+      if (!"APPROVED".equals(fields[6])) continue;
+      String word = java.text.Normalizer.normalize(fields[0], java.text.Normalizer.Form.NFC);
+      Cdict.Result exact = dict.find(word);
+      assertTrue("Missing reviewed entry " + word, exact.found);
+      assertEquals(word, dict.word(exact.index));
+
+      // A single-letter entry has no non-empty shorter prefix.
+      String prefix = word.length() == 1 ? word : word.substring(0, word.length() - 1);
+      suggestions.currently_typed_word(prefix);
+      assertTrue("Missing reviewed completion " + prefix + " -> " + word,
+          java.util.Arrays.asList(suggestions.suggestions).contains(word));
+    }
+  }
+
+  @Test
   public void sinhalaDictionaryPrefixAndSuffixSearch() throws Exception
   {
     byte[] data = Files.readAllBytes(Paths.get("assets/dict/si.dict"));

@@ -1,0 +1,19 @@
+proposal	group	word	proposed_singlish_aliases	benchmark_rows	source	license	review	status
+word	everyday	වහිනවා		12				PENDING
+word	everyday	පුස්තකාලයට		17				PENDING
+word	everyday	වෙළඳපොළේ		19				PENDING
+word	everyday	කාර්යාලයට		20				PENDING
+word	places_names	සූරියවැව	suriyawaewa	26,65				PENDING
+word	places_names	දඹදෙණිය	dambadeniya	27,66				PENDING
+word	places_names	අමායා		30				PENDING
+word	chat_apps	වට්ස්ඇප්	watsapp	31,72				PENDING
+word	chat_apps	ඩවුන්ලෝඩ්	download	32,73				PENDING
+word	chat_apps	අප්ලෝඩ්	upload	33,74				PENDING
+word	chat_apps	ස්තුතියි		36				PENDING
+word	chat_apps	නිවරදි		38				PENDING
+word	chat_apps	යූටියුබ්		39				PENDING
+alias	everyday	නිවැරදි	niwaradhi	45				PENDING
+alias	everyday	සාකච්ඡාව	saakachchaawa	60				PENDING
+alias	chat_apps	ඊමේල්	email	76				PENDING
+word	everyday	වැස්සා		92				PENDING
+word	everyday	හමුවෙමු		93				PENDING

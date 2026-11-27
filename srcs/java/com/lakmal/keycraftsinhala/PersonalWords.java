@@ -2,6 +2,7 @@ package com.lakmal.keycraftsinhala;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,9 @@ public final class PersonalWords
   private static PersonalWords instance;
   private final SharedPreferences prefs;
   private final Map<String, Integer> words = new HashMap<>();
+  // Recency is scoped to this process. Persisted frequency remains the primary signal.
+  private final Map<String, Long> recentUse = new HashMap<>();
+  private long useSequence;
   private static final int LIMIT = 256;
 
   static synchronized PersonalWords open(Context context)
@@ -59,6 +63,7 @@ public final class PersonalWords
     }
     int next = count == null ? 1 : Math.min(1000000, count + 1);
     words.put(word, next);
+    recentUse.put(word, ++useSequence);
     if (prefs != null) prefs.edit().putInt(word, next).apply();
     return true;
   }
@@ -66,12 +71,14 @@ public final class PersonalWords
   synchronized void remove(String word)
   {
     words.remove(word);
+    recentUse.remove(word);
     if (prefs != null) prefs.edit().remove(word).apply();
   }
 
   synchronized void clear()
   {
     words.clear();
+    recentUse.clear();
     if (prefs != null) prefs.edit().clear().apply();
   }
 
@@ -79,15 +86,18 @@ public final class PersonalWords
 
   public synchronized List<String> matching(String prefix)
   {
+    String key = Normalizer.normalize(prefix, Normalizer.Form.NFC);
     List<String> result = new ArrayList<>();
     for (String word : words.keySet())
-      if (word.startsWith(prefix)) result.add(word);
-    java.util.Collections.sort(result, (a,b) -> {
-      if (a.equals(b)) return 0;
-      if (a.equals(prefix)) return -1;
-      if (b.equals(prefix)) return 1;
+      if (Normalizer.normalize(word, Normalizer.Form.NFC).startsWith(key)) result.add(word);
+    result.sort((a, b) -> {
+      boolean exactA = Normalizer.normalize(a, Normalizer.Form.NFC).equals(key);
+      boolean exactB = Normalizer.normalize(b, Normalizer.Form.NFC).equals(key);
+      if (exactA != exactB) return exactA ? -1 : 1;
       int byCount = Integer.compare(words.get(b), words.get(a));
-      return byCount != 0 ? byCount : a.compareTo(b);
+      if (byCount != 0) return byCount;
+      int byRecency = Long.compare(recentUse.getOrDefault(b, 0L), recentUse.getOrDefault(a, 0L));
+      return byRecency != 0 ? byRecency : a.compareTo(b);
     });
     return result;
   }
