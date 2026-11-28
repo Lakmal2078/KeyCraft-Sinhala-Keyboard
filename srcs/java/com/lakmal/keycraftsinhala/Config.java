@@ -87,7 +87,7 @@ public class Config
   public int clipboard_history_duration;
   public boolean space_bar_auto_complete;
   public boolean sinhala_transliteration;
-  public boolean literal_singlish = true;
+  public boolean literal_singlish = false;
   public boolean double_space_period;
   public boolean physical_keyboard_hide;
   public Typeface custom_font = null;
@@ -247,7 +247,7 @@ public class Config
     clipboard_history_enabled = _prefs.getBoolean("clipboard_history_enabled", false);
     clipboard_history_duration = parseIntPref(_prefs, "clipboard_history_duration", 5);
     space_bar_auto_complete = _prefs.getBoolean("space_bar_auto_complete", false);
-    literal_singlish = _prefs.getBoolean("literal_singlish", true);
+    literal_singlish = _prefs.getBoolean("literal_singlish", false);
     double_space_period = _prefs.getBoolean("double_space_period", false);
     sinhala_transliteration = _prefs.getBoolean("sinhala_transliteration", true);
     physical_keyboard_hide = _prefs.getString("physical_keyboard_behavior", "hide").equals("hide");
